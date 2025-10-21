@@ -2,6 +2,8 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { resolve } from "path"
 import tailwindcss from "@tailwindcss/vite"
+import { crx } from '@crxjs/vite-plugin'
+import manifest from './manifest.json'
 
 export default defineConfig({
   plugins: [
@@ -10,6 +12,7 @@ export default defineConfig({
         plugins: [['babel-plugin-react-compiler']],
       },
     }),
+    crx({ manifest }),
     tailwindcss(),
   ],
   resolve: {
@@ -18,24 +21,14 @@ export default defineConfig({
     },
   },
   build: {
-    rollupOptions: {
-      input: {
-        popup: resolve(__dirname, 'src/pages/popup/index.html'),
-        background: resolve(__dirname, 'src/pages/background/index.ts'),
-        content: resolve(__dirname, 'src/pages/content/index.ts'),
-      },
-      output: {
-        entryFileNames: '[name]/index.js',
-        chunkFileNames: 'chunks/[name].js',
-         assetFileNames: (assetInfo) => {
-          if (assetInfo.name?.endsWith('.css')) {
-            return 'assets/[name][extname]';
-          }
-          return 'assets/[name][extname]';
-        },
-      },
-    },
     outDir: 'dist',
     emptyOutDir: true
+  },
+  server: {
+    strictPort: true,
+    port: 5173,
+    hmr: {
+      port: 5173,
+    },
   },
 })

@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Summer",
+  "version": "0.0.1",
+  "description": "Learn English effortlessly with Summer, your AI-powered language learning companion.",
+  "icons": {
+    "16": "public/icons/icon16.png",
+    "48": "public/icons/icon48.png",
+    "128": "public/icons/icon128.png"
+  },
+
+  "action": {
+    "default_popup": "src/pages/popup/index.html"
+  },
+  "background": {
+    "service_worker": "src/pages/background/index.ts",
+    "type": "module"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/pages/content/index.ts"]
+    }
+  ],
+
+  "permissions": ["storage", "activeTab"]
+}
