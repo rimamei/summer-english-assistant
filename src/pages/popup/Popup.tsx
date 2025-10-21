@@ -18,7 +18,7 @@ function Popup() {
                 Summer
               </h1>
               <p className="text-sm text-gray-600 dark:text-gray-300 font-medium transition-colors duration-500">
-                Master English with AI-powered insights
+                Learn English Effortlessly
               </p>
             </div>
           </div>
