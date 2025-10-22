@@ -3,20 +3,16 @@ import { classes } from './style';
 import { Camera, GripVertical, Highlighter, Power } from 'lucide-react';
 import { Tooltip } from '../Tooltip';
 import { useDraggable } from '../../hooks/useDraggable';
+import { useExtensionMode } from '../../hooks/useExtensionMode';
 
-export function ContentModal() {
-  const [isVisible, setIsVisible] = useState(true);
+const ModeModal = () => {
   const [hoveredButtonIndex, setHoveredButtonIndex] = useState<number | null>(
     null
   );
 
   const { position, isDragging, handleMouseDown } = useDraggable();
-  
-  const handleClose = () => {
-    setIsVisible(false);
-  };
-
-  if (!isVisible) return null;
+  const { enableHighlightMode, enableScreenshotMode, mode, closeModeModal } =
+    useExtensionMode();
 
   // Function to get button style with simple grey hover effect
   const getButtonStyle = (index: number) => {
@@ -30,11 +26,7 @@ export function ContentModal() {
             padding: '8px',
             borderRadius: '8px',
           }
-        : {
-            backgroundColor: 'transparent',
-            padding: '8px',
-            borderRadius: '8px',
-          }),
+        : {}),
     };
   };
 
@@ -42,32 +34,37 @@ export function ContentModal() {
     {
       icon: <Highlighter size={18} />,
       action: () => {
-        console.log('Highlight action');
+        enableHighlightMode();
       },
-      title: 'Highlight Text',
+      title: 'Enable Text Translation',
+      key: 'highlight',
     },
     {
       icon: <Camera size={18} />,
       action: () => {
-        console.log('Capture action');
+        enableScreenshotMode();
       },
       title: 'Capture Screenshot',
+      key: 'screenshot',
     },
     {
       icon: <Power size={18} />,
       action: () => {
-        handleClose();
+        closeModeModal();
       },
-      title: 'Close Extension',
+      title: 'Hide Mode Selector',
+      key: 'close',
     },
   ];
 
   return (
-    <div style={{
-      ...classes.summerContainer,
-      transform: `translate(${position.x}px, ${position.y}px)`,
-      cursor: isDragging ? 'grabbing' : 'default',
-    }}>
+    <div
+      style={{
+        ...classes.modalContainer,
+        transform: `translate(${position.x}px, ${position.y}px)`,
+        cursor: isDragging ? 'grabbing' : 'default',
+      }}
+    >
       <div
         style={{
           color: '#9ca3af',
@@ -85,7 +82,13 @@ export function ContentModal() {
         {options.map((option, index) => (
           <button
             key={index}
-            style={{ ...getButtonStyle(index), position: 'relative' }}
+            style={{
+              position: 'relative',
+              ...getButtonStyle(index),
+              ...(option.key === mode && {
+                backgroundColor: '#f3f4f6',
+              }),
+            }}
             onClick={option.action}
             onMouseEnter={() => {
               setHoveredButtonIndex(index);
@@ -100,4 +103,6 @@ export function ContentModal() {
       </div>
     </div>
   );
-}
+};
+
+export default ModeModal;

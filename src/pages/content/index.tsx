@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import Main from './main';
 
-// Create our own container since we're injecting into an existing page
+// Create container for injecting script into an existing page
 const createAppContainer = () => {
   // Remove any existing container first
   const existingContainer = document.getElementById('summer-extension-root');
@@ -29,7 +29,7 @@ const createAppContainer = () => {
   return container;
 };
 
-// Initialize the React app safely
+// Initialize the React app
 const initializeApp = () => {
   if (!document.body) {
     // Wait for body to be available
@@ -38,18 +38,18 @@ const initializeApp = () => {
   }
 
   try {
-    // 1. This is your host element, which lives on the main page
+    // host element, which lives on the main page
     const hostContainer = createAppContainer();
 
-    // 2. This is the new part: Create the Shadow DOM
+    // Create the Shadow DOM
     const shadowRoot = hostContainer.attachShadow({ mode: 'open' });
 
-    // 3. We need a new element *inside* the shadow DOM for React to attach to
+    // a new element *inside* the shadow DOM for React to attach to
     const reactRootContainer = document.createElement('div');
-    reactRootContainer.id = 'react-root';
+    reactRootContainer.id = 'summer-extension-react-root';
     shadowRoot.appendChild(reactRootContainer);
 
-    // 4. Create the React root on the element *inside* the shadow DOM
+    // Create the React root on the element *inside* the shadow DOM
     const root = ReactDOM.createRoot(reactRootContainer);
     
     root.render(

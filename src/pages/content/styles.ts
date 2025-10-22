@@ -12,9 +12,35 @@ export const keyframes = `
   }
 `;
 
+export const translationKeyframes = `
+  @keyframes summer-translation-appear {
+    from {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+`;
+
+const modaAppearKeyframes = `
+  @keyframes summer-modal-appear {
+    from {
+      opacity: 0;
+      transform: translateY(-10px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+`;
+
 // Function to inject keyframes
 export const injectStyles = (targetRoot: ShadowRoot | null) => {
-  if (!targetRoot) return; 
+  if (!targetRoot) return;
 
   const styleId = 'summer-extension-styles';
 
@@ -27,7 +53,7 @@ export const injectStyles = (targetRoot: ShadowRoot | null) => {
   // Create and inject new styles
   const style = document.createElement('style');
   style.id = styleId;
-  style.textContent = keyframes;
+  style.textContent = keyframes + translationKeyframes + modaAppearKeyframes;
 
   targetRoot.appendChild(style);
 };

@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react';
 
 // Inline styles for content script - ensures no conflicts with host page
 export const classes = {
-    summerContainer: {
+    modalContainer: {
         position: 'fixed',
         bottom: '80px',
         right: '20px',
