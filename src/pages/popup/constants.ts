@@ -25,3 +25,13 @@ export const selectorOptions = [
     { value: 'sentence', label: 'Sentence' },
     { value: 'paragraph', label: 'Paragraph' },
 ];
+
+export const extensionOptions = [
+    { value: 'word', label: 'Active' },
+    { value: 'sentence', label: 'Sentence' },
+];
+
+export const accentOptions = [
+    { value: 'american', label: 'American' },
+    { value: 'british', label: 'British' },
+];

@@ -9,9 +9,16 @@ import { validation } from './validation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type z from 'zod';
 import { getDefaultSelectorValue, getEnabledOptions } from '../utils';
-import { modeOptions, selectorOptions, sourceLangOptions, targetLangOptions } from '../constants';
+import {
+  accentOptions,
+  modeOptions,
+  selectorOptions,
+  sourceLangOptions,
+  targetLangOptions,
+} from '../constants';
 import RadioGroup from '@/components/base/RadioGroup';
 import { Label } from '@/components/ui/label';
+import Switch from '@/components/base/Switch';
 
 const SettingForm = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -24,6 +31,8 @@ const SettingForm = () => {
       target_lang: 'en',
       mode: 'pronunciation',
       selector: 'word',
+      accent: 'american',
+      enabled_extension: false,
     },
   });
 
@@ -49,6 +58,8 @@ const SettingForm = () => {
           'target_lang',
           'mode',
           'selector',
+          'accent',
+          'enabled_extension',
         ]);
 
         // Check if we have actual saved values (not just empty object)
@@ -57,7 +68,9 @@ const SettingForm = () => {
           (result.source_lang ||
             result.target_lang ||
             result.mode ||
-            result.selector);
+            result.selector ||
+            result.accent ||
+            result.enabled_extension);
 
         if (hasValidData) {
           // Create new data object with loaded values and defaults
@@ -66,6 +79,8 @@ const SettingForm = () => {
             target_lang: result.target_lang || 'en',
             mode: result.mode || 'pronunciation',
             selector: result.selector || 'word',
+            accent: result.accent || 'american',
+            enabled_extension: result.enabled_extension || false,
           };
 
           // Reset form with loaded data (this updates both values and default values)
@@ -101,7 +116,9 @@ const SettingForm = () => {
         source_lang: data.source_lang,
         target_lang: data.target_lang,
         mode: data.mode,
-        ...(data.selector && { selector: data.selector }), // Only save selector if it exists
+        accent: data.accent,
+        enabled_extension: data.enabled_extension,
+        ...(data.selector && { selector: data.selector }),
       });
 
       // Reset form dirty state after successful save
@@ -122,14 +139,10 @@ const SettingForm = () => {
 
   return (
     <div className="my-4 border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 transition-colors duration-500">
-      <h3 className="text-base text-gray-900 dark:text-gray-100 font-semibold mb-6 transition-colors duration-500">
+      <h3 className="text-base text-gray-900 dark:text-gray-100 font-semibold mb-4 transition-colors duration-500">
         Setting
       </h3>
-      <form
-        className="space-y-4"
-        id="form-rhf-demo"
-        onSubmit={form.handleSubmit(onSubmit)}
-      >
+      <form id="form-rhf-demo" onSubmit={form.handleSubmit(onSubmit)}>
         <FieldGroup>
           <ControlledField
             form={form}
@@ -187,7 +200,6 @@ const SettingForm = () => {
                     fieldState={fieldState}
                     options={targetLanguageOptions}
                     defaultValue="en"
-                    className="w-full"
                     onValueChange={(value) => {
                       form.setValue('target_lang', value, {
                         shouldDirty: true,
@@ -221,7 +233,38 @@ const SettingForm = () => {
               )}
             />
           )}
-          <div className="flex justify-end mt-4">
+
+          <ControlledField
+            form={form}
+            name="accent"
+            htmlId="accent"
+            label="Accent"
+            component={(field, fieldState) => (
+              <RadioGroup
+                field={field}
+                fieldState={fieldState}
+                options={accentOptions}
+                className="grid-cols-3"
+              />
+            )}
+          />
+
+          <ControlledField
+            form={form}
+            name="enabled_extension"
+            htmlId="enabled_extension"
+            label="Enabled Extension"
+            component={(field) => (
+              <Switch
+                name={field.name}
+                checked={field.value as boolean}
+                onCheckedChange={(checked) => {
+                  field.onChange(checked);
+                }}
+              />
+            )}
+          />
+          <div className="flex justify-end">
             <Button
               type="submit"
               disabled={
