@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import Main from './main';
+import { initializeOriginTrial } from './utils/originTrial';
 
 // Create container for injecting script into an existing page
 const createAppContainer = () => {
@@ -36,6 +37,9 @@ const initializeApp = () => {
     setTimeout(initializeApp, 10);
     return;
   }
+
+  // Initialize Chrome AI origin trial token first
+  initializeOriginTrial();
 
   try {
     // host element, which lives on the main page
