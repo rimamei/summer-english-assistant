@@ -38,7 +38,41 @@ const modaAppearKeyframes = `
   }
 `;
 
-// Function to inject keyframes
+// Google Fonts CSS import
+const googleFontsCSS = `
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+`;
+
+// Base font styles using the imported font
+const baseFontStyles = `
+  * {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+  }
+`;
+
+// Function to inject Google Fonts preconnect links
+export const injectFontPreconnects = () => {
+  // Check if preconnects already exist
+  if (document.querySelector('link[href="https://fonts.googleapis.com"]')) {
+    return;
+  }
+
+  // Create preconnect links
+  const preconnect1 = document.createElement('link');
+  preconnect1.rel = 'preconnect';
+  preconnect1.href = 'https://fonts.googleapis.com';
+
+  const preconnect2 = document.createElement('link');
+  preconnect2.rel = 'preconnect';
+  preconnect2.href = 'https://fonts.gstatic.com';
+  preconnect2.crossOrigin = 'anonymous';
+
+  // Inject into document head for better performance
+  document.head.appendChild(preconnect1);
+  document.head.appendChild(preconnect2);
+};
+
+// Function to inject keyframes and fonts
 export const injectStyles = (targetRoot: ShadowRoot | null) => {
   if (!targetRoot) return;
 
@@ -53,7 +87,12 @@ export const injectStyles = (targetRoot: ShadowRoot | null) => {
   // Create and inject new styles
   const style = document.createElement('style');
   style.id = styleId;
-  style.textContent = keyframes + translationKeyframes + modaAppearKeyframes;
+  style.textContent = 
+    googleFontsCSS + 
+    baseFontStyles + 
+    keyframes + 
+    translationKeyframes + 
+    modaAppearKeyframes;
 
   targetRoot.appendChild(style);
 };

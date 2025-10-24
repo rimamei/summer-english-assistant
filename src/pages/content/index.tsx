@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import Main from './main';
 import { initializeOriginTrial } from './utils/originTrial';
+import { injectFontPreconnects } from './styles';
 
 // Create container for injecting script into an existing page
 const createAppContainer = () => {
@@ -23,7 +24,7 @@ const createAppContainer = () => {
     height: 100vh !important;
     pointer-events: none !important;
     z-index: 2147483647 !important;
-    font-family: system-ui, -apple-system, sans-serif !important;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
   `;
   
   document.body.appendChild(container);
@@ -40,6 +41,9 @@ const initializeApp = () => {
 
   // Initialize Chrome AI origin trial token first
   initializeOriginTrial();
+
+  // Initialize Google Fonts preconnects for better performance
+  injectFontPreconnects();
 
   try {
     // host element, which lives on the main page
