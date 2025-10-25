@@ -28,7 +28,7 @@ const SettingForm = () => {
     resolver: zodResolver(validation),
     defaultValues: {
       source_lang: 'en',
-      target_lang: 'en',
+      target_lang: 'id',
       mode: 'pronunciation',
       selector: 'word',
       accent: 'american',
@@ -53,14 +53,11 @@ const SettingForm = () => {
           return;
         }
 
-        const result = await chrome.storage.local.get([
-          'source_lang',
-          'target_lang',
-          'mode',
-          'selector',
-          'accent',
-          'enabled_extension',
-        ]);
+        const getLocalStorageData = await chrome.storage.local.get(['settings']);
+
+        const result = getLocalStorageData.settings
+          ? JSON.parse(getLocalStorageData.settings)
+          : null;
 
         // Check if we have actual saved values (not just empty object)
         const hasValidData =
@@ -112,14 +109,16 @@ const SettingForm = () => {
       }
 
       // Save to Chrome local storage
-      await chrome.storage.local.set({
+      const storageData = {
         source_lang: data.source_lang,
         target_lang: data.target_lang,
         mode: data.mode,
         accent: data.accent,
         enabled_extension: data.enabled_extension,
         ...(data.selector && { selector: data.selector }),
-      });
+      };
+
+      await chrome.storage.local.set({ settings: JSON.stringify(storageData) });
 
       // Reset form dirty state after successful save
       form.reset(data);

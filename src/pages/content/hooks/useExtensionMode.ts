@@ -1,14 +1,16 @@
 import { useCallback } from 'react';
-import { useExtension } from './useExtension';
+import { useExtension } from './useContext';
 import { useNotifications } from './useNotifications';
 
 interface useExtensionModeProps {
-  mode: 'highlight' | 'screenshot';
+  mode: 'highlight' | 'screenshot' | 'disabled';
   isHighlightMode: boolean;
   isScreenshotMode: boolean;
+  showModeModal: boolean;
   enableHighlightMode: () => void;
   enableScreenshotMode: () => void;
   closeModeModal: () => void;
+  disableModes: () => void;
 }
 
 export function useExtensionMode(): useExtensionModeProps {
@@ -16,35 +18,42 @@ export function useExtensionMode(): useExtensionModeProps {
   const { showNotification } = useNotifications();
 
   const enableHighlightMode = useCallback(() => {
-    setState(prev => ({ 
-      ...prev, 
+    setState(prev => ({
+      ...prev,
       mode: 'highlight',
     }));
-    
+
     // Show notification
     showNotification('Highlight mode enabled! Select text to translate.', '#10b981');
   }, [setState, showNotification]);
 
   const enableScreenshotMode = useCallback(() => {
-    setState(prev => ({ 
-      ...prev, 
+    setState(prev => ({
+      ...prev,
       mode: 'screenshot',
     }));
-    
+
     // Show notification
     showNotification('Screenshot mode enabled! Click to capture area.', '#f59e0b');
   }, [setState, showNotification]);
 
   const closeModeModal = useCallback(() => {
-    setState(prev => ({ ...prev, showModeModal: false }));
+    setState(prev => ({ ...prev, showModeModal: false, mode: 'disabled' }));
+  }, [setState]);
+
+  const disableModes = useCallback(async () => {
+    setState(prev => ({ ...prev, mode: 'disabled' }));
+    await chrome.storage.local.set({ enabled_extension: false });
   }, [setState]);
 
   return {
     mode: state.mode,
+    showModeModal: state.showModeModal,
     isHighlightMode: state.mode === 'highlight',
     isScreenshotMode: state.mode === 'screenshot',
     closeModeModal,
     enableHighlightMode,
-    enableScreenshotMode
+    enableScreenshotMode,
+    disableModes,
   };
 }

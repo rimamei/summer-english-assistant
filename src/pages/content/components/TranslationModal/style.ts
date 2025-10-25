@@ -3,13 +3,13 @@ import type { CSSProperties } from "react";
 export const classes = {
     modalStyle: {
         position: 'fixed',
-        width: '380px',
-        maxWidth: '90vw',
-        backgroundColor: 'white',
-        borderRadius: '12px',
-        boxShadow:
-            '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+        backgroundColor: '#ffffff',
         border: '1px solid #e5e7eb',
+        borderRadius: '12px',
+        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+        padding: '4px',
+        minWidth: '300px',
+        maxWidth: '500px',
         zIndex: 2147483648,
         fontFamily: 'system-ui, -apple-system, sans-serif',
         overflow: 'hidden',
@@ -56,4 +56,21 @@ export const classes = {
         gap: '6px',
         transition: 'all 0.2s ease',
     } as CSSProperties,
+
+    smallText: {
+        fontSize: '11px',
+        color: ' #6b7280',
+        padding: '0 !important',
+        margin: '0 !important',
+        lineHeight: '1.2 !important'
+    } as CSSProperties,
+
+    contentText: {
+        fontSize: '12px',
+        color: '#374151',
+        lineHeight: '1.43 !important',
+        fontWeight: '600',
+        padding: '0 !important',
+        margin: '0 !important',
+    }
 }

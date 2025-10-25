@@ -1,12 +1,14 @@
+import type { ISelectionInfo } from '@/type/textSelection';
 import { createContext, useState } from 'react';
 import type { ReactNode } from 'react';
 
 interface ExtensionState {
-  mode: 'highlight' | 'screenshot';
+  mode: 'highlight' | 'screenshot' | 'disabled';
   showModeModal: boolean;
-  showTranslationModal: boolean;
   translationText: string;
   translationPosition: { x: number; y: number };
+  showTranslationModal: boolean;
+  selectionInfo: ISelectionInfo | null;
 }
 
 export interface ExtensionContextType {
@@ -20,6 +22,7 @@ const initialState: ExtensionState = {
   showTranslationModal: false,
   translationText: '',
   translationPosition: { x: 0, y: 0 },
+  selectionInfo: null,
 };
 
 // eslint-disable-next-line react-refresh/only-export-components

@@ -10,9 +10,18 @@ const ModeModal = () => {
     null
   );
 
-  const { position, isDragging, handleMouseDown } = useDraggable();
-  const { enableHighlightMode, enableScreenshotMode, mode, closeModeModal } =
-    useExtensionMode();
+  const { position, isDragging, handleMouseDown } = useDraggable({});
+  const {
+    enableHighlightMode,
+    enableScreenshotMode,
+    mode,
+    closeModeModal,
+    showModeModal,
+  } = useExtensionMode();
+
+  if (!showModeModal) {
+    return null;
+  }
 
   // Function to get button style with simple grey hover effect
   const getButtonStyle = (index: number) => {

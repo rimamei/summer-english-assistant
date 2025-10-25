@@ -14,7 +14,6 @@ export const classes = {
         padding: '12px 8px',
         minWidth: '100px',
         maxWidth: '400px',
-        fontFamily: "Inter, system-ui, -apple-system, sans-serif",
         fontSize: '14px',
         lineHeight: '1.5',
         color: '#1f2937',

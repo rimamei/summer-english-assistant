@@ -1,20 +1,24 @@
 import { useState, useCallback, useEffect } from 'react';
 
-interface Position {
+interface IPosition {
     x: number;
     y: number;
 }
 
+interface useDraggableProps {
+    initialPosition?: IPosition
+}
+
 interface UseDraggableReturn {
-    position: Position;
+    position: IPosition;
     isDragging: boolean;
     handleMouseDown: (e: React.MouseEvent) => void;
 }
 
-export function useDraggable(): UseDraggableReturn {
+export function useDraggable({ initialPosition = { x: 0, y: 0 } }: useDraggableProps): UseDraggableReturn {
     const [isDragging, setIsDragging] = useState(false);
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-    const [position, setPosition] = useState({ x: 0, y: 0 });
+    const [position, setPosition] = useState(initialPosition);
 
 
     const handleMouseDown = (e: React.MouseEvent) => {

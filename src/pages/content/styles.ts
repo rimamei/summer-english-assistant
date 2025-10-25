@@ -38,6 +38,34 @@ const modaAppearKeyframes = `
   }
 `;
 
+const loadingDotsKeyframes = `
+    @keyframes loadingDots {
+      0%, 80%, 100% {
+        opacity: 0;
+      }
+      40% {
+        opacity: 1;
+      }
+    }
+    
+    .loading-dots span {
+      display: inline-block;
+      animation: loadingDots 1.4s infinite;
+    }
+    
+    .loading-dots span:nth-child(1) {
+      animation-delay: 0s;
+    }
+    
+    .loading-dots span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    
+    .loading-dots span:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+  `;
+
 // Google Fonts CSS import
 const googleFontsCSS = `
   @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
@@ -87,12 +115,12 @@ export const injectStyles = (targetRoot: ShadowRoot | null) => {
   // Create and inject new styles
   const style = document.createElement('style');
   style.id = styleId;
-  style.textContent = 
-    googleFontsCSS + 
-    baseFontStyles + 
-    keyframes + 
-    translationKeyframes + 
-    modaAppearKeyframes;
+  style.textContent =
+    googleFontsCSS +
+    baseFontStyles +
+    keyframes +
+    translationKeyframes +
+    modaAppearKeyframes + loadingDotsKeyframes;
 
   targetRoot.appendChild(style);
 };

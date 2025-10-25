@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useExtension } from './useExtension';
+import { useExtension } from './useContext';
 
 interface UseTranslationModalReturn {
   showTranslationModal: boolean;
