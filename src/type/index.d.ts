@@ -21,7 +21,16 @@ interface Window {
     availability: () => Promise<{ available: string }>;
     create: (options?: LanguageModelCreateOptions) => Promise<LanguageModelSession>;
     params: () => Promise<LanguageModelParams>;
-  }
+  },
+  Summarizer: {
+    create: (options: {
+      type: string,
+      expectedInputLanguages: string[],
+      outputLanguage: string,
+      expectedContextLanguages: string[]
+    }) => Promise<SummarizerInstance>;
+    availability: () => Promise<'unavailable' | 'available'>;
+  };
 }
 
 interface LanguageModelParams {
@@ -47,10 +56,16 @@ interface LanguageModelCreateOptions {
 }
 
 interface LanguageModelSession {
-    prompt: (prompt: string, options?: {
-        responseConstraint?: any;
-    }) => Promise<string>;
-    destroy: () => void;
+  prompt: (prompt: string, options?: {
+    responseConstraint?: object;
+  }) => Promise<string>;
+  destroy: () => void;
+}
+
+interface SummarizerInstance {
+  summarize: (text: string, options?: {
+    context?: string;
+  }) => Promise<string>;
 }
 
 interface TranslatorInstance {

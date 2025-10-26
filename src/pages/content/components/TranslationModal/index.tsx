@@ -5,6 +5,7 @@ import { modeOptions } from '@/pages/popup/constants';
 import FullTranslation from './FullTranslation';
 import { useStorage } from '../../hooks/useStorage';
 import GrammarAnalyzer from './GrammarAnalyzer';
+import Summarization from './Summarization';
 
 interface TranslationModalProps {
   isVisible: boolean;
@@ -32,6 +33,7 @@ export function TranslationModal({
   const modeView = {
     translation: <FullTranslation />,
     grammar: <GrammarAnalyzer />,
+    summarizer: <Summarization />,
   };
 
   return (
