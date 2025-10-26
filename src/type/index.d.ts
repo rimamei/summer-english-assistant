@@ -19,7 +19,38 @@ interface Window {
   },
   LanguageModel: {
     availability: () => Promise<{ available: string }>;
+    create: (options?: LanguageModelCreateOptions) => Promise<LanguageModelSession>;
+    params: () => Promise<LanguageModelParams>;
   }
+}
+
+interface LanguageModelParams {
+  defaultTopK: number;
+  defaultTemperature: number;
+}
+
+interface LanguageModelCreateOptions {
+  expectedInputs?: Array<{
+    type: string;
+    languages?: string[];
+  }>;
+  expectedOutputs?: Array<{
+    type: string;
+    languages?: string[];
+  }>;
+  initialPrompts?: Array<{
+    role: string;
+    content: string;
+  }>;
+  temperature?: number;
+  topK?: number;
+}
+
+interface LanguageModelSession {
+    prompt: (prompt: string, options?: {
+        responseConstraint?: any;
+    }) => Promise<string>;
+    destroy: () => void;
 }
 
 interface TranslatorInstance {

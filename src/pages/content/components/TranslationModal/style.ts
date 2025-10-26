@@ -109,4 +109,10 @@ export const classes = {
         alignItems: 'center',
         justifyContent: 'center',
     } as CSSProperties,
+
+    grammarContainer: {
+        display: 'flex',
+        flexDirection: 'column',
+        padding: '6px 8px',
+    } as CSSProperties,
 }

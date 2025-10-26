@@ -75,8 +75,6 @@ export function useTextSelection(): UseTextSelectionReturn {
         return;
       }
 
-      console.log('Selected text:', selectionData.text);
-
       // Update selection info
       setState(prev => ({
         ...prev,

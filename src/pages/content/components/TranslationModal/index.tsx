@@ -4,6 +4,7 @@ import { useDraggable } from '../../hooks/useDraggable';
 import { modeOptions } from '@/pages/popup/constants';
 import FullTranslation from './FullTranslation';
 import { useStorage } from '../../hooks/useStorage';
+import GrammarAnalyzer from './GrammarAnalyzer';
 
 interface TranslationModalProps {
   isVisible: boolean;
@@ -30,6 +31,7 @@ export function TranslationModal({
 
   const modeView = {
     translation: <FullTranslation />,
+    grammar: <GrammarAnalyzer />,
   };
 
   return (
