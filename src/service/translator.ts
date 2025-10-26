@@ -1,19 +1,21 @@
+import type { TTranslationCapabilitiesParams, TTranslationParams } from "@/type/translator";
+
 // Check language pair support
-export const translatorCapabilities = async (sourceLang: string, targetLang: string) => {
+export const translatorCapabilities = async ({ sourceLanguage, targetLanguage }: TTranslationCapabilitiesParams) => {
     const result = await window?.Translator.availability({
-        sourceLanguage: sourceLang,
-        targetLanguage: targetLang,
+        sourceLanguage: sourceLanguage,
+        targetLanguage: targetLanguage,
     })
 
     return result;
 };
 
 // Create and run the translator
-export const translation = async (sourceLang: string, targetLang: string, text: string) => {
+export const getTranslation = async ({ sourceLanguage, targetLanguage, text }: TTranslationParams) => {
     try {
         const translatorInstance = await window.Translator.create({
-            sourceLanguage: sourceLang,
-            targetLanguage: targetLang,
+            sourceLanguage: sourceLanguage,
+            targetLanguage: targetLanguage,
         })
 
         return await translatorInstance.translate(text);
@@ -23,11 +25,11 @@ export const translation = async (sourceLang: string, targetLang: string, text: 
     }
 };
 
-export const longTranslation = async (sourceLang: string, targetLang: string, text: string) => {
+export const longTranslation = async ({ sourceLanguage, targetLanguage, text }: TTranslationParams) => {
     try {
         const translatorInstance = await window.Translator.create({
-            sourceLanguage: sourceLang,
-            targetLanguage: targetLang,
+            sourceLanguage: sourceLanguage,
+            targetLanguage: targetLanguage,
         });
 
         const stream = translatorInstance.translateStreaming(text);

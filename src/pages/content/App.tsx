@@ -14,7 +14,6 @@ const App = ({ shadowRoot }: MainProps) => {
   const { selection, clearSelection } = useTextSelection();
   const {
     showTranslationModal,
-    translationText,
     translationPosition,
     openTranslationModal,
     closeTranslationModal,
@@ -27,7 +26,7 @@ const App = ({ shadowRoot }: MainProps) => {
 
   const handleTranslationClick = () => {
     if (selection) {
-      openTranslationModal(selection.text, selection.position);
+      openTranslationModal(selection.position);
     }
   };
 
@@ -58,7 +57,6 @@ const App = ({ shadowRoot }: MainProps) => {
         {/* Translation Modal */}
         <TranslationModal
           isVisible={showTranslationModal}
-          originalText={translationText}
           onClose={handleCloseTranslationModal}
           position={translationPosition}
         />

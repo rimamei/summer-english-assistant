@@ -1,0 +1,74 @@
+import { useCallback, useEffect, useState } from 'react';
+import { classes } from '../style';
+import LoadingDots from '../../LoadingDots';
+import { useStorage } from '@/pages/content/hooks/useStorage';
+import { useExtension } from '@/pages/content/hooks/useContext';
+import { getTranslation } from '@/service/translator';
+
+const FullTranslation = () => {
+  const [translationText, setTranslationText] = useState('');
+
+  const { sourceLanguage, targetLanguage } = useStorage();
+
+  const { state } = useExtension();
+  const isLoading = !translationText;
+
+  const selectedText = state.selectionInfo?.text || '';
+  const handleFullTranslation = useCallback(async () => {
+    const result = await getTranslation({
+      sourceLanguage,
+      targetLanguage,
+      text: selectedText,
+    });
+
+    setTranslationText(result);
+  }, [sourceLanguage, targetLanguage, selectedText]);
+
+  useEffect(() => {
+    if (selectedText) {
+      handleFullTranslation();
+    }
+  }, [handleFullTranslation, selectedText]);
+
+  return (
+    <div
+      style={{
+        padding: '8px',
+      }}
+    >
+      <div
+        style={{
+          marginBottom: '12px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '4px',
+        }}
+      >
+        <div style={classes.translationContainer}>
+          <span style={{ ...classes.smallText, fontWeight: 'bold' }}>
+            Translation:
+          </span>
+          <span
+            style={{
+              ...classes.contentText,
+              userSelect: 'text',
+              cursor: 'text',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {isLoading ? (
+              <span style={{ color: '#6b7280' }}>
+                Loading
+                <LoadingDots />
+              </span>
+            ) : (
+              translationText || 'No translation available'
+            )}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default FullTranslation;

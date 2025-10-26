@@ -1,11 +1,9 @@
 import { useCallback } from 'react';
 import { useExtension } from './useContext';
-
 interface UseTranslationModalReturn {
   showTranslationModal: boolean;
-  translationText: string;
   translationPosition: { x: number; y: number };
-  openTranslationModal: (text: string, position: { x: number; y: number }) => void;
+  openTranslationModal: (position: { x: number; y: number }) => void;
   closeTranslationModal: () => void;
   resetTranslation: () => void;
 }
@@ -13,15 +11,14 @@ interface UseTranslationModalReturn {
 export function useTranslationModal(): UseTranslationModalReturn {
   const { state, setState } = useExtension();
 
-  const openTranslationModal = useCallback((text: string, position: { x: number; y: number }) => {
+  const openTranslationModal = useCallback(async (position: { x: number; y: number }) => {
     setState(prev => ({
       ...prev,
       showTranslationModal: true,
-      translationText: text,
       translationPosition: position,
       isHighlightMode: false,
     }));
-  }, [setState]);
+  }, []);
 
   const closeTranslationModal = useCallback(() => {
     setState(prev => ({
@@ -41,7 +38,6 @@ export function useTranslationModal(): UseTranslationModalReturn {
 
   return {
     showTranslationModal: state.showTranslationModal,
-    translationText: state.translationText,
     translationPosition: state.translationPosition,
     openTranslationModal,
     closeTranslationModal,

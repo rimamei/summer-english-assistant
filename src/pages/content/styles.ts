@@ -47,6 +47,10 @@ const loadingDotsKeyframes = `
         opacity: 1;
       }
     }
+
+    .loading-dots {
+      font-size: 16px;
+    }
     
     .loading-dots span {
       display: inline-block;

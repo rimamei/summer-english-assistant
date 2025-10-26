@@ -22,6 +22,7 @@ export function useDraggable({ initialPosition = { x: 0, y: 0 } }: useDraggableP
 
 
     const handleMouseDown = (e: React.MouseEvent) => {
+        e.stopPropagation();
         setIsDragging(true);
         setDragStart({
             x: e.clientX - position.x,

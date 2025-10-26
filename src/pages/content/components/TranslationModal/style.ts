@@ -8,8 +8,9 @@ export const classes = {
         borderRadius: '12px',
         boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
         padding: '4px',
-        minWidth: '300px',
-        maxWidth: '500px',
+        minWidth: '100px',
+        maxWidth: '400px',
+        minHeight: '100px',
         zIndex: 2147483648,
         fontFamily: 'system-ui, -apple-system, sans-serif',
         overflow: 'hidden',
@@ -72,5 +73,40 @@ export const classes = {
         fontWeight: '600',
         padding: '0 !important',
         margin: '0 !important',
-    }
+    },
+
+    translationContainer: {
+        backgroundColor: '#f3f4f6',
+        borderRadius: '4px',
+        display: 'flex',
+        flexDirection: 'column',
+        padding: '6px 8px',
+    } as CSSProperties,
+
+    modalHead: {
+        borderBottom: '1px solid #e5e7eb',
+        padding: '4px 6px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        userSelect: 'none',
+    } as CSSProperties,
+
+    modalHeadTitle: {
+        fontWeight: '600',
+        fontSize: '12px',
+        color: '#111827',
+        marginRight: '42px',
+    } as CSSProperties,
+
+    closeButton: {
+        background: 'none',
+        border: 'none',
+        cursor: 'pointer',
+        padding: '2px',
+        borderRadius: '4px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+    } as CSSProperties,
 }
