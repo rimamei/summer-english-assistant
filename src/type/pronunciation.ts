@@ -5,7 +5,10 @@ export type TPronunciationState = {
         uk: string;
         us: string;
     },
-    soundBySound: { symbol: string; exampleWord: string }[],
+    soundBySound: {
+        uk: { symbol: string; exampleWord: string }[];
+        us: { symbol: string; exampleWord: string }[];
+    },
     synonyms: string[];
     text: string;
     translation: string;

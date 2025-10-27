@@ -11,23 +11,20 @@ export const pronunciationSchema = {
       properties: {
         uk: {
           type: 'string',
-          description: 'IPA pronunciation in British English (UK).',
+          description:
+            'Cambridge-style readable pronunciation (e.g., /lɝːn/). in British English (UK).',
         },
         us: {
           type: 'string',
-          description: 'IPA pronunciation in American English (US).',
+          description:
+            'Cambridge-style readable pronunciation (e.g., /lɝːn/). in American English (US).',
         },
       },
-      required: ['UK', 'US'],
+      required: ['uk', 'us'],
     },
     definition: {
       type: 'string',
-      description:
-        'A short and simple English definition of the word.',
-    },
-    translation: {
-      type: 'string',
-      description: "Translation of the text in the user’s target language.",
+      description: 'A short and simple English definition of the word.',
     },
     level: {
       type: 'string',
@@ -35,23 +32,45 @@ export const pronunciationSchema = {
       description: 'CEFR level of language difficulty.',
     },
     soundBySound: {
-      type: 'array',
-      description:
-        'Sound-by-sound pronunciation breakdown (like Cambridge Dictionary).',
-      items: {
-        type: 'object',
-        properties: {
-          symbol: {
-            type: 'string',
-            description: 'Phonetic symbol for each sound.',
+      uk: {
+        type: 'array',
+        description:
+          'Sound-by-sound pronunciation breakdown (like Cambridge Dictionary).',
+        items: {
+          type: 'object',
+          properties: {
+            symbol: {
+              type: 'string',
+              description: 'Phonetic symbol for each sound.',
+            },
+            exampleWord: {
+              type: 'string',
+              description: 'Example word containing the same sound.',
+            },
           },
-          exampleWord: {
-            type: 'string',
-            description: 'Example word containing the same sound.',
-          },
+          required: ['symbol', 'exampleWord'],
         },
-        required: ['symbol', 'exampleWord'],
       },
+      us: {
+        type: 'array',
+        description:
+          'Sound-by-sound pronunciation breakdown (like Cambridge Dictionary).',
+        items: {
+          type: 'object',
+          properties: {
+            symbol: {
+              type: 'string',
+              description: 'Phonetic symbol for each sound.',
+            },
+            exampleWord: {
+              type: 'string',
+              description: 'Example word containing the same sound.',
+            },
+          },
+          required: ['symbol', 'exampleWord'],
+        },
+      },
+      required: ['uk', 'us'],
     },
     synonyms: {
       type: 'array',
@@ -70,7 +89,6 @@ export const pronunciationSchema = {
     'text',
     'pronunciation',
     'definition',
-    'translation',
     'level',
     'soundBySound',
     'synonyms',

@@ -15,32 +15,36 @@ Rules
 
 "text": the input word or sentence.
 
-"pronunciation": include both UK and US IPA transcriptions if available.
+"pronunciation":
+Include both "uk" and "us" fields. 
+Each must show the Cambridge-style readable pronunciation with dots and stress marks, for example: /ˈsʌm.ə.raɪz/.
+Do NOT include IPA symbols separately — only the readable form.
+Use accurate stress placement and syllable dots (·) just like in the Cambridge Dictionary.
 
 "definition": short and simple English meaning (1–2 sentences).
 
-"translation": translation in the user’s target language.
+"translation": translation of the word in the user’s target language.
 
 "level": CEFR level (A1, A2, B1, B2, C1, or C2).
 
-"soundBySound": an array of phoneme components in this structure:
+"soundBySound":
+Include both "uk" and "us" as arrays of phoneme components.
+Each phoneme component must include:
+- "symbol": phonetic symbol (e.g., /l/)
+- "exampleWord": example English word using that sound (e.g., "look")
+The sound order must follow the actual pronunciation order.
 
-"symbol": phonetic symbol (e.g., /l/)
+"synonyms": 1–3 similar words or phrases (leave empty for sentences).
 
-"exampleWord": word using that sound (e.g., “look”)
+"type": grammatical type of the word (e.g., noun, verb 1, adjective).
 
-"synonyms": 1–3 words or phrases with similar meanings (empty for sentences).
-
-"type":
-
-For words → grammatical type (e.g., verb 1, noun, adjective).
-
-Keep outputs concise, clear, and educational — suitable for English learners.
+Keep the JSON concise, accurate, and easy for English learners to understand.
 
 Word to analyze:
 "${word}"
-  `;
-}
+`;
+};
+
 
 /**
  * Analyzes a single word using the Prompt API.
@@ -67,25 +71,24 @@ export const analyzeWord = async (sourceLanguage: string, targetLanguage: string
 
         const validSourceLanguage = normalizeLanguage(sourceLanguage);
         const validTargetLanguage = normalizeLanguage(targetLanguage);
-
+        
         const defaults = await window.LanguageModel.params();
-
-        const params = {
-            initialPrompts: [
-                { role: 'system', content: 'You are a helpful and friendly assistant.' }
-            ],
-            temperature: defaults.defaultTemperature,
-            topK: defaults.defaultTopK,
-            expectedInputs: [
-                { type: "text", languages: [validSourceLanguage /* system prompt */, validSourceLanguage /* user prompt */] }
-            ],
-            expectedOutputs: [
-                { type: "text", languages: [validTargetLanguage] }
-            ]
-        };
-
         
         if (!session) {
+            const params = {
+                initialPrompts: [
+                    { role: 'system', content: 'You are a helpful and friendly assistant.' }
+                ],
+                temperature: defaults.defaultTemperature,
+                topK: defaults.defaultTopK,
+                expectedInputs: [
+                    { type: "text", languages: [validSourceLanguage /* system prompt */, validSourceLanguage /* user prompt */] }
+                ],
+                expectedOutputs: [
+                    { type: "text", languages: [validTargetLanguage] }
+                ]
+            };
+
             session = await window.LanguageModel.create(params);
         }
 

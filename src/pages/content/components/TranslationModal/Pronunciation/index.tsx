@@ -5,6 +5,7 @@ import { useStorage } from '@/pages/content/hooks/useStorage';
 import { useExtension } from '@/pages/content/hooks/useContext';
 import { analyzeWord } from '@/pages/content/prompt/pronunciation/pronunciationPrompt';
 import type { TPronunciationState } from '@/type/pronunciation';
+import { getTranslation } from '@/service/translator';
 
 const Pronunciation = () => {
   const [data, setData] = useState<TPronunciationState>({
@@ -14,7 +15,10 @@ const Pronunciation = () => {
       uk: '',
       us: '',
     },
-    soundBySound: [],
+    soundBySound: {
+      uk: [],
+      us: [],
+    },
     synonyms: [],
     text: '',
     translation: '',
@@ -27,7 +31,7 @@ const Pronunciation = () => {
     state: { selectedText },
   } = useExtension();
 
-  const isLoading = !data?.translation;
+  const isLoading = !data?.definition;
 
   useEffect(() => {
     if (selectedText) {
@@ -38,13 +42,22 @@ const Pronunciation = () => {
           selectedText
         );
 
-        setData(result);
+        const translation = await getTranslation({
+          sourceLanguage,
+          targetLanguage,
+          text: selectedText,
+        });
+
+        setData({ ...result, translation });
       };
 
       analyzeSentence();
     }
   }, [selectedText, sourceLanguage, targetLanguage]);
 
+  const accent = settingsData?.accent === 'british' ? 'uk' : 'us';
+
+  console.log(data);
   return (
     <div>
       <div
@@ -73,10 +86,8 @@ const Pronunciation = () => {
               <div>
                 <span style={{ ...classes.smallText, fontWeight: 'normal' }}>
                   <b>
-                    {data.pronunciation[
-                      settingsData?.accent === 'british' ? 'uk' : 'us'
-                    ] || 'N/A'}{' '}
-                    ({data.type || 'N/A'} / {data.level || 'N/A'})
+                    {data.pronunciation[accent] || 'N/A'} ({data.type || 'N/A'}{' '}
+                    / {data.level || 'N/A'})
                   </b>
                 </span>
                 <div
@@ -117,7 +128,7 @@ const Pronunciation = () => {
                     </span>
                   </div>
                 )}
-                {data.soundBySound.length > 0 && (
+                {data.soundBySound[accent].length > 0 && (
                   <div
                     style={{
                       display: 'flex',
@@ -141,7 +152,7 @@ const Pronunciation = () => {
                         margin: 0,
                       }}
                     >
-                      {data.soundBySound.map((item, index) => (
+                      {data.soundBySound[accent].map((item, index) => (
                         <li key={index}>
                           <span
                             style={{
