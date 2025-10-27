@@ -155,7 +155,10 @@ const SettingForm = () => {
                 name={field.name}
                 checked={field.value as boolean}
                 onCheckedChange={(checked) => {
-                  field.onChange(checked);
+                  form.setValue('enabled_extension', checked, {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  });
                 }}
               />
             )}
