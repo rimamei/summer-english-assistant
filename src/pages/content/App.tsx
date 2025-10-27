@@ -12,6 +12,8 @@ interface MainProps {
 
 const App = ({ shadowRoot }: MainProps) => {
   const { selection, clearSelection } = useTextSelection();
+
+  console.log(selection)
   const {
     showTranslationModal,
     translationPosition,
@@ -26,7 +28,7 @@ const App = ({ shadowRoot }: MainProps) => {
 
   const handleTranslationClick = () => {
     if (selection) {
-      openTranslationModal(selection.position);
+      openTranslationModal(selection.text, selection.position);
     }
   };
 
@@ -48,11 +50,13 @@ const App = ({ shadowRoot }: MainProps) => {
         <ModeModal />
 
         {/* Translation Icon - appears when text is selected */}
-        <TranslationIcon
-          position={selection?.position || { x: 0, y: 0 }}
-          onClick={handleTranslationClick}
-          isVisible={!!selection && !showTranslationModal}
-        />
+        {selection?.position && (
+          <TranslationIcon
+            position={selection?.position || { x: 0, y: 0 }}
+            onClick={handleTranslationClick}
+            isVisible={!!selection && !showTranslationModal}
+          />
+        )}
 
         {/* Translation Modal */}
         <TranslationModal

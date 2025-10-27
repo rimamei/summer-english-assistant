@@ -10,10 +10,13 @@ const FullTranslation = () => {
 
   const { sourceLanguage, targetLanguage } = useStorage();
 
-  const { state } = useExtension();
+  const {
+    state: { selectedText },
+  } = useExtension();
+
+
   const isLoading = !translationText;
 
-  const selectedText = state.selectionInfo?.text || '';
   const handleFullTranslation = useCallback(async () => {
     const result = await getTranslation({
       sourceLanguage,

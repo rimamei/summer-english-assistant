@@ -1,4 +1,3 @@
-import type { ISelectionInfo } from '@/type/textSelection';
 import { createContext, useState } from 'react';
 import type { ReactNode } from 'react';
 
@@ -8,7 +7,7 @@ interface ExtensionState {
   translationText: string;
   translationPosition: { x: number; y: number };
   showTranslationModal: boolean;
-  selectionInfo: ISelectionInfo | null;
+  selectedText: string;
 }
 
 export interface ExtensionContextType {
@@ -22,7 +21,7 @@ const initialState: ExtensionState = {
   showTranslationModal: false,
   translationText: '',
   translationPosition: { x: 0, y: 0 },
-  selectionInfo: null,
+  selectedText: '',
 };
 
 // eslint-disable-next-line react-refresh/only-export-components

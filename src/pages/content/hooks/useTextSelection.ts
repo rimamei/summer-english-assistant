@@ -1,121 +1,100 @@
-import { useEffect, useCallback, useRef } from 'react';
-import { useExtension } from './useContext';
-import type { ISelectionInfo } from '@/type/textSelection';
+import { useState, useEffect, useCallback } from 'react';
+
+interface SelectionInfo {
+  text: string;
+  position: { x: number; y: number };
+  range: Range | null;
+}
 
 interface UseTextSelectionReturn {
-  selection: ISelectionInfo | null;
+  selection: SelectionInfo | null;
   clearSelection: () => void;
 }
 
-const DEBOUNCE_DELAY = 50;
-const TOOLTIP_OFFSET = { x: 10, y: -5 };
-
 export function useTextSelection(): UseTextSelectionReturn {
-  const { state, setState } = useExtension();
-
-  const timeoutRef = useRef<number | null>(null);
-  const isProcessingRef = useRef(false);
-
-  // Helper functions
-  const clearState = useCallback(() => {
-    setState(prev => ({
-      ...prev,
-      selectionInfo: null
-    }));
-  }, [setState]);
-
-  const clearTimeout = useCallback(() => {
-    if (timeoutRef.current) {
-      window.clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-  }, []);
-
-  const getSelectionData = useCallback(() => {
-    const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) return null;
-
-    const text = selection.toString().trim();
-    if (!text) return null;
-
-    const range = selection.getRangeAt(0);
-
-    // Check if selection is within extension elements (modal, tooltips, etc.)
-    const container = range.commonAncestorContainer;
-    const element = container.nodeType === Node.TEXT_NODE
-      ? container.parentElement
-      : container as Element;
-
-    if (element && element.closest('[data-summer-extension]')) {
-      return null; // Don't process selections within extension elements
-    }
-
-    const rect = range.getBoundingClientRect();
-
-    return {
-      text,
-      position: {
-        x: rect.right + TOOLTIP_OFFSET.x,
-        y: rect.top + TOOLTIP_OFFSET.y,
-      },
-      range: range.cloneRange(),
-    };
-  }, []);
-
-  const processSelection = useCallback(async () => {
-    // Prevent concurrent executions
-    if (isProcessingRef.current) return;
-    isProcessingRef.current = true;
-
-    try {
-      const selectionData = getSelectionData();
-
-      if (!selectionData) {
-        clearState();
-        return;
-      }
-
-      // Update selection info
-      setState(prev => ({
-        ...prev,
-        selectionInfo: selectionData,
-      }));
-
-    } catch (error) {
-      console.error('Selection processing failed:', error);
-    } finally {
-      isProcessingRef.current = false;
-    }
-  }, [getSelectionData, clearState, setState]);
+  const [selection, setSelection] = useState<SelectionInfo | null>(null);
 
   const handleSelectionChange = useCallback(() => {
-    clearTimeout();
-    timeoutRef.current = window.setTimeout(processSelection, DEBOUNCE_DELAY);
-  }, [clearTimeout, processSelection]);
+    const sel = window.getSelection();
+    
+    if (!sel || sel.rangeCount === 0) {
+      setSelection(null);
+      return;
+    }
+
+    const selectedText = sel.toString().trim();
+    
+    // Only process if there's actual selected text (not just cursor position)
+    if (selectedText.length === 0) {
+      setSelection(null);
+      return;
+    }
+
+    // Get the range and calculate position
+    const range = sel.getRangeAt(0);
+    const rect = range.getBoundingClientRect();
+    
+    // Position the translation icon near the end of the selection
+    const position = {
+      x: rect.right + 10, // Slightly to the right of selection
+      y: rect.top - 5,    // Slightly above selection
+    };
+
+    console.log('Text selected:', selectedText, 'at position:', position);
+
+    setSelection({
+      text: selectedText,
+      position,
+      range: range.cloneRange(),
+    });
+  }, []);
 
   const clearSelection = useCallback(() => {
-    clearTimeout();
-    clearState();
-
-    // Clear browser selection
-    const selection = window.getSelection();
-    if (selection) {
-      selection.removeAllRanges();
+    setSelection(null);
+    // Also clear the browser selection
+    const sel = window.getSelection();
+    if (sel) {
+      sel.removeAllRanges();
     }
-  }, [clearTimeout, clearState]);
+  }, []);
 
-  // Event listeners
   useEffect(() => {
+    // Listen for selection changes
     document.addEventListener('selectionchange', handleSelectionChange);
+    
+    // Also listen for mouse up to catch selection end
+    document.addEventListener('mouseup', handleSelectionChange);
 
     return () => {
       document.removeEventListener('selectionchange', handleSelectionChange);
-      clearTimeout();
+      document.removeEventListener('mouseup', handleSelectionChange);
     };
-  }, [handleSelectionChange, clearTimeout]);
+  }, [handleSelectionChange]);
+
+  // Clear selection when clicking elsewhere
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      // If clicking on our extension elements, don't clear selection
+      const target = e.target as Element;
+      if (target.closest('[data-summer-extension]')) {
+        return;
+      }
+      
+      // Small delay to allow for proper selection handling
+      setTimeout(() => {
+        const sel = window.getSelection();
+        if (!sel || sel.toString().trim().length === 0) {
+          setSelection(null);
+        }
+      }, 10);
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
 
   return {
-    selection: state.selectionInfo,
+    selection,
     clearSelection,
   };
 }

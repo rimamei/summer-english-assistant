@@ -6,6 +6,7 @@ import FullTranslation from './FullTranslation';
 import { useStorage } from '../../hooks/useStorage';
 import GrammarAnalyzer from './GrammarAnalyzer';
 import Summarization from './Summarization';
+import Pronunciation from './Pronunciation';
 
 interface TranslationModalProps {
   isVisible: boolean;
@@ -34,6 +35,7 @@ export function TranslationModal({
     translation: <FullTranslation />,
     grammar: <GrammarAnalyzer />,
     summarizer: <Summarization />,
+    pronunciation: <Pronunciation />
   };
 
   return (

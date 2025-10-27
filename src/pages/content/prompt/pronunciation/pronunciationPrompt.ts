@@ -1,69 +1,70 @@
-import { grammarSchema } from "./grammarSchema";
+import { pronunciationSchema } from "./pronunciationSchema";
 
 /**
- * Creates a prompt for the AI to analyze a single sentence.
- * @param {string} sentence - The sentence to analyze.
+ * Creates a prompt for the AI to analyze a single word.
+ * @param {string} word - The word to analyze.
  * @returns {string} The formatted prompt.
  */
-export const createGrammarPrompt = (sentence: string): string => {
+export const createPronunciationPrompt = (word: string): string => {
     return `
-Analyze the given sentence and explain the grammar it uses.
-Output only valid JSON with: "isCorrect", "correctedSentence", "explanation", and "errors".
+Analyze the given English word and provide pronunciation, meaning, and grammar details.
+Output only valid JSON with the following fields:
+"text", "pronunciation", "definition", "translation", "level", "soundBySound", "synonyms", and "type".
 
-Rules:
+Rules
 
-Do not just say it is correct or incorrect.
+"text": the input word or sentence.
 
-Always explain the grammar concepts used (e.g., verb tense, structure, punctuation, conjunctions).
+"pronunciation": include both UK and US IPA transcriptions if available.
 
-Bold examples of grammar elements (e.g., runs, and, to meet).
+"definition": short and simple English meaning (1–2 sentences).
 
-If the sentence has no errors:
+"translation": translation in the user’s target language.
 
-"isCorrect": true
+"level": CEFR level (A1, A2, B1, B2, C1, or C2).
 
-"correctedSentence" = original sentence
+"soundBySound": an array of phoneme components in this structure:
 
-"explanation" = 1–2 short sentences explaining what grammar rules are used and how (e.g., “The sentence uses the simple present tense (Join, meet, ask) with parallel structure connected by conjunctions.”)
+"symbol": phonetic symbol (e.g., /l/)
 
-If the sentence has errors:
+"exampleWord": word using that sound (e.g., “look”)
 
-"isCorrect": false
+"synonyms": 1–3 words or phrases with similar meanings (empty for sentences).
 
-"correctedSentence" = corrected version
+"type":
 
-"explanation" = short explanation of the grammar rules and how they should be applied
+For words → grammatical type (e.g., verb 1, noun, adjective).
 
-Keep the "explanation" simple, educational, and friendly for learners.
+Keep outputs concise, clear, and educational — suitable for English learners.
 
-Sentence to analyze:
-"${sentence}"
+Word to analyze:
+"${word}"
   `;
 }
 
 /**
- * Analyzes a single sentence using the Prompt API.
+ * Analyzes a single word using the Prompt API.
  * @param {LanguageModelSession} session - The active AI session.
- * @param {string} sentence - The sentence to analyze.
+ * @param {string} word - The word to analyze.
  * @returns {Promise<object>} A promise that resolves to the parsed JSON analysis.
  */
 
 let session: LanguageModelSession | null;
 
-export const analyzeSentence = async (sourceLanguage: string, targetLanguage: string, sentence: string) => {
+export const analyzeWord = async (sourceLanguage: string, targetLanguage: string, word: string) => {
     try {
-        const prompt = createGrammarPrompt(sentence);
+        const prompt = createPronunciationPrompt(word);
 
         // Supported languages for AI prompt
         const supportedLanguages = ['en', 'ja', 'es'];
-        
+
         // Validate and normalize language codes
         const normalizeLanguage = (lang: string): string => {
             if (!lang || !lang.trim()) return 'en';
             const cleanLang = lang.trim().toLowerCase();
             return supportedLanguages.includes(cleanLang) ? cleanLang : 'en';
         };
-        
+
         const validSourceLanguage = normalizeLanguage(sourceLanguage);
         const validTargetLanguage = normalizeLanguage(targetLanguage);
 
@@ -83,13 +84,14 @@ export const analyzeSentence = async (sourceLanguage: string, targetLanguage: st
             ]
         };
 
+        
         if (!session) {
             session = await window.LanguageModel.create(params);
         }
 
         // Call the prompt() method with our schema
         const resultString = await session.prompt(prompt, {
-            responseConstraint: grammarSchema
+            responseConstraint: pronunciationSchema
         });
 
         // The result is a string, so we need to parse it
@@ -101,8 +103,8 @@ export const analyzeSentence = async (sourceLanguage: string, targetLanguage: st
         resetSession();
         return {
             isCorrect: false,
-            correctedSentence: sentence,
-            explanation: `Failed to analyze sentence: ${error instanceof Error ? error.message : 'Unknown error'}`
+            correctedSentence: word,
+            explanation: `Failed to define: ${error instanceof Error ? error.message : 'Unknown error'}`
         };
     }
 }

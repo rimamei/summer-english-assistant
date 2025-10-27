@@ -43,7 +43,7 @@ export const useStorage = () => {
       setError(err instanceof Error ? err.message : 'Failed to get settings');
       return null;
     }
-  }, []);
+  }, [chrome.storage.local]);
 
   const loadSettings = useCallback(async () => {
     setIsLoading(true);

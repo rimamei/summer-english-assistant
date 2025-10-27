@@ -6,7 +6,6 @@ import { useExtension } from '@/pages/content/hooks/useContext';
 import { analyzeSentence } from '@/pages/content/prompt/grammar/grammarPrompt';
 import { renderMarkdown } from '@/pages/content/utils/renderMarkdown';
 
-
 const GrammarAnalyzer = () => {
   const [explanation, setExplanation] = useState({
     isCorrect: true,
@@ -19,7 +18,8 @@ const GrammarAnalyzer = () => {
   const { state } = useExtension();
   const isLoading = !explanation.details;
 
-  const selectedText = state.selectionInfo?.text || '';
+  const { selectedText } = state;
+
   const handleAnalyzeSentence = useCallback(async () => {
     const result = await analyzeSentence(
       sourceLanguage,
@@ -67,7 +67,9 @@ const GrammarAnalyzer = () => {
             ) : (
               <span
                 dangerouslySetInnerHTML={{
-                  __html: renderMarkdown(explanation.details || 'No explanation available')
+                  __html: renderMarkdown(
+                    explanation.details || 'No explanation available'
+                  ),
                 }}
               />
             )}
