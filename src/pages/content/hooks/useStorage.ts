@@ -43,7 +43,7 @@ export const useStorage = () => {
       setError(err instanceof Error ? err.message : 'Failed to get settings');
       return null;
     }
-  }, [chrome.storage.local]);
+  }, []);
 
   const loadSettings = useCallback(async () => {
     setIsLoading(true);
@@ -63,6 +63,29 @@ export const useStorage = () => {
   useEffect(() => {
     loadSettings();
   }, [loadSettings]);
+
+  // Listen for storage changes from popup or other extension contexts
+  useEffect(() => {
+    if (!chrome?.storage?.onChanged) return;
+
+    const handleStorageChange = (changes: { [key: string]: chrome.storage.StorageChange }) => {
+      
+      if (changes.settings) {
+        try {
+          const newSettings = JSON.parse(changes.settings.newValue || '{}');
+          setSettingsData(newSettings);
+        } catch (err) {
+          console.error('Error parsing storage change:', err);
+        }
+      }
+    };
+
+    chrome.storage.onChanged.addListener(handleStorageChange);
+
+    return () => {
+      chrome.storage.onChanged.removeListener(handleStorageChange);
+    };
+  }, []);
 
   return {
     settingsData,
