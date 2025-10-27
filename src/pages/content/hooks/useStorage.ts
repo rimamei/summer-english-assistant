@@ -15,7 +15,7 @@ const defaultSettings: SettingsData = {
   mode: 'pronunciation',
   selector: 'word',
   accent: 'american',
-  enabled_extension: true, // Enable by default for testing
+  enabled_extension: false, 
 };
 
 export const useStorage = () => {

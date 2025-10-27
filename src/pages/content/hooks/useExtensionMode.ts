@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { useExtension } from './useContext';
 import { useNotifications } from './useNotifications';
+import { useStorage } from './useStorage';
 
 interface useExtensionModeProps {
   mode: 'highlight' | 'screenshot' | 'disabled';
@@ -16,6 +17,7 @@ interface useExtensionModeProps {
 export function useExtensionMode(): useExtensionModeProps {
   const { state, setState } = useExtension();
   const { showNotification } = useNotifications();
+  const { settingsData } = useStorage();
 
   const enableHighlightMode = useCallback(() => {
     setState(prev => ({
@@ -37,13 +39,16 @@ export function useExtensionMode(): useExtensionModeProps {
     showNotification('Screenshot mode enabled! Click to capture area.', '#f59e0b');
   }, [setState, showNotification]);
 
-  const closeModeModal = useCallback(() => {
+  const closeModeModal = useCallback(async () => {
     setState(prev => ({ ...prev, showModeModal: false, mode: 'disabled' }));
-  }, [setState]);
+
+    const newValue = { ...settingsData, enabled_extension: false }
+
+    await chrome.storage.local.set({ settings: JSON.stringify(newValue) });
+  }, [setState, settingsData]);
 
   const disableModes = useCallback(async () => {
     setState(prev => ({ ...prev, mode: 'disabled' }));
-    await chrome.storage.local.set({ enabled_extension: false });
   }, [setState]);
 
   return {

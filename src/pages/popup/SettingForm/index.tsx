@@ -53,7 +53,9 @@ const SettingForm = () => {
           return;
         }
 
-        const getLocalStorageData = await chrome.storage.local.get(['settings']);
+        const getLocalStorageData = await chrome.storage.local.get([
+          'settings',
+        ]);
 
         const result = getLocalStorageData.settings
           ? JSON.parse(getLocalStorageData.settings)
@@ -139,10 +141,25 @@ const SettingForm = () => {
   return (
     <div className="my-4 border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 transition-colors duration-500">
       <h3 className="text-base text-gray-900 dark:text-gray-100 font-semibold mb-4 transition-colors duration-500">
-        Setting
+        Configuration
       </h3>
       <form id="form-rhf-demo" onSubmit={form.handleSubmit(onSubmit)}>
         <FieldGroup>
+          <ControlledField
+            form={form}
+            name="enabled_extension"
+            htmlId="enabled_extension"
+            label="Enabled Extension"
+            component={(field) => (
+              <Switch
+                name={field.name}
+                checked={field.value as boolean}
+                onCheckedChange={(checked) => {
+                  field.onChange(checked);
+                }}
+              />
+            )}
+          />
           <ControlledField
             form={form}
             label="Mode"
@@ -244,22 +261,6 @@ const SettingForm = () => {
                 fieldState={fieldState}
                 options={accentOptions}
                 className="grid-cols-3"
-              />
-            )}
-          />
-
-          <ControlledField
-            form={form}
-            name="enabled_extension"
-            htmlId="enabled_extension"
-            label="Enabled Extension"
-            component={(field) => (
-              <Switch
-                name={field.name}
-                checked={field.value as boolean}
-                onCheckedChange={(checked) => {
-                  field.onChange(checked);
-                }}
               />
             )}
           />

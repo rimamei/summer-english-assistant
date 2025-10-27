@@ -1,10 +1,10 @@
 export const modeOptions = [
+    { value: 'grammar', label: 'Grammar Analyzer' },
     {
         value: 'pronunciation',
         label: 'Pronunciation & Definition',
     },
-    { value: 'grammar', label: 'Analyze Grammar' },
-    { value: 'summarizer', label: 'AI Summarizer' },
+    { value: 'summarizer', label: 'Summarizer' },
     { value: 'translation', label: 'Full Translation' },
 ]
 
