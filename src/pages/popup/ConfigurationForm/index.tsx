@@ -9,17 +9,20 @@ import { validation } from './validation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type z from 'zod';
 import { getDefaultSelectorValue, getEnabledOptions } from '../utils';
-import {
-  accentOptions,
-  modeOptions,
-  selectorOptions,
-  sourceLangOptions,
-  targetLangOptions,
-} from '../constants';
 import RadioGroup from '@/components/base/RadioGroup';
 import { Label } from '@/components/ui/label';
+import { useI18n } from '@/hooks/useI18n';
+import { useTranslatedOptions } from '@/hooks/useTranslatedOptions';
 
 const Configuration = () => {
+  const { t } = useI18n();
+  const {
+    modeOptions: translatedModeOptions,
+    targetLangOptions: translatedTargetLangOptions,
+    sourceLangOptions: translatedSourceLangOptions,
+    selectorOptions: translatedSelectorOptions,
+    accentOptions: translatedAccentOptions,
+  } = useTranslatedOptions();
   const [isLoading, setIsLoading] = useState(true);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
@@ -38,8 +41,8 @@ const Configuration = () => {
 
   const targetLanguageOptions =
     selectedMode === 'translation'
-      ? targetLangOptions.filter((option) => option.value !== 'en')
-      : targetLangOptions;
+      ? translatedTargetLangOptions.filter((option) => option.value !== 'en')
+      : translatedTargetLangOptions;
 
   // Load settings from Chrome storage on component mount
   useEffect(() => {
@@ -137,14 +140,14 @@ const Configuration = () => {
   return (
     <div className="my-4 border border-gray-200 dark:border-none dark:shadow-lg rounded-lg p-4 bg-card dark:bg-card transition-colors duration-500">
       <h3 className="text-base text-gray-900 dark:text-gray-100 font-semibold transition-colors duration-500 mb-6">
-        Configuration
+        {t('configuration')}
       </h3>
 
       <form id="form-rhf-demo" onSubmit={form.handleSubmit(onSubmit)}>
         <FieldGroup>
           <ControlledField
             form={form}
-            label="Mode"
+            label={t('mode')}
             name="mode"
             htmlId="mode"
             component={(field, fieldState) => (
@@ -152,7 +155,7 @@ const Configuration = () => {
                 field={field}
                 fieldState={fieldState}
                 className="w-full"
-                options={modeOptions}
+                options={translatedModeOptions}
                 defaultValue="pronunciation"
                 onValueChange={(value) => {
                   setSelectedMode(value as 'pronunciation' | 'grammar');
@@ -166,7 +169,7 @@ const Configuration = () => {
           />
 
           <div className="w-full">
-            <Label>Language</Label>
+            <Label>{t('language')}</Label>
             <div className="w-full grid grid-cols-12 place-content-center items-center mt-2">
               <ControlledField
                 form={form}
@@ -177,7 +180,7 @@ const Configuration = () => {
                   <Select
                     field={field}
                     fieldState={fieldState}
-                    options={sourceLangOptions}
+                    options={translatedSourceLangOptions}
                     defaultValue="en"
                     className="w-full"
                   />
@@ -216,12 +219,12 @@ const Configuration = () => {
               form={form}
               name="selector"
               htmlId="selector"
-              label="Selector"
+              label={t('selector')}
               component={(field, fieldState) => (
                 <RadioGroup
                   field={field}
                   fieldState={fieldState}
-                  options={selectorOptions.map((option) => ({
+                  options={translatedSelectorOptions.map((option) => ({
                     ...option,
                     disabled: !getEnabledOptions(selectedMode).includes(
                       option.value
@@ -237,12 +240,12 @@ const Configuration = () => {
             form={form}
             name="accent"
             htmlId="accent"
-            label="Accent"
+            label={t('accent')}
             component={(field, fieldState) => (
               <RadioGroup
                 field={field}
                 fieldState={fieldState}
-                options={accentOptions}
+                options={translatedAccentOptions}
                 className="grid-cols-3"
               />
             )}
@@ -258,10 +261,10 @@ const Configuration = () => {
               {saveSuccess ? (
                 <>
                   <CheckCircle className="w-4 h-4 mr-2" />
-                  Saved!
+                  {t('saved')}
                 </>
               ) : (
-                <>Save & Activate</>
+                <>{t('save_activate')}</>
               )}
             </Button>
           </div>

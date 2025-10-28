@@ -4,8 +4,10 @@ import LoadingDots from '../../LoadingDots';
 import { useStorage } from '@/pages/content/hooks/useStorage';
 import { useExtension } from '@/pages/content/hooks/useContext';
 import { getTranslation } from '@/service/translator';
+import { useI18n } from '@/hooks/useI18n';
 
 const FullTranslation = () => {
+  const { t } = useI18n();
   const [translationText, setTranslationText] = useState('');
 
   const { sourceLanguage, targetLanguage, isLightTheme } = useStorage();
@@ -56,7 +58,7 @@ const FullTranslation = () => {
             fontWeight: 'bold',
             color: isLightTheme ? '#6b7280' : '#9ca3af',
           }}>
-            Translation:
+            {t('translation_label')}
           </span>
           <span
             style={{
@@ -69,11 +71,11 @@ const FullTranslation = () => {
           >
             {isLoading ? (
               <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
-                Loading
+                {t('loading')}
                 <LoadingDots />
               </span>
             ) : (
-              translationText || 'No translation available'
+              translationText || t('no_translation_available')
             )}
           </span>
         </div>

@@ -8,12 +8,15 @@ import { useForm } from 'react-hook-form';
 import { validation } from './validation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type z from 'zod';
-import { languageExtensionOptions, themeOptions } from '../constants';
 import Switch from '@/components/base/Switch';
+import { useI18n } from '@/hooks/useI18n';
+import { useTranslatedOptions } from '@/hooks/useTranslatedOptions';
 
 type Theme = 'light' | 'dark';
 
 const PreferencesForm = () => {
+  const { t, changeLanguage } = useI18n();
+  const { themeOptions: translatedThemeOptions, languageExtensionOptions: translatedLanguageOptions } = useTranslatedOptions();
   const [isLoading, setIsLoading] = useState(true);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [extensionEnabled, setExtensionEnabled] = useState(false);
@@ -99,6 +102,10 @@ const PreferencesForm = () => {
         preferences: JSON.stringify(storageData),
       });
       applyTheme(data.theme as Theme);
+
+       // Immediately change the language for real-time UI updates
+                      changeLanguage(storageData.lang as 'en' | 'id' | 'es' | 'ja');
+                      
       // Reset form dirty state after successful save
       form.reset(data);
 
@@ -124,10 +131,10 @@ const PreferencesForm = () => {
     <>
       <div className="my-4 border border-gray-200 dark:border-none dark:shadow-lg rounded-lg p-4 bg-card dark:bg-card transition-colors duration-500">
         <h3 className="text-base text-gray-900 dark:text-gray-100 font-semibold mb-6 transition-colors duration-500">
-          Extension Status
+          {t('extension_status')}
         </h3>
         <Switch
-          label="Enabled"
+          label={t('enabled')}
           checked={extensionEnabled}
           onCheckedChange={(checked) => {
             handleSaveStatus(checked);
@@ -137,13 +144,13 @@ const PreferencesForm = () => {
       </div>
       <div className="my-4 border border-gray-200 dark:border-none dark:shadow-lg rounded-lg p-4 bg-card dark:bg-card transition-colors duration-500">
         <h3 className="text-base text-gray-900 dark:text-gray-100 font-semibold mb-6 transition-colors duration-500">
-          Preference
+          {t('preferences')}
         </h3>
         <form id="form-rhf-demo" onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>
             <ControlledField
               form={form}
-              label="Theme"
+              label={t('theme')}
               name="theme"
               htmlId="theme"
               component={(field, fieldState) => (
@@ -151,7 +158,7 @@ const PreferencesForm = () => {
                   field={field}
                   fieldState={fieldState}
                   className="w-full"
-                  options={themeOptions}
+                  options={translatedThemeOptions}
                   defaultValue="light"
                   onValueChange={(value) => {
                     form.setValue('theme', value, {
@@ -169,12 +176,12 @@ const PreferencesForm = () => {
                 name="lang"
                 htmlId="lang"
                 className="col-span-5"
-                label="Language"
+                label={t('language')}
                 component={(field, fieldState) => (
                   <Select
                     field={field}
                     fieldState={fieldState}
-                    options={languageExtensionOptions}
+                    options={translatedLanguageOptions}
                     defaultValue="en"
                     className="w-full"
                     onValueChange={(value) => {
@@ -201,10 +208,10 @@ const PreferencesForm = () => {
                 {saveSuccess ? (
                   <>
                     <CheckCircle className="w-4 h-4 mr-2" />
-                    Saved!
+                    {t('saved')}
                   </>
                 ) : (
-                  <>Apply</>
+                  <>{t('apply')}</>
                 )}
               </Button>
             </div>
