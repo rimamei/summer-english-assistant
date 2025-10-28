@@ -35,3 +35,14 @@ export const accentOptions = [
     { value: 'american', label: 'American' },
     { value: 'british', label: 'British' },
 ];
+
+export const themeOptions = [
+    { value: 'light', label: 'Light' },
+    { value: 'dark', label: 'Dark' },
+
+]
+
+export const languageExtensionOptions = [
+    { value: 'en', label: 'English' },
+    { value: 'in', label: 'Indonesian' },
+]

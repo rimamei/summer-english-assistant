@@ -2,7 +2,7 @@ import ControlledField from '@/components/base/ControlledField';
 import Select from '@/components/base/Select';
 import { Button } from '@/components/ui/button';
 import { FieldGroup } from '@/components/ui/field';
-import { ArrowRight, CheckCircle, SaveIcon } from 'lucide-react';
+import { ArrowRight, CheckCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { validation } from './validation';
@@ -18,9 +18,8 @@ import {
 } from '../constants';
 import RadioGroup from '@/components/base/RadioGroup';
 import { Label } from '@/components/ui/label';
-import Switch from '@/components/base/Switch';
 
-const SettingForm = () => {
+const Configuration = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
@@ -28,11 +27,10 @@ const SettingForm = () => {
     resolver: zodResolver(validation),
     defaultValues: {
       source_lang: 'en',
-      target_lang: 'id',
+      target_lang: 'in',
       mode: 'pronunciation',
       selector: 'word',
-      accent: 'american',
-      enabled_extension: false,
+      accent: 'american'
     },
   });
 
@@ -64,22 +62,21 @@ const SettingForm = () => {
         // Check if we have actual saved values (not just empty object)
         const hasValidData =
           result &&
-          (result.source_lang ||
-            result.target_lang ||
-            result.mode ||
-            result.selector ||
-            result.accent ||
-            result.enabled_extension);
+          (result?.source_lang ||
+            result?.target_lang ||
+            result?.mode ||
+            result?.selector ||
+            result?.accent);
 
         if (hasValidData) {
           // Create new data object with loaded values and defaults
           const loadedData = {
-            source_lang: result.source_lang || 'en',
-            target_lang: result.target_lang || 'en',
-            mode: result.mode || 'pronunciation',
-            selector: result.selector || 'word',
-            accent: result.accent || 'american',
-            enabled_extension: result.enabled_extension || false,
+            source_lang: result?.source_lang || 'en',
+            target_lang: result?.target_lang || 'in',
+            mode: result?.mode || 'pronunciation',
+            selector: result?.selector || 'word',
+            accent: result?.accent || 'american',
+            enabled_extension: result?.enabled_extension || false,
           };
 
           // Reset form with loaded data (this updates both values and default values)
@@ -116,7 +113,6 @@ const SettingForm = () => {
         target_lang: data.target_lang,
         mode: data.mode,
         accent: data.accent,
-        enabled_extension: data.enabled_extension,
         ...(data.selector && { selector: data.selector }),
       };
 
@@ -140,29 +136,12 @@ const SettingForm = () => {
 
   return (
     <div className="my-4 border border-gray-200 dark:border-none dark:shadow-lg rounded-lg p-4 bg-card dark:bg-card transition-colors duration-500">
-      <h3 className="text-base text-gray-900 dark:text-gray-100 font-semibold mb-4 transition-colors duration-500">
+      <h3 className="text-base text-gray-900 dark:text-gray-100 font-semibold transition-colors duration-500 mb-6">
         Configuration
       </h3>
+
       <form id="form-rhf-demo" onSubmit={form.handleSubmit(onSubmit)}>
         <FieldGroup>
-          <ControlledField
-            form={form}
-            name="enabled_extension"
-            htmlId="enabled_extension"
-            label="Enabled Extension"
-            component={(field) => (
-              <Switch
-                name={field.name}
-                checked={field.value as boolean}
-                onCheckedChange={(checked) => {
-                  form.setValue('enabled_extension', checked, {
-                    shouldDirty: true,
-                    shouldValidate: true,
-                  });
-                }}
-              />
-            )}
-          />
           <ControlledField
             form={form}
             label="Mode"
@@ -218,7 +197,8 @@ const SettingForm = () => {
                     field={field}
                     fieldState={fieldState}
                     options={targetLanguageOptions}
-                    defaultValue="en"
+                    defaultValue="in"
+                    className="w-full"
                     onValueChange={(value) => {
                       form.setValue('target_lang', value, {
                         shouldDirty: true,
@@ -281,10 +261,7 @@ const SettingForm = () => {
                   Saved!
                 </>
               ) : (
-                <>
-                  <SaveIcon className="w-4 h-4 mr-1" />
-                  Save
-                </>
+                <>Save & Activate</>
               )}
             </Button>
           </div>
@@ -294,4 +271,4 @@ const SettingForm = () => {
   );
 };
 
-export default SettingForm;
+export default Configuration;

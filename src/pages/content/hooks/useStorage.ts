@@ -6,7 +6,12 @@ export interface SettingsData {
   mode: string;
   selector: string;
   accent: string;
-  enabled_extension: boolean;
+}
+
+export interface IPreferences {
+  theme: 'light' | 'dark';
+  ext_status: boolean;
+  lang: string;
 }
 
 const defaultSettings: SettingsData = {
@@ -15,26 +20,35 @@ const defaultSettings: SettingsData = {
   mode: 'pronunciation',
   selector: 'word',
   accent: 'american',
-  enabled_extension: false,
+};
+
+const defaultPreferences: IPreferences = {
+  lang: 'en',
+  theme: 'light',
+  ext_status: false,
 };
 
 export const useStorage = () => {
-  const [isLightTheme, setIsLightTheme] = useState(true);
   const [settingsData, setSettingsData] = useState<SettingsData>(defaultSettings);
+  const [preferencesData, setPreferencesData] = useState<IPreferences>(defaultPreferences);
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const getThemeStorage = useCallback(async (): Promise<string | null> => {
+  const getPreferencesStorage = useCallback(async (): Promise<IPreferences | null> => {
     try {
       if (!chrome?.storage?.local) {
         console.warn('Chrome storage not available');
         return null;
       }
 
-      const storageData = await chrome.storage.local.get(['theme']);
+      const storageData = await chrome.storage.local.get(['preferences', 'ext_status']);
 
-      if (storageData.theme) {
-        return storageData.theme;
+      console.log('storageData', storageData)
+
+      if (storageData.preferences || storageData?.ext_status) {
+        const parsedPreferences = storageData.preferences ? JSON.parse(storageData.preferences) : {};
+        return { ...parsedPreferences, ext_status: storageData?.ext_status || false };
       }
 
       return null;
@@ -83,14 +97,14 @@ export const useStorage = () => {
 
   const loadTheme = useCallback(async () => {
     try {
-      const theme = await getThemeStorage();
-      if (theme) {
-        setIsLightTheme(theme === 'light');
+      const data = await getPreferencesStorage();
+      if (data) {
+        setPreferencesData(data);
       }
     } catch (err) {
       console.error('Error loading theme:', err);
     }
-  }, [getThemeStorage]);
+  }, [getPreferencesStorage]);
 
   // Load settings and theme on mount
   useEffect(() => {
@@ -119,9 +133,27 @@ export const useStorage = () => {
       if (changes.theme) {
         try {
           const newTheme = changes.theme.newValue || 'light';
-          setIsLightTheme(newTheme === 'light');
+          setPreferencesData((prev) => ({ ...prev, theme: newTheme }));
         } catch (err) {
           console.error('Error parsing storage change:', err);
+        }
+      }
+
+      if (changes.preferences) {
+        try {
+          const newPreferences = JSON.parse(changes.preferences.newValue || '{}');
+          setPreferencesData((prev) => ({ ...prev, ...newPreferences }));
+        } catch (err) {
+          console.error('Error parsing preferences change:', err);
+        }
+      }
+
+      if (changes.ext_status) {
+        try {
+          const newStatus = changes.ext_status.newValue || false;
+          setPreferencesData((prev) => ({ ...prev, ext_status: newStatus }));
+        } catch (err) {
+          console.error('Error parsing ext_status change:', err);
         }
       }
     };
@@ -141,6 +173,8 @@ export const useStorage = () => {
     sourceLanguage: settingsData.source_lang,
     targetLanguage: settingsData.target_lang,
     mode: settingsData.mode,
-    isLightTheme
+    enableExtension: preferencesData.ext_status,
+    isLightTheme: preferencesData.theme === 'light',
+    lang: preferencesData.lang,
   };
 };

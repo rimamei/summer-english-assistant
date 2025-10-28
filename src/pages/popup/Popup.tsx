@@ -1,22 +1,23 @@
-// import ToggleTheme from '@/components/base/ToggleTheme';
-import ToggleTheme from '@/components/base/ToggleTheme';
-import SettingForm from './SettingForm';
-import { HelpCircle, Mic, Settings2 } from 'lucide-react';
+import { HelpCircle, Home, Mic, Settings } from 'lucide-react';
 import { useState } from 'react';
+import Configuration from './ConfigurationForm';
+import PreferencesForm from './PreferencesForm';
 
 function Popup() {
-  const [menu, setMenu] = useState('configuration');
+  const [menu, setMenu] = useState('home');
 
   const menuOption = [
-    { name: 'configuration', label: 'Configuration', icon: Settings2 },
+    { name: 'home', label: 'Home', icon: Home },
     { name: 'mic', label: 'Mic & Audio Test', icon: Mic },
     { name: 'help', label: 'Help', icon: HelpCircle },
+    { name: 'settings', label: 'Settings', icon: Settings },
   ];
 
   const view = {
-    configuration: <SettingForm />,
+    home: <Configuration />,
     mic: <div>Mic & Audio Test - Coming Soon!</div>,
     help: <div>Help Section - Coming Soon!</div>,
+    settings: <PreferencesForm />,
   };
 
   return (
@@ -38,25 +39,13 @@ function Popup() {
               </p>
             </div>
           </div>
-
-          <ToggleTheme />
         </div>
 
         {view[menu as keyof typeof view]}
-
-        {/* <div className="flex justify-center">
-          <div className="shadow-md dark:shadow-lg dark:shadow-black/30 rounded-full mt-4 p-4 bg-white dark:bg-gray-800 border dark:border-gray-700 flex items-center justify-around min-w-[120px] transition-all duration-500">
-            <div className="bg-logo text-white rounded-md p-2 hover:scale-110 transition-transform duration-300">
-              <Settings />
-            </div>
-            <div className="bg-blue-500 dark:bg-blue-600 text-white rounded-md p-2 hover:scale-110 transition-transform duration-300">
-              <HelpCircleIcon />
-            </div>
-          </div>
-        </div> */}
       </div>
 
       <div className="w-16 relative flex items-center justify-center">
+        {/* <ToggleTheme /> */}
         <div className="min-h-[20vh] min-w-8 bg-white dark:bg-card rounded-4xl fixed right-3 shadow-lg flex flex-col items-center justify-center">
           {menuOption.map((option) => {
             const Icon = option.icon;

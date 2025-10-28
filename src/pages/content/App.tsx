@@ -12,7 +12,7 @@ interface MainProps {
 }
 
 const App = ({ shadowRoot }: MainProps) => {
-  const { settingsData } = useStorage();
+  const { enableExtension } = useStorage();
   const { selection, clearSelection } = useTextSelection();
 
   const {
@@ -38,7 +38,10 @@ const App = ({ shadowRoot }: MainProps) => {
     clearSelection();
   };
 
-  if (settingsData.enabled_extension) {
+
+  console.log('sta', enableExtension)
+
+  if (enableExtension) {
     return (
       <div
         style={{
