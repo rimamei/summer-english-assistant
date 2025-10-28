@@ -19,7 +19,7 @@ export function TranslationModal({
   onClose,
   position = { x: 0, y: 0 },
 }: TranslationModalProps) {
-  const { mode } = useStorage();
+  const { mode, isLightTheme } = useStorage();
 
   const {
     position: draggablePosition,
@@ -42,6 +42,8 @@ export function TranslationModal({
     <div
       style={{
         ...classes.modalStyle,
+        backgroundColor: isLightTheme ? '#ffffff' : '#1f2937',
+        borderColor: isLightTheme ? '#e5e7eb' : '#374151',
         left: `${Math.min(
           draggablePosition.x || position.x,
           window.innerWidth - 400
@@ -54,10 +56,14 @@ export function TranslationModal({
         onMouseDown={handleMouseDown}
         style={{
           ...classes.modalHead,
+          borderBottomColor: isLightTheme ? '#e5e7eb' : '#374151',
           cursor: isDragging ? 'grabbing' : 'grab',
         }}
       >
-        <span style={classes.modalHeadTitle}>
+        <span style={{
+          ...classes.modalHeadTitle,
+          color: isLightTheme ? '#111827' : '#f9fafb',
+        }}>
           {modeOptions.find((opt) => opt.value === mode)?.label}
         </span>
         <button
@@ -69,7 +75,7 @@ export function TranslationModal({
         >
           <XIcon
             style={{
-              color: '#6b7280',
+              color: isLightTheme ? '#6b7280' : '#9ca3af',
             }}
             size={16}
           />

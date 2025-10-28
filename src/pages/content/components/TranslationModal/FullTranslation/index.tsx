@@ -8,7 +8,7 @@ import { getTranslation } from '@/service/translator';
 const FullTranslation = () => {
   const [translationText, setTranslationText] = useState('');
 
-  const { sourceLanguage, targetLanguage } = useStorage();
+  const { sourceLanguage, targetLanguage, isLightTheme } = useStorage();
 
   const {
     state: { selectedText },
@@ -47,20 +47,28 @@ const FullTranslation = () => {
           gap: '4px',
         }}
       >
-        <div style={classes.translationContainer}>
-          <span style={{ ...classes.smallText, fontWeight: 'bold' }}>
+        <div style={{
+          ...classes.translationContainer,
+          backgroundColor: isLightTheme ? '#f3f4f6' : '#374151',
+        }}>
+          <span style={{ 
+            ...classes.smallText, 
+            fontWeight: 'bold',
+            color: isLightTheme ? '#6b7280' : '#9ca3af',
+          }}>
             Translation:
           </span>
           <span
             style={{
               ...classes.contentText,
+              color: isLightTheme ? '#374151' : '#',
               userSelect: 'text',
               cursor: 'text',
             }}
             onClick={(e) => e.stopPropagation()}
           >
             {isLoading ? (
-              <span style={{ color: '#6b7280' }}>
+              <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
                 Loading
                 <LoadingDots />
               </span>

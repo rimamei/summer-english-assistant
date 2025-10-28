@@ -9,12 +9,13 @@ import { getSummary } from '@/service/summarizer';
 const Summarization = () => {
   const [explanation, setExplanation] = useState('');
 
-  const { sourceLanguage, targetLanguage } = useStorage();
+  const { sourceLanguage, targetLanguage, isLightTheme } = useStorage();
 
-  const { state } = useExtension();
+  const {
+    state: { selectedText },
+  } = useExtension();
+  
   const isLoading = !explanation;
-
-  const selectedText = state.selectionInfo?.text || '';
 
   const handleAnalyzeSentence = useCallback(async () => {
     const result = await getSummary({
@@ -41,10 +42,17 @@ const Summarization = () => {
           flexDirection: 'column',
         }}
       >
-        <div style={classes.grammarContainer}>
+        <div
+          style={{
+            ...classes.grammarContainer,
+            backgroundColor: isLightTheme ? '#f3f4f6' : '#374151',
+            borderRadius: '4px',
+          }}
+        >
           <div
             style={{
               ...classes.contentText,
+              color: isLightTheme ? '#374151' : '',
               userSelect: 'text',
               cursor: 'text',
               lineHeight: '1.6',
@@ -52,7 +60,7 @@ const Summarization = () => {
             onClick={(e) => e.stopPropagation()}
           >
             {isLoading ? (
-              <span style={{ color: '#6b7280' }}>
+              <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
                 Loading
                 <LoadingDots />
               </span>

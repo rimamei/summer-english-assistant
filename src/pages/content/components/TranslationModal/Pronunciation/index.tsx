@@ -25,7 +25,7 @@ const Pronunciation = () => {
     type: '',
   });
 
-  const { settingsData, sourceLanguage, targetLanguage } = useStorage();
+  const { settingsData, sourceLanguage, targetLanguage, isLightTheme } = useStorage();
 
   const {
     state: { selectedText },
@@ -57,7 +57,6 @@ const Pronunciation = () => {
 
   const accent = settingsData?.accent === 'british' ? 'uk' : 'us';
 
-  console.log(data);
   return (
     <div>
       <div
@@ -67,10 +66,15 @@ const Pronunciation = () => {
           flexDirection: 'column',
         }}
       >
-        <div style={classes.grammarContainer}>
+        <div style={{
+          ...classes.grammarContainer,
+          backgroundColor: isLightTheme ? '#f3f4f6' : '',
+          borderRadius: '4px',
+        }}>
           <div
             style={{
               ...classes.contentText,
+              color: isLightTheme ? '#374151' : '',
               userSelect: 'text',
               cursor: 'text',
               lineHeight: '1.6',
@@ -78,7 +82,7 @@ const Pronunciation = () => {
             onClick={(e) => e.stopPropagation()}
           >
             {isLoading ? (
-              <span style={{ color: '#6b7280' }}>
+              <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
                 Loading
                 <LoadingDots />
               </span>
@@ -98,10 +102,18 @@ const Pronunciation = () => {
                     marginTop: '8px',
                   }}
                 >
-                  <span style={{ ...classes.smallText, fontWeight: 'normal' }}>
+                  <span style={{ 
+                    ...classes.smallText, 
+                    fontWeight: 'normal',
+                    color: isLightTheme ? '#6b7280' : '#9ca3af',
+                  }}>
                     <b>Definition:</b>
                   </span>
-                  <span style={{ ...classes.smallText, fontWeight: 'normal' }}>
+                  <span style={{ 
+                    ...classes.smallText, 
+                    fontWeight: 'normal',
+                    color: isLightTheme ? '#6b7280' : '#9ca3af',
+                  }}>
                     {data.definition || 'N/A'}
                   </span>
                 </div>
@@ -115,12 +127,20 @@ const Pronunciation = () => {
                     }}
                   >
                     <span
-                      style={{ ...classes.smallText, fontWeight: 'normal' }}
+                      style={{ 
+                        ...classes.smallText, 
+                        fontWeight: 'normal',
+                        color: isLightTheme ? '#6b7280' : '#9ca3af',
+                      }}
                     >
                       <b>Synonyms:</b>
                     </span>
                     <span
-                      style={{ ...classes.smallText, fontWeight: 'normal' }}
+                      style={{ 
+                        ...classes.smallText, 
+                        fontWeight: 'normal',
+                        color: isLightTheme ? '#6b7280' : '#9ca3af',
+                      }}
                     >
                       {data.synonyms && Array.isArray(data.synonyms)
                         ? data.synonyms.join(', ')
@@ -138,7 +158,11 @@ const Pronunciation = () => {
                     }}
                   >
                     <span
-                      style={{ ...classes.smallText, fontWeight: 'normal' }}
+                      style={{ 
+                        ...classes.smallText, 
+                        fontWeight: 'normal',
+                        color: isLightTheme ? '#6b7280' : '#9ca3af',
+                      }}
                     >
                       <b>Sound by Sound:</b>
                     </span>
@@ -158,6 +182,7 @@ const Pronunciation = () => {
                             style={{
                               ...classes.smallText,
                               fontWeight: 'normal',
+                              color: isLightTheme ? '#6b7280' : '#9ca3af',
                             }}
                           >
                             <b>{item?.symbol}</b> as in{' '}

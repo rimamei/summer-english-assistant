@@ -13,12 +13,13 @@ const GrammarAnalyzer = () => {
     correctedSentence: '',
   });
 
-  const { sourceLanguage, targetLanguage } = useStorage();
+  const { sourceLanguage, targetLanguage, isLightTheme } = useStorage();
 
-  const { state } = useExtension();
+  const {
+    state: { selectedText },
+  } = useExtension();
+  
   const isLoading = !explanation.details;
-
-  const { selectedText } = state;
 
   const handleAnalyzeSentence = useCallback(async () => {
     const result = await analyzeSentence(
@@ -49,10 +50,17 @@ const GrammarAnalyzer = () => {
           flexDirection: 'column',
         }}
       >
-        <div style={classes.grammarContainer}>
+        <div
+          style={{
+            ...classes.grammarContainer,
+            backgroundColor: isLightTheme ? '#f3f4f6' : '',
+            borderRadius: '4px',
+          }}
+        >
           <div
             style={{
               ...classes.contentText,
+              color: isLightTheme ? '#374151' : '#f3f4f6',
               userSelect: 'text',
               cursor: 'text',
               lineHeight: '1.6',
@@ -60,7 +68,7 @@ const GrammarAnalyzer = () => {
             onClick={(e) => e.stopPropagation()}
           >
             {isLoading ? (
-              <span style={{ color: '#6b7280' }}>
+              <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
                 Loading
                 <LoadingDots />
               </span>
