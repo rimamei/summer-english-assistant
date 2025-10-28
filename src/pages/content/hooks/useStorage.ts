@@ -15,13 +15,35 @@ const defaultSettings: SettingsData = {
   mode: 'pronunciation',
   selector: 'word',
   accent: 'american',
-  enabled_extension: false, 
+  enabled_extension: false,
 };
 
 export const useStorage = () => {
+  const [isLightTheme, setIsLightTheme] = useState(true);
   const [settingsData, setSettingsData] = useState<SettingsData>(defaultSettings);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const getThemeStorage = useCallback(async (): Promise<string | null> => {
+    try {
+      if (!chrome?.storage?.local) {
+        console.warn('Chrome storage not available');
+        return null;
+      }
+
+      const storageData = await chrome.storage.local.get(['theme']);
+
+      if (storageData.theme) {
+        return storageData.theme;
+      }
+
+      return null;
+    } catch (err) {
+      console.error('Error getting storage:', err);
+      setError(err instanceof Error ? err.message : 'Failed to get theme');
+      return null;
+    }
+  }, []);
 
   const getSettingStorage = useCallback(async (): Promise<SettingsData | null> => {
     try {
@@ -59,21 +81,45 @@ export const useStorage = () => {
     }
   }, [getSettingStorage]);
 
-  // Load settings on mount
+  const loadTheme = useCallback(async () => {
+    try {
+      const theme = await getThemeStorage();
+      if (theme) {
+        setIsLightTheme(theme === 'light');
+      }
+    } catch (err) {
+      console.error('Error loading theme:', err);
+    }
+  }, [getThemeStorage]);
+
+  // Load settings and theme on mount
   useEffect(() => {
-    loadSettings();
-  }, [loadSettings]);
+    const loadData = async () => {
+      await loadSettings();
+      await loadTheme();
+    };
+    loadData();
+  }, [loadSettings, loadTheme]);
 
   // Listen for storage changes from popup or other extension contexts
   useEffect(() => {
     if (!chrome?.storage?.onChanged) return;
 
     const handleStorageChange = (changes: { [key: string]: chrome.storage.StorageChange }) => {
-      
+
       if (changes.settings) {
         try {
           const newSettings = JSON.parse(changes.settings.newValue || '{}');
           setSettingsData(newSettings);
+        } catch (err) {
+          console.error('Error parsing storage change:', err);
+        }
+      }
+
+      if (changes.theme) {
+        try {
+          const newTheme = changes.theme.newValue || 'light';
+          setIsLightTheme(newTheme === 'light');
         } catch (err) {
           console.error('Error parsing storage change:', err);
         }
@@ -95,5 +141,6 @@ export const useStorage = () => {
     sourceLanguage: settingsData.source_lang,
     targetLanguage: settingsData.target_lang,
     mode: settingsData.mode,
+    isLightTheme
   };
 };
