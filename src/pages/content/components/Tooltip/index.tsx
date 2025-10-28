@@ -1,5 +1,6 @@
 import { useState, type CSSProperties, type JSX } from 'react';
 import { classes } from './style';
+import { useStorage } from '../../hooks/useStorage';
 
 interface TooltipProps {
   text: string;
@@ -8,6 +9,7 @@ interface TooltipProps {
 }
 
 export function Tooltip({ text, customStyles, children }: TooltipProps) {
+  const { isLightTheme } = useStorage();
   const [isVisible, setIsVisible] = useState(false);
 
   const handleMouseEnter = () => {
@@ -29,7 +31,18 @@ export function Tooltip({ text, customStyles, children }: TooltipProps) {
       </div>
 
       {/* Render tooltip only when visible */}
-      {isVisible && <div style={classes.tooltipContainer}>{text}</div>}
+      {isVisible && (
+        <div 
+          style={{
+            ...classes.tooltipContainer,
+            backgroundColor: isLightTheme ? '#1f2937' : '#f9fafb',
+            color: isLightTheme ? '#ffffff' : '#1f2937',
+            border: isLightTheme ? 'none' : '1px solid #e5e7eb',
+          }}
+        >
+          {text}
+        </div>
+      )}
     </>
   );
 }
