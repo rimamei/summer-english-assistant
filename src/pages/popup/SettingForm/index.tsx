@@ -139,7 +139,7 @@ const SettingForm = () => {
   };
 
   return (
-    <div className="my-4 border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 transition-colors duration-500">
+    <div className="my-4 border border-gray-200 dark:border-none dark:shadow-lg rounded-lg p-4 bg-card dark:bg-card transition-colors duration-500">
       <h3 className="text-base text-gray-900 dark:text-gray-100 font-semibold mb-4 transition-colors duration-500">
         Configuration
       </h3>

@@ -20,7 +20,7 @@ function Popup() {
   };
 
   return (
-    <div className="flex shadow-lg dark:shadow-2xl dark:shadow-black/50 min-w-[500px] max-w-[500px] max-auto min-h-[500px] h-full bg-background text-foreground font-display transition-all duration-700 ease-in-out transform hover:shadow-2xl dark:hover:shadow-black/70 relative overflow-hidden rounded-xl dark:border dark:border-white/10">
+    <div className="flex shadow-lg dark:shadow-2xl dark:shadow-black/50 min-w-[500px] max-w-[500px] max-auto min-h-[500px] h-full bg-background text-foreground font-display transition-all duration-700 ease-in-out transform hover:shadow-2xl dark:hover:shadow-black/70 relative overflow-hidden dark:border dark:border-white/10">
       <div className="relative z-10 w-full p-4 overflow-y-auto">
         <div className="flex justify-between items-center">
           <div className="flex items-start space-x-2">
@@ -57,7 +57,7 @@ function Popup() {
       </div>
 
       <div className="w-16 relative flex items-center justify-center">
-        <div className="min-h-[20vh] min-w-8 bg-white dark:bg-gray-900 rounded-4xl fixed right-3 shadow-lg flex flex-col items-center justify-center">
+        <div className="min-h-[20vh] min-w-8 bg-white dark:bg-card rounded-4xl fixed right-3 shadow-lg flex flex-col items-center justify-center">
           {menuOption.map((option) => {
             const Icon = option.icon;
             return (
