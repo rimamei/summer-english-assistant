@@ -38,9 +38,6 @@ const App = ({ shadowRoot }: MainProps) => {
     clearSelection();
   };
 
-
-  console.log('sta', enableExtension)
-
   if (enableExtension) {
     return (
       <div
