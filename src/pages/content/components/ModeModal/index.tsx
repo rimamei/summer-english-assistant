@@ -4,8 +4,11 @@ import { Camera, GripVertical, Highlighter, Power } from 'lucide-react';
 import { Tooltip } from '../Tooltip';
 import { useDraggable } from '../../hooks/useDraggable';
 import { useExtensionMode } from '../../hooks/useExtensionMode';
+import { useStorage } from '../../hooks/useStorage';
 
 const ModeModal = () => {
+  const { isLightTheme } = useStorage();
+
   const [hoveredButtonIndex, setHoveredButtonIndex] = useState<number | null>(
     null
   );
@@ -23,15 +26,16 @@ const ModeModal = () => {
     return null;
   }
 
-  // Function to get button style with simple grey hover effect
+  // Function to get button style with theme-aware hover effect
   const getButtonStyle = (index: number) => {
     const isHovered = hoveredButtonIndex === index;
 
     return {
       ...classes.plainButton,
+      color: isLightTheme ? '#6b7280' : '#9ca3af',
       ...(isHovered
         ? {
-            backgroundColor: '#f3f4f6',
+            backgroundColor: isLightTheme ? '#f3f4f6' : '#374151',
             padding: '8px',
             borderRadius: '8px',
           }
@@ -70,13 +74,16 @@ const ModeModal = () => {
     <div
       style={{
         ...classes.modalContainer,
+        backgroundColor: isLightTheme ? '#ffffff' : '#1f2937',
+        borderColor: isLightTheme ? '#e5e7eb' : '#374151',
+        color: isLightTheme ? '#1f2937' : '#f9fafb',
         transform: `translate(${position.x}px, ${position.y}px)`,
         cursor: isDragging ? 'grabbing' : 'default',
       }}
     >
       <div
         style={{
-          color: '#9ca3af',
+          color: isLightTheme ? '#9ca3af' : '#6b7280',
           cursor: isDragging ? 'grabbing' : 'grab',
           display: 'flex',
           alignItems: 'center',
@@ -95,7 +102,7 @@ const ModeModal = () => {
               position: 'relative',
               ...getButtonStyle(index),
               ...(option.key === mode && {
-                backgroundColor: '#f3f4f6',
+                backgroundColor: isLightTheme ? '#f3f4f6' : '#374151',
               }),
             }}
             onClick={option.action}

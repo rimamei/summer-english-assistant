@@ -7,8 +7,8 @@ export const classes = {
         bottom: '80px',
         right: '20px',
         zIndex: 2147483647,
-        backgroundColor: '#ffffff',
-        border: '1px solid #e5e7eb',
+        backgroundColor: '#ffffff', 
+        border: '1px solid #e5e7eb', 
         borderRadius: '12px',
         boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
         padding: '12px 8px',
@@ -16,7 +16,7 @@ export const classes = {
         maxWidth: '400px',
         fontSize: '14px',
         lineHeight: '1.5',
-        color: '#1f2937',
+        color: '#1f2937', 
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
         animation: 'summer-slide-in 0.3s ease-out',
@@ -25,6 +25,7 @@ export const classes = {
         justifyContent: 'center',
         alignItems: 'center',
         gap: '12px',
+        transition: 'all 0.2s ease',
     } as CSSProperties,
 
     title: {
