@@ -16,7 +16,6 @@ const FullTranslation = () => {
     state: { selectedText },
   } = useExtension();
 
-
   const isLoading = !translationText;
 
   const handleFullTranslation = useCallback(async () => {
@@ -35,6 +34,8 @@ const FullTranslation = () => {
     }
   }, [handleFullTranslation, selectedText]);
 
+  console.log('text', translationText);
+
   return (
     <div
       style={{
@@ -49,21 +50,25 @@ const FullTranslation = () => {
           gap: '4px',
         }}
       >
-        <div style={{
-          ...classes.translationContainer,
-          backgroundColor: isLightTheme ? '#f3f4f6' : '#374151',
-        }}>
-          <span style={{ 
-            ...classes.smallText, 
-            fontWeight: 'bold',
-            color: isLightTheme ? '#6b7280' : '#9ca3af',
-          }}>
+        <div
+          style={{
+            ...classes.translationContainer,
+            backgroundColor: isLightTheme ? '#f3f4f6' : '#374151',
+          }}
+        >
+          <span
+            style={{
+              ...classes.smallText,
+              fontWeight: 'bold',
+              color: isLightTheme ? '#6b7280' : '#9ca3af',
+            }}
+          >
             {t('translation_label')}
           </span>
           <span
             style={{
               ...classes.contentText,
-              color: isLightTheme ? '#374151' : '#',
+              color: isLightTheme ? '#374151' : '#9ca3af',
               userSelect: 'text',
               cursor: 'text',
             }}

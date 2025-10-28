@@ -5,8 +5,10 @@ import { Tooltip } from '../Tooltip';
 import { useDraggable } from '../../hooks/useDraggable';
 import { useExtensionMode } from '../../hooks/useExtensionMode';
 import { useStorage } from '../../hooks/useStorage';
+import { useI18n } from '@/hooks/useI18n';
 
 const ModeModal = () => {
+  const { t } = useI18n();
   const { isLightTheme } = useStorage();
 
   const [hoveredButtonIndex, setHoveredButtonIndex] = useState<number | null>(
@@ -49,7 +51,7 @@ const ModeModal = () => {
       action: () => {
         enableHighlightMode();
       },
-      title: 'Enable Text Translation',
+      title: t('enable_text_translation'),
       key: 'highlight',
     },
     {
@@ -57,7 +59,7 @@ const ModeModal = () => {
       action: () => {
         enableScreenshotMode();
       },
-      title: 'Capture Screenshot',
+      title: t('capture_screenshot'),
       key: 'screenshot',
     },
     {
@@ -65,7 +67,7 @@ const ModeModal = () => {
       action: () => {
         closeModeModal();
       },
-      title: 'Hide Mode Selector',
+      title: t('extension_off'),
       key: 'close',
     },
   ];

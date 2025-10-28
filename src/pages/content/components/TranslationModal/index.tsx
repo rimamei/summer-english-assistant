@@ -1,12 +1,12 @@
 import { XIcon } from 'lucide-react';
 import { classes } from './style';
 import { useDraggable } from '../../hooks/useDraggable';
-import { modeOptions } from '@/pages/popup/constants';
 import FullTranslation from './FullTranslation';
 import { useStorage } from '../../hooks/useStorage';
 import GrammarAnalyzer from './GrammarAnalyzer';
 import Summarization from './Summarization';
 import Pronunciation from './Pronunciation';
+import { useTranslatedOptions } from '@/hooks/useTranslatedOptions';
 
 interface TranslationModalProps {
   isVisible: boolean;
@@ -20,6 +20,7 @@ export function TranslationModal({
   position = { x: 0, y: 0 },
 }: TranslationModalProps) {
   const { mode, isLightTheme } = useStorage();
+  const { modeOptions } = useTranslatedOptions();
 
   const {
     position: draggablePosition,
@@ -35,7 +36,7 @@ export function TranslationModal({
     translation: <FullTranslation />,
     grammar: <GrammarAnalyzer />,
     summarizer: <Summarization />,
-    pronunciation: <Pronunciation />
+    pronunciation: <Pronunciation />,
   };
 
   return (
@@ -60,10 +61,12 @@ export function TranslationModal({
           cursor: isDragging ? 'grabbing' : 'grab',
         }}
       >
-        <span style={{
-          ...classes.modalHeadTitle,
-          color: isLightTheme ? '#111827' : '#f9fafb',
-        }}>
+        <span
+          style={{
+            ...classes.modalHeadTitle,
+            color: isLightTheme ? '#111827' : '#f9fafb',
+          }}
+        >
           {modeOptions.find((opt) => opt.value === mode)?.label}
         </span>
         <button

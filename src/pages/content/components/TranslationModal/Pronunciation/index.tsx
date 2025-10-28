@@ -6,8 +6,10 @@ import { useExtension } from '@/pages/content/hooks/useContext';
 import { analyzeWord } from '@/pages/content/prompt/pronunciation/pronunciationPrompt';
 import type { TPronunciationState } from '@/type/pronunciation';
 import { getTranslation } from '@/service/translator';
+import { useI18n } from '@/hooks/useI18n';
 
 const Pronunciation = () => {
+  const { t } = useI18n();
   const [data, setData] = useState<TPronunciationState>({
     definition: '',
     level: '',
@@ -83,7 +85,7 @@ const Pronunciation = () => {
           >
             {isLoading ? (
               <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
-                Loading
+                {t('loading')}
                 <LoadingDots />
               </span>
             ) : (
@@ -107,7 +109,7 @@ const Pronunciation = () => {
                     fontWeight: 'normal',
                     color: isLightTheme ? '#6b7280' : '#9ca3af',
                   }}>
-                    <b>Definition:</b>
+                    <b>{t('definition')}</b>
                   </span>
                   <span style={{ 
                     ...classes.smallText, 
@@ -133,7 +135,7 @@ const Pronunciation = () => {
                         color: isLightTheme ? '#6b7280' : '#9ca3af',
                       }}
                     >
-                      <b>Synonyms:</b>
+                      <b>{t('synonyms')}</b>
                     </span>
                     <span
                       style={{ 
@@ -164,7 +166,7 @@ const Pronunciation = () => {
                         color: isLightTheme ? '#6b7280' : '#9ca3af',
                       }}
                     >
-                      <b>Sound by Sound:</b>
+                      <b>{t('sound_by_sound')}</b>
                     </span>
                     <ul
                       style={{
@@ -185,7 +187,7 @@ const Pronunciation = () => {
                               color: isLightTheme ? '#6b7280' : '#9ca3af',
                             }}
                           >
-                            <b>{item?.symbol}</b> as in{' '}
+                            <b>{item?.symbol}</b> {t('as_in')}{' '}
                             <b>{item?.exampleWord}</b>
                           </span>
                         </li>

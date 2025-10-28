@@ -5,8 +5,10 @@ import { useStorage } from '@/pages/content/hooks/useStorage';
 import { useExtension } from '@/pages/content/hooks/useContext';
 import { renderMarkdown } from '@/pages/content/utils/renderMarkdown';
 import { getSummary } from '@/service/summarizer';
+import { useI18n } from '@/hooks/useI18n';
 
 const Summarization = () => {
+  const { t } = useI18n();
   const [explanation, setExplanation] = useState('');
 
   const { sourceLanguage, targetLanguage, isLightTheme } = useStorage();
@@ -61,13 +63,13 @@ const Summarization = () => {
           >
             {isLoading ? (
               <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
-                Loading
+                {t('loading')}
                 <LoadingDots />
               </span>
             ) : (
               <span
                 dangerouslySetInnerHTML={{
-                  __html: renderMarkdown(explanation || 'No summary available'),
+                  __html: renderMarkdown(explanation || t('no_summary_available')),
                 }}
               />
             )}

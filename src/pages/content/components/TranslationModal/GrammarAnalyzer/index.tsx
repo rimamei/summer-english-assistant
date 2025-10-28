@@ -5,8 +5,10 @@ import { useStorage } from '@/pages/content/hooks/useStorage';
 import { useExtension } from '@/pages/content/hooks/useContext';
 import { analyzeSentence } from '@/pages/content/prompt/grammar/grammarPrompt';
 import { renderMarkdown } from '@/pages/content/utils/renderMarkdown';
+import { useI18n } from '@/hooks/useI18n';
 
 const GrammarAnalyzer = () => {
+  const { t } = useI18n();
   const [explanation, setExplanation] = useState({
     isCorrect: true,
     details: '',
@@ -30,7 +32,7 @@ const GrammarAnalyzer = () => {
 
     setExplanation({
       isCorrect: result.isCorrect,
-      details: result?.explanation || 'No explanation available',
+      details: result?.explanation || t('no_explanation_available'),
       correctedSentence: result?.correctedSentence ?? '',
     });
   }, [selectedText, sourceLanguage, targetLanguage]);
@@ -69,14 +71,14 @@ const GrammarAnalyzer = () => {
           >
             {isLoading ? (
               <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
-                Loading
+                {t('loading')}
                 <LoadingDots />
               </span>
             ) : (
               <span
                 dangerouslySetInnerHTML={{
                   __html: renderMarkdown(
-                    explanation.details || 'No explanation available'
+                    explanation.details || t('no_explanation_available')
                   ),
                 }}
               />

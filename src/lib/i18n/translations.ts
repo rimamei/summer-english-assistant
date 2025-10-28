@@ -43,9 +43,9 @@ export const translations = {
     'as_in': 'as in',
     
     // Content Script - Mode Modal
-    'enable_text_translation': 'Enable Text Translation',
-    'capture_screenshot': 'Capture Screenshot',
-    'hide_mode_selector': 'Hide Mode Selector',
+    'enable_text_translation': 'Highlight',
+    'capture_screenshot': 'Screenshot',
+    'extension_off': 'Disable Extension',
     
     // Language Names
     'english': 'English',
@@ -105,9 +105,9 @@ export const translations = {
     'as_in': 'seperti dalam',
     
     // Content Script - Mode Modal
-    'enable_text_translation': 'Aktifkan Terjemahan Teks',
+    'enable_text_translation': 'Highlight Teks',
     'capture_screenshot': 'Ambil Screenshot',
-    'hide_mode_selector': 'Sembunyikan Pemilih Mode',
+    'extension_off': 'Nonaktifkan Ekstensi',
     
     // Language Names
     'english': 'Bahasa Inggris',
@@ -167,9 +167,9 @@ export const translations = {
     'as_in': 'como en',
     
     // Content Script - Mode Modal
-    'enable_text_translation': 'Habilitar Traducción de Texto',
-    'capture_screenshot': 'Capturar Pantalla',
-    'hide_mode_selector': 'Ocultar Selector de Modo',
+    'enable_text_translation': 'Highlight',
+    'capture_screenshot': 'Screenshot',
+    'extension_off': 'Desactivar Extensión',
     
     // Language Names
     'english': 'Inglés',
@@ -231,7 +231,7 @@ export const translations = {
     // Content Script - Mode Modal
     'enable_text_translation': 'テキスト翻訳を有効にする',
     'capture_screenshot': 'スクリーンショットを撮る',
-    'hide_mode_selector': 'モードセレクターを非表示',
+    'extension_off': '拡張機能を無効化',
     
     // Language Names
     'english': '英語',
