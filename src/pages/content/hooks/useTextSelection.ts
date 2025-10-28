@@ -14,39 +14,38 @@ interface UseTextSelectionReturn {
 export function useTextSelection(): UseTextSelectionReturn {
   const [selection, setSelection] = useState<SelectionInfo | null>(null);
 
-  const handleSelectionChange = useCallback(() => {
+
+  // Only set selection on mouseup for smoother UX
+  const handleMouseUp = useCallback(() => {
     const sel = window.getSelection();
-    
     if (!sel || sel.rangeCount === 0) {
       setSelection(null);
       return;
     }
-
     const selectedText = sel.toString().trim();
-    
-    // Only process if there's actual selected text (not just cursor position)
     if (selectedText.length === 0) {
       setSelection(null);
       return;
     }
-
-    // Get the range and calculate position
     const range = sel.getRangeAt(0);
     const rect = range.getBoundingClientRect();
-    
-    // Position the translation icon near the end of the selection
     const position = {
-      x: rect.right + 10, // Slightly to the right of selection
-      y: rect.top - 5,    // Slightly above selection
+      x: rect.right + 10,
+      y: rect.top - 5,
     };
-
-    console.log('Text selected:', selectedText, 'at position:', position);
-
     setSelection({
       text: selectedText,
       position,
       range: range.cloneRange(),
     });
+  }, []);
+
+  // Only clear selection on selectionchange if nothing is selected
+  const handleSelectionChange = useCallback(() => {
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0 || sel.toString().trim().length === 0) {
+      setSelection(null);
+    }
   }, []);
 
   const clearSelection = useCallback(() => {
@@ -59,17 +58,15 @@ export function useTextSelection(): UseTextSelectionReturn {
   }, []);
 
   useEffect(() => {
-    // Listen for selection changes
+    // Listen for selection changes to clear selection if needed
     document.addEventListener('selectionchange', handleSelectionChange);
-    
-    // Also listen for mouse up to catch selection end
-    document.addEventListener('mouseup', handleSelectionChange);
-
+    // Listen for mouseup to set selection
+    document.addEventListener('mouseup', handleMouseUp);
     return () => {
       document.removeEventListener('selectionchange', handleSelectionChange);
-      document.removeEventListener('mouseup', handleSelectionChange);
+      document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [handleSelectionChange]);
+  }, [handleSelectionChange, handleMouseUp]);
 
   // Clear selection when clicking elsewhere
   useEffect(() => {
