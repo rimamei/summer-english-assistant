@@ -146,57 +146,7 @@
     transition: background-color 0.7s ease-in-out, color 0.7s ease-in-out;
   }
   
-  /* Magical theme transition animations */
   html {
     transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  /* Custom magical animations */
-  @keyframes shimmer {
-    0% {
-      background-position: -200% center;
-    }
-    100% {
-      background-position: 200% center;
-    }
-  }
-  
-  @keyframes float {
-    0%, 100% {
-      transform: translateY(0px) rotate(0deg);
-    }
-    50% {
-      transform: translateY(-10px) rotate(5deg);
-    }
-  }
-  
-  @keyframes magical-glow {
-    0%, 100% {
-      opacity: 0.5;
-      transform: scale(1);
-    }
-    50% {
-      opacity: 1;
-      transform: scale(1.05);
-    }
-  }
-  
-  .animate-shimmer {
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.4),
-      transparent
-    );
-    background-size: 200% 100%;
-    animation: shimmer 2s infinite;
-  }
-  
-  .animate-float {
-    animation: float 3s ease-in-out infinite;
-  }
-  
-  .animate-magical-glow {
-    animation: magical-glow 2s ease-in-out infinite;
   }
 }
