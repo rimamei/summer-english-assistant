@@ -70,13 +70,7 @@ export function useTextSelection(): UseTextSelectionReturn {
 
   // Clear selection when clicking elsewhere
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      // If clicking on our extension elements, don't clear selection
-      const target = e.target as Element;
-      if (target.closest('[data-summer-extension]')) {
-        return;
-      }
-      
+    const handleClickOutside = () => {
       // Small delay to allow for proper selection handling
       setTimeout(() => {
         const sel = window.getSelection();
