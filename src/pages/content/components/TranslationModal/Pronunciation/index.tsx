@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { classes } from '../style';
 import LoadingDots from '../../LoadingDots';
-import { useStorage } from '@/pages/content/hooks/useStorage';
+import { useStorage } from '@/hooks/useStorage';
 import { useExtension } from '@/pages/content/hooks/useContext';
 import { analyzeWord } from '@/pages/content/prompt/pronunciation/pronunciationPrompt';
 import type { TPronunciationState } from '@/type/pronunciation';

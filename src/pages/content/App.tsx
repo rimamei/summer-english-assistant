@@ -5,7 +5,7 @@ import { TranslationModal } from './components/TranslationModal';
 import { useTextSelection } from './hooks/useTextSelection';
 import { useTranslationModal } from './hooks/useTranslationModal';
 import { injectStyles } from './styles';
-import { useStorage } from './hooks/useStorage';
+import { useStorage } from '@/hooks/useStorage';
 
 interface MainProps {
   shadowRoot: ShadowRoot | null;

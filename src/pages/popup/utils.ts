@@ -1,3 +1,5 @@
+import type { TTheme } from "@/type/theme";
+
 // Get enabled options based on mode
 export const getEnabledOptions = (mode: string) => {
     switch (mode) {
@@ -29,3 +31,9 @@ export const getDefaultSelectorValue = (mode: string) => {
             return 'word';
     }
 };
+
+  export const applyTheme = (newTheme: TTheme) => {
+    const root = document.documentElement;
+    root.classList.remove('light', 'dark');
+    root.classList.add(newTheme);
+  };

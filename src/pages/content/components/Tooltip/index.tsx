@@ -1,6 +1,6 @@
 import { useState, type CSSProperties, type JSX } from 'react';
 import { classes } from './style';
-import { useStorage } from '../../hooks/useStorage';
+import { useStorage } from '@/hooks/useStorage';
 
 interface TooltipProps {
   text: string;

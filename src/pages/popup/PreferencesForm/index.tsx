@@ -3,7 +3,7 @@ import Select from '@/components/base/Select';
 import { Button } from '@/components/ui/button';
 import { FieldGroup } from '@/components/ui/field';
 import { CheckCircle } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { validation } from './validation';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -11,12 +11,18 @@ import type z from 'zod';
 import Switch from '@/components/base/Switch';
 import { useI18n } from '@/hooks/useI18n';
 import { useTranslatedOptions } from '@/hooks/useTranslatedOptions';
-
-type Theme = 'light' | 'dark';
+import type { TTheme } from '@/type/theme';
+import { applyTheme } from '../utils';
+import { useStorage } from '@/hooks/useStorage';
 
 const PreferencesForm = () => {
   const { t, changeLanguage } = useI18n();
-  const { themeOptions: translatedThemeOptions, languageExtensionOptions: translatedLanguageOptions } = useTranslatedOptions();
+  const { preferences, enableExtension } = useStorage();
+
+  const {
+    themeOptions: translatedThemeOptions,
+    languageExtensionOptions: translatedLanguageOptions,
+  } = useTranslatedOptions();
   const [isLoading, setIsLoading] = useState(true);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [extensionEnabled, setExtensionEnabled] = useState(false);
@@ -29,56 +35,37 @@ const PreferencesForm = () => {
     },
   });
 
+  const loadSettings = useCallback(async () => {
+    try {
+      // Load extension status
+      setExtensionEnabled(enableExtension || false);
+
+      // Check if we have actual saved values (not just empty object)
+      const hasValidData = preferences && preferences.lang && preferences.theme;
+
+      if (hasValidData) {
+        // Create new data object with loaded values and defaults
+        const loadedData = {
+          lang: preferences.lang || 'en',
+          theme: preferences.theme || 'light',
+        };
+
+        // Reset form with loaded data (this updates both values and default values)
+        form.reset(loadedData);
+      }
+    } catch {
+      // Silently handle storage errors
+    } finally {
+      setIsLoading(false);
+    }
+  }, [preferences, enableExtension, form]);
+
   // Load settings from Chrome storage on component mount
   useEffect(() => {
-    const loadSettings = async () => {
-      try {
-        // Check if chrome.storage is available
-        if (!chrome?.storage?.local) {
-          setIsLoading(false);
-          return;
-        }
-
-        const getLocalStorageData = await chrome.storage.local.get([
-          'preferences',
-          'ext_status',
-        ]);
-
-        const result = getLocalStorageData.preferences
-          ? JSON.parse(getLocalStorageData.preferences)
-          : null;
-
-        // Load extension status
-        setExtensionEnabled(getLocalStorageData.ext_status || false);
-
-        // Check if we have actual saved values (not just empty object)
-        const hasValidData = result && (result.lang || result.theme);
-
-        if (hasValidData) {
-          // Create new data object with loaded values and defaults
-          const loadedData = {
-            lang: result.lang || 'en',
-            theme: result.theme || 'light',
-          };
-
-          // Reset form with loaded data (this updates both values and default values)
-          form.reset(loadedData);
-        }
-      } catch {
-        // Silently handle storage errors
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadSettings();
-  }, [form]);
-
-  const applyTheme = (newTheme: Theme) => {
-    const root = document.documentElement;
-    root.classList.remove('light', 'dark');
-    root.classList.add(newTheme);
-  };
+    if (preferences || enableExtension) {
+      loadSettings();
+    }
+  }, [preferences, enableExtension, form, loadSettings]);
 
   const onSubmit = async (data: z.infer<typeof validation>) => {
     try {
@@ -101,11 +88,11 @@ const PreferencesForm = () => {
       await chrome.storage.local.set({
         preferences: JSON.stringify(storageData),
       });
-      applyTheme(data.theme as Theme);
+      applyTheme(data.theme as TTheme);
 
-       // Immediately change the language for real-time UI updates
-                      changeLanguage(storageData.lang as 'en' | 'id' | 'es' | 'ja');
-                      
+      // Immediately change the language for real-time UI updates
+      changeLanguage(storageData.lang as 'en' | 'id' | 'es' | 'ja');
+
       // Reset form dirty state after successful save
       form.reset(data);
 

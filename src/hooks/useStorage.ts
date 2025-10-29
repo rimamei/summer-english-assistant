@@ -176,5 +176,6 @@ export const useStorage = () => {
     enableExtension: preferencesData.ext_status,
     isLightTheme: preferencesData.theme === 'light',
     lang: preferencesData.lang,
+    preferences: preferencesData,
   };
 };

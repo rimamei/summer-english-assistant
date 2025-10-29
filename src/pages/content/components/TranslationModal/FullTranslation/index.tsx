@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { classes } from '../style';
 import LoadingDots from '../../LoadingDots';
-import { useStorage } from '@/pages/content/hooks/useStorage';
+import { useStorage } from '@/hooks/useStorage';
 import { useExtension } from '@/pages/content/hooks/useContext';
 import { getTranslation } from '@/service/translator';
 import { useI18n } from '@/hooks/useI18n';

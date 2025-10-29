@@ -2,7 +2,7 @@ import { XIcon } from 'lucide-react';
 import { classes } from './style';
 import { useDraggable } from '../../hooks/useDraggable';
 import FullTranslation from './FullTranslation';
-import { useStorage } from '../../hooks/useStorage';
+import { useStorage } from '@/hooks/useStorage';
 import GrammarAnalyzer from './GrammarAnalyzer';
 import Summarization from './Summarization';
 import Pronunciation from './Pronunciation';

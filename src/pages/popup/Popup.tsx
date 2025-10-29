@@ -1,10 +1,13 @@
 import { HelpCircle, Home, Mic, Settings } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Configuration from './ConfigurationForm';
 import PreferencesForm from './PreferencesForm';
+import { applyTheme } from './utils';
+import { useStorage } from '@/hooks/useStorage';
 
 function Popup() {
   const [menu, setMenu] = useState('home');
+  const { preferences } = useStorage();
 
   const menuOption = [
     { name: 'home', label: 'Home', icon: Home },
@@ -12,6 +15,13 @@ function Popup() {
     { name: 'help', label: 'Help', icon: HelpCircle },
     { name: 'settings', label: 'Settings', icon: Settings },
   ];
+
+  // Apply theme as soon as preferences.theme is available
+  useEffect(() => {
+    if (preferences?.theme) {
+      applyTheme(preferences.theme);
+    }
+  }, [preferences?.theme]);
 
   const view = {
     home: <Configuration />,

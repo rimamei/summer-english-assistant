@@ -4,7 +4,7 @@ import { Camera, GripVertical, Highlighter, Power } from 'lucide-react';
 import { Tooltip } from '../Tooltip';
 import { useDraggable } from '../../hooks/useDraggable';
 import { useExtensionMode } from '../../hooks/useExtensionMode';
-import { useStorage } from '../../hooks/useStorage';
+import { useStorage } from '@/hooks/useStorage';
 import { useI18n } from '@/hooks/useI18n';
 
 const ModeModal = () => {
