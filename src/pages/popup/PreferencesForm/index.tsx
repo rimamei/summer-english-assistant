@@ -25,7 +25,6 @@ const PreferencesForm = () => {
   } = useTranslatedOptions();
   const [isLoading, setIsLoading] = useState(true);
   const [saveSuccess, setSaveSuccess] = useState(false);
-  const [extensionEnabled, setExtensionEnabled] = useState(false);
 
   const form = useForm<z.infer<typeof validation>>({
     resolver: zodResolver(validation),
@@ -37,9 +36,6 @@ const PreferencesForm = () => {
 
   const loadSettings = useCallback(async () => {
     try {
-      // Load extension status
-      setExtensionEnabled(enableExtension || false);
-
       // Check if we have actual saved values (not just empty object)
       const hasValidData = preferences && preferences.lang && preferences.theme;
 
@@ -58,14 +54,14 @@ const PreferencesForm = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [preferences, enableExtension, form]);
+  }, [preferences, form]);
 
   // Load settings from Chrome storage on component mount
   useEffect(() => {
-    if (preferences || enableExtension) {
+    if (preferences) {
       loadSettings();
     }
-  }, [preferences, enableExtension, form, loadSettings]);
+  }, [preferences, form, loadSettings]);
 
   const onSubmit = async (data: z.infer<typeof validation>) => {
     try {
@@ -111,7 +107,6 @@ const PreferencesForm = () => {
 
   const handleSaveStatus = async (val: boolean) => {
     await chrome.storage.local.set({ ext_status: val });
-    setExtensionEnabled(val);
   };
 
   return (
@@ -122,10 +117,8 @@ const PreferencesForm = () => {
         </h3>
         <Switch
           label={t('enabled')}
-          checked={extensionEnabled}
-          onCheckedChange={(checked) => {
-            handleSaveStatus(checked);
-          }}
+          checked={!!enableExtension}
+          onCheckedChange={handleSaveStatus}
           isRightLabel
         />
       </div>

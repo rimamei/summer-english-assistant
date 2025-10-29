@@ -21,12 +21,7 @@ const ModeModal = () => {
     enableScreenshotMode,
     mode,
     closeModeModal,
-    showModeModal,
   } = useExtensionMode();
-
-  if (!showModeModal) {
-    return null;
-  }
 
   // Function to get button style with theme-aware hover effect
   const getButtonStyle = (index: number) => {
