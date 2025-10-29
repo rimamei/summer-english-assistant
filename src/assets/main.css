@@ -145,8 +145,39 @@
     border-radius: 16px;
     transition: background-color 0.7s ease-in-out, color 0.7s ease-in-out;
   }
-  
+
   html {
     transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes pulse-light {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.8;
+      transform: scale(1.05);
+    }
+  }
+  .animate-pulse-light {
+    animation: pulse-light 3s infinite;
+  }
+
+  @keyframes wiggle {
+    0%,
+    100% {
+      transform: rotate(0deg);
+    }
+    25% {
+      transform: rotate(-8deg);
+    }
+    75% {
+      transform: rotate(8deg);
+    }
+  }
+  .animate-wiggle {
+    animation: wiggle 0.3s ease-in-out;
   }
 }

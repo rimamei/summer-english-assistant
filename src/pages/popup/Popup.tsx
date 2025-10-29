@@ -4,6 +4,7 @@ import Configuration from './ConfigurationForm';
 import PreferencesForm from './PreferencesForm';
 import { applyTheme } from './utils';
 import { useStorage } from '@/hooks/useStorage';
+import Sound from './Sound';
 
 function Popup() {
   const [menu, setMenu] = useState('home');
@@ -25,7 +26,7 @@ function Popup() {
 
   const view = {
     home: <Configuration />,
-    mic: <div>Mic & Audio Test - Coming Soon!</div>,
+    mic: <Sound />,
     help: <div>Help Section - Coming Soon!</div>,
     settings: <PreferencesForm />,
   };
