@@ -35,7 +35,7 @@ const GrammarAnalyzer = () => {
       details: result?.explanation || t('no_explanation_available'),
       correctedSentence: result?.correctedSentence ?? '',
     });
-  }, [selectedText, sourceLanguage, targetLanguage]);
+  }, [selectedText, sourceLanguage, t, targetLanguage]);
 
   useEffect(() => {
     if (selectedText) {

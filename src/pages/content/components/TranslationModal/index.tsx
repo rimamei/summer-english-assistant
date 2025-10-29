@@ -7,6 +7,8 @@ import GrammarAnalyzer from './GrammarAnalyzer';
 import Summarization from './Summarization';
 import Pronunciation from './Pronunciation';
 import { useTranslatedOptions } from '@/hooks/useTranslatedOptions';
+import { useCallback, useRef } from 'react';
+import { useClickOutside } from '../../hooks/useClickOutside';
 
 interface TranslationModalProps {
   isVisible: boolean;
@@ -21,6 +23,13 @@ export function TranslationModal({
 }: TranslationModalProps) {
   const { mode, isLightTheme } = useStorage();
   const { modeOptions } = useTranslatedOptions();
+
+  const modalRef = useRef<HTMLDivElement>(null!);
+  const handleClickOutside = useCallback(() => {
+    if (isVisible) onClose();
+  }, [isVisible, onClose]);
+
+  useClickOutside(modalRef, handleClickOutside);
 
   const {
     position: draggablePosition,
@@ -41,6 +50,9 @@ export function TranslationModal({
 
   return (
     <div
+      ref={modalRef}
+      onMouseDown={(e) => e.stopPropagation()}
+      onTouchStart={(e) => e.stopPropagation()}
       style={{
         ...classes.modalStyle,
         backgroundColor: isLightTheme ? '#ffffff' : '#1f2937',
@@ -84,6 +96,7 @@ export function TranslationModal({
           />
         </button>
       </div>
+
       {modeView[mode as keyof typeof modeView]}
     </div>
   );
