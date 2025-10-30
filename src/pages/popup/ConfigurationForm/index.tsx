@@ -2,7 +2,7 @@ import ControlledField from '@/components/base/ControlledField';
 import Select from '@/components/base/Select';
 import { Button } from '@/components/ui/button';
 import { FieldGroup } from '@/components/ui/field';
-import { ArrowRight, CheckCircle } from 'lucide-react';
+import { ArrowRight, CheckCircle, InfoIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { validation } from './validation';
@@ -13,6 +13,7 @@ import RadioGroup from '@/components/base/RadioGroup';
 import { Label } from '@/components/ui/label';
 import { useI18n } from '@/hooks/useI18n';
 import { useTranslatedOptions } from '@/hooks/useTranslatedOptions';
+import { useTranslator } from '@/hooks/useTranslator';
 
 const Configuration = () => {
   const { t } = useI18n();
@@ -23,8 +24,12 @@ const Configuration = () => {
     selectorOptions: translatedSelectorOptions,
     accentOptions: translatedAccentOptions,
   } = useTranslatedOptions();
-  const [isLoading, setIsLoading] = useState(true);
+
+  const { initLanguageTranslator, translatorStatus } = useTranslator();
+
+  const [isLoading, setIsLoading] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [error, setError] = useState('');
 
   const form = useForm<z.infer<typeof validation>>({
     resolver: zodResolver(validation),
@@ -33,7 +38,7 @@ const Configuration = () => {
       target_lang: 'in',
       mode: 'pronunciation',
       selector: 'word',
-      accent: 'american'
+      accent: 'american',
     },
   });
 
@@ -99,6 +104,22 @@ const Configuration = () => {
   }, [form]);
 
   const onSubmit = async (data: z.infer<typeof validation>) => {
+    setIsLoading(true);
+
+    try {
+      if (data.mode === 'translation') {
+        await initLanguageTranslator(data.source_lang, data.target_lang);
+      }
+
+      await saveToStorage(data);
+    } catch {
+      return;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const saveToStorage = async (data: z.infer<typeof validation>) => {
     try {
       // Check if chrome.storage is available
       if (!chrome?.storage?.local) {
@@ -131,9 +152,8 @@ const Configuration = () => {
       setTimeout(() => {
         setSaveSuccess(false);
       }, 2000);
-    } catch {
-      // Silently handle save errors
-      // Could add user-facing error notification here in the future
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : String(err));
     }
   };
 
@@ -142,6 +162,58 @@ const Configuration = () => {
       <h3 className="text-base text-gray-900 dark:text-gray-100 font-semibold transition-colors duration-500 mb-6">
         {t('configuration')}
       </h3>
+
+      {/* Notification Card */}
+      {error ||
+        (selectedMode === 'translation' &&
+          translatorStatus?.status !== 'idle' && (
+            <div
+              className={`w-full flex items-center gap-3 min-h-12 px-4 py-3 mb-6 rounded-lg shadow-sm border
+            ${
+              translatorStatus.status === 'error'
+                ? 'border-red-200 bg-red-50 dark:bg-red-900 dark:border-red-700'
+                : translatorStatus.status === 'downloading'
+                ? 'border-blue-200 bg-blue-50 dark:bg-blue-900 dark:border-blue-700'
+                : translatorStatus.status === 'ready'
+                ? 'border-green-200 bg-green-50 dark:bg-green-900 dark:border-green-700'
+                : 'border-zinc-200 from-zinc-50 to-zinc-100 dark:from-zinc-800 dark:to-zinc-900 dark:border-zinc-700'
+            }`}
+              style={{ fontWeight: 500 }}
+            >
+              {translatorStatus.status === 'error' ||
+                (error && (
+                  <>
+                    <InfoIcon className="w-5 h-5 text-red-500 dark:text-red-400" />
+                    <span className="text-red-800 dark:text-red-100">
+                      {translatorStatus.error?.message
+                        ? translatorStatus.error?.message
+                        : error}
+                    </span>
+                  </>
+                ))}
+              {translatorStatus.status === 'downloading' && (
+                <>
+                  <InfoIcon className="w-5 h-5 text-blue-500 dark:text-blue-400 animate-spin" />
+                  <span className="text-blue-800 dark:text-blue-100">
+                    {t('api_downloading')}
+                    {typeof translatorStatus.progress === 'number' && (
+                      <span className="ml-2">
+                        {Math.round(translatorStatus.progress * 100)}%
+                      </span>
+                    )}
+                  </span>
+                </>
+              )}
+              {translatorStatus.status === 'ready' && (
+                <>
+                  <InfoIcon className="w-5 h-5 text-green-500 dark:text-green-400" />
+                  <span className="text-green-800 dark:text-green-100">
+                    {t('api_ready')}
+                  </span>
+                </>
+              )}
+            </div>
+          ))}
 
       <form id="form-rhf-demo" onSubmit={form.handleSubmit(onSubmit)}>
         <FieldGroup>
@@ -253,6 +325,7 @@ const Configuration = () => {
           <div className="flex justify-end">
             <Button
               type="submit"
+              isLoading={isLoading}
               disabled={
                 !form.formState.isDirty || !form.formState.isValid || isLoading
               }
