@@ -189,11 +189,8 @@ export const useTranslator = () => {
                 }
             }
 
-            console.log('sessionRef', sessionRef)
-
             // Initialize if needed
             if (!sessionRef.current) {
-                console.log('run', sessionRef)
                 await initLanguageTranslator(sourceLanguage, targetLanguage);
             }
 

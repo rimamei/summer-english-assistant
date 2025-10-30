@@ -44,8 +44,6 @@ export const useStorage = () => {
 
       const storageData = await chrome.storage.local.get(['preferences', 'ext_status']);
 
-      console.log('storageData', storageData)
-
       if (storageData.preferences || storageData?.ext_status) {
         const parsedPreferences = storageData.preferences ? JSON.parse(storageData.preferences) : {};
         return { ...parsedPreferences, ext_status: storageData?.ext_status || false };
