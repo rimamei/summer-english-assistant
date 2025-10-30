@@ -103,18 +103,17 @@ export const useTranslator = () => {
                     status: 'error',
                     error: new Error('Translator model is unavailable for the selected languages.'),
                 });
-                return;
-            }
-            if (availability === 'downloadable') {
+                throw new Error('Translator model is unavailable for the selected languages.');
+            } else {
                 if (!navigator.userActivation.isActive) {
                     setTranslatorStatus({
                         status: 'error',
                         error: new Error('User interaction required to download translation model.'),
                     });
-                    return;
+                    throw new Error('User interaction required to download translation model.');
                 }
 
-                // Create the session with abort signal
+                // Create the session with abort signal and download monitoring
                 sessionRef.current = await window.Translator.create({
                     sourceLanguage: initSourceLang,
                     targetLanguage: initTargetLang,
@@ -130,7 +129,6 @@ export const useTranslator = () => {
                         });
                     },
                 });
-
             }
 
             // Check if aborted after creation
@@ -186,8 +184,11 @@ export const useTranslator = () => {
                 }
             }
 
+            console.log('sessionRef', sessionRef)
+
             // Initialize if needed
             if (!sessionRef.current) {
+                console.log('run', sessionRef)
                 await initLanguageTranslator(sourceLanguage, targetLanguage);
             }
 
@@ -196,33 +197,31 @@ export const useTranslator = () => {
                 return;
             }
 
-            // Check if initialization was successful
-            if (!sessionRef.current) {
-                throw new Error('Translator session could not be initialized.');
-            }
-
-            const stream = sessionRef.current.translateStreaming(text.trim().replace(/\n/g, '<br>'), { signal });
-
-            // Check if aborted
-            if (signal.aborted) {
-                return;
-            }
-
-            const reader = stream.getReader();
-
-            try {
-                while (true) {
-                    const { done, value } = await reader.read();
-
-                    if (done || signal.aborted) {
-                        break;
-                    }
-
-                    yield value;
+            if (sessionRef?.current) {
+                const stream = sessionRef.current.translateStreaming(text.trim().replace(/\n/g, '<br>'), { signal });
+                
+                // Check if aborted
+                if (signal.aborted) {
+                    return;
                 }
-            } finally {
-                reader.releaseLock();
+
+                const reader = stream.getReader();
+
+                try {
+                    while (true) {
+                        const { done, value } = await reader.read();
+
+                        if (done || signal.aborted) {
+                            break;
+                        }
+
+                        yield value;
+                    }
+                } finally {
+                    reader.releaseLock();
+                }
             }
+
         } catch (error) {
             // Don't update state if aborted
             if (signal.aborted || (error instanceof Error && error.name === 'AbortError')) {
