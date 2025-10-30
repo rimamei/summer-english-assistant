@@ -28,6 +28,9 @@ export const translations = {
     'american': 'American',
     'british': 'British',
     'save_activate': 'Save & Activate',
+    'api_downloading': 'Model is being downloaded...',
+    'api_error_default': 'An error occurred with the translator.',
+    'api_ready': 'Model is ready to use.',
     
     // Content Script - Translation Modal
     'loading': 'Loading',
@@ -90,6 +93,9 @@ export const translations = {
     'american': 'Amerika',
     'british': 'Inggris',
     'save_activate': 'Simpan & Aktifkan',
+    'api_downloading': 'Model sedang diunduh...',
+    'api_error_default': 'Terjadi kesalahan pada penerjemah.',
+    'api_ready': 'Model siap digunakan.',
     
     // Content Script - Translation Modal
     'loading': 'Memuat',
@@ -152,6 +158,9 @@ export const translations = {
     'american': 'Americano',
     'british': 'Británico',
     'save_activate': 'Guardar y Activar',
+    'api_downloading': 'El modelo se está descargando...',
+    'api_error_default': 'Ocurrió un error con el traductor.',
+    'api_ready': 'El modelo está listo para usar.',
     
     // Content Script - Translation Modal
     'loading': 'Cargando',
@@ -214,6 +223,9 @@ export const translations = {
     'american': 'アメリカ',
     'british': 'イギリス',
     'save_activate': '保存して有効化',
+    'api_downloading': 'モデルをダウンロード中...',
+    'api_error_default': '翻訳機能でエラーが発生しました。',
+    'api_ready': 'モデルの使用準備ができました。',
     
     // Content Script - Translation Modal
     'loading': '読み込み中',
