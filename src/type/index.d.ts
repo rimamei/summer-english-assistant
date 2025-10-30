@@ -4,16 +4,6 @@ declare module '*?raw' {
 }
 
 interface Window {
-  Translator: {
-    create: (options: {
-      sourceLanguage: string;
-      targetLanguage: string;
-    }) => Promise<TranslatorInstance>;
-    availability: (options: {
-      sourceLanguage: string;
-      targetLanguage: string;
-    }) => Promise<{ available: string }>;
-  };
   translator?: {
     translate: (text: string) => Promise<string>;
   },
