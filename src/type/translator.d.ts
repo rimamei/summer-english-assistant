@@ -118,12 +118,3 @@ declare interface TranslatorInstance {
      */
     translateStreaming: (text: string, options?: TranslatorOperationOptions) => ReadableStream<string>;
 }
-
-type TTranslationCapabilitiesParams = {
-    sourceLanguage: string;
-    targetLanguage: string;
-}
-
-type TTranslationParams = TTranslationCapabilitiesParams & {
-    text: string;
-}
