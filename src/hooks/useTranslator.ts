@@ -18,7 +18,7 @@ export const useTranslator = () => {
     const isInitializingRef = useRef(false);
     const initControllerRef = useRef<AbortController | null>(null);
     const translateControllerRef = useRef<AbortController | null>(null);
-    
+
     const currentLanguagesRef = useRef<{ source: string; target: string } | null>(null);
 
     // Cleanup and reinitialize when languages change
@@ -105,23 +105,33 @@ export const useTranslator = () => {
                 });
                 return;
             }
-
-            // Create the session with abort signal
-            sessionRef.current = await window.Translator.create({
-                sourceLanguage: initSourceLang,
-                targetLanguage: initTargetLang,
-                signal,
-                monitor(m) {
-                    m.addEventListener('downloadprogress', (e) => {
-                        if (!signal.aborted) {
-                            setTranslatorStatus({
-                                status: 'downloading',
-                                progress: e.loaded,
-                            });
-                        }
+            if (availability === 'downloadable') {
+                if (!navigator.userActivation.isActive) {
+                    setTranslatorStatus({
+                        status: 'error',
+                        error: new Error('User interaction required to download translation model.'),
                     });
-                },
-            });
+                    return;
+                }
+
+                // Create the session with abort signal
+                sessionRef.current = await window.Translator.create({
+                    sourceLanguage: initSourceLang,
+                    targetLanguage: initTargetLang,
+                    signal,
+                    monitor(m) {
+                        m.addEventListener('downloadprogress', (e) => {
+                            if (!signal.aborted) {
+                                setTranslatorStatus({
+                                    status: 'downloading',
+                                    progress: e.loaded,
+                                });
+                            }
+                        });
+                    },
+                });
+
+            }
 
             // Check if aborted after creation
             if (signal.aborted) {
@@ -156,69 +166,6 @@ export const useTranslator = () => {
             }
         }
     }, [isTranslatorSupported, translatorStatus.status]);
-
-    const handleTranslate = useCallback(async (text: string): Promise<string | undefined> => {
-        // Abort previous translation if any
-        translateControllerRef.current?.abort();
-        translateControllerRef.current = new AbortController();
-        const signal = translateControllerRef.current.signal;
-
-        try {
-            // Check if we need to reinitialize due to language change
-            if (sessionRef.current && currentLanguagesRef.current) {
-                if (
-                    currentLanguagesRef.current.source !== sourceLanguage ||
-                    currentLanguagesRef.current.target !== targetLanguage
-                ) {
-                    console.log('Language mismatch detected, reinitializing...');
-                    sessionRef.current.destroy();
-                    sessionRef.current = null;
-                    currentLanguagesRef.current = null;
-                }
-            }
-
-            // Initialize if needed
-            if (!sessionRef.current) {
-                await initLanguageTranslator(sourceLanguage, targetLanguage);
-            }
-
-            // Check if aborted after initialization
-            if (signal.aborted) {
-                return undefined;
-            }
-
-            // Check if initialization was successful
-            if (!sessionRef.current) {
-                throw new Error('Translator session could not be initialized.');
-            }
-
-            const result = await sessionRef.current.translate(text, { signal });
-
-            // Return undefined if aborted
-            if (signal.aborted) {
-                return undefined;
-            }
-
-            return result;
-        } catch (error) {
-            // Don't update state if aborted
-            if (signal.aborted || (error instanceof Error && error.name === 'AbortError')) {
-                return undefined;
-            }
-
-            setTranslatorStatus(prev => ({
-                ...prev,
-                status: 'error',
-                error: error instanceof Error ? error : new Error('Translation failed'),
-            }));
-            return undefined;
-        } finally {
-            // Clear controller if it matches current one
-            if (translateControllerRef.current?.signal === signal) {
-                translateControllerRef.current = null;
-            }
-        }
-    }, [initLanguageTranslator, sourceLanguage, targetLanguage]);
 
     const handleTranslateStreaming = useCallback(async function* (text: string): AsyncGenerator<string, void, unknown> {
         // Abort previous translation if any
@@ -266,11 +213,11 @@ export const useTranslator = () => {
             try {
                 while (true) {
                     const { done, value } = await reader.read();
-                    
+
                     if (done || signal.aborted) {
                         break;
                     }
-                    
+
                     yield value;
                 }
             } finally {
@@ -325,7 +272,6 @@ export const useTranslator = () => {
         isTranslatorSupported,
         initLanguageTranslator,
         destroySession,
-        handleTranslate,
         handleTranslateStreaming,
         abortTranslation,
         abortInitialization,
