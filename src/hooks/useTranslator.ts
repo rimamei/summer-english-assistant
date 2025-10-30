@@ -4,7 +4,7 @@ import { useStorage } from "@/hooks/useStorage";
 interface TranslatorStatusItem {
     status: 'idle' | 'checking' | 'downloading' | 'ready' | 'error';
     progress?: number;
-    error?: Error;
+    error?: string;
 }
 
 export const useTranslator = () => {
@@ -74,9 +74,10 @@ export const useTranslator = () => {
         if (!isTranslatorSupported) {
             setTranslatorStatus({
                 status: 'error',
-                error: new Error('Translator API is not supported in this environment.'),
+                error: 'Translator API is not supported in this environment.',
             });
-            return;
+
+            throw new Error('Translator API is not supported in this environment.');
         }
 
         // Abort previous initialization if any
@@ -101,15 +102,17 @@ export const useTranslator = () => {
             if (availability === 'unavailable') {
                 setTranslatorStatus({
                     status: 'error',
-                    error: new Error('Translator model is unavailable for the selected languages.'),
+                    error: 'Translator model is unavailable for the selected languages.',
                 });
+
                 throw new Error('Translator model is unavailable for the selected languages.');
             } else {
                 if (!navigator.userActivation.isActive) {
                     setTranslatorStatus({
                         status: 'error',
-                        error: new Error('User interaction required to download translation model.'),
+                        error: 'User interaction required to download translation model.',
                     });
+
                     throw new Error('User interaction required to download translation model.');
                 }
 
@@ -154,8 +157,10 @@ export const useTranslator = () => {
 
             setTranslatorStatus({
                 status: 'error',
-                error: error instanceof Error ? error : new Error('Failed to initialize translator'),
+                error: error instanceof Error ? error?.message : 'Failed to initialize translator',
             });
+
+            throw error;
         } finally {
             isInitializingRef.current = false;
             // Clear controller if it matches current one
@@ -199,7 +204,7 @@ export const useTranslator = () => {
 
             if (sessionRef?.current) {
                 const stream = sessionRef.current.translateStreaming(text.trim().replace(/\n/g, '<br>'), { signal });
-                
+
                 // Check if aborted
                 if (signal.aborted) {
                     return;
@@ -231,7 +236,7 @@ export const useTranslator = () => {
             setTranslatorStatus(prev => ({
                 ...prev,
                 status: 'error',
-                error: error instanceof Error ? error : new Error('Translation failed'),
+                error: error instanceof Error ? error?.message : 'Translation failed',
             }));
             throw error;
         } finally {
