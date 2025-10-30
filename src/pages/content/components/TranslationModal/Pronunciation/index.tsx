@@ -5,8 +5,8 @@ import { useStorage } from '@/hooks/useStorage';
 import { useExtension } from '@/pages/content/hooks/useContext';
 import { analyzeWord } from '@/pages/content/prompt/pronunciation/pronunciationPrompt';
 import type { TPronunciationState } from '@/type/pronunciation';
-import { getTranslation } from '@/service/translator';
 import { useI18n } from '@/hooks/useI18n';
+import { useTranslator } from '@/hooks/useTranslator';
 
 const Pronunciation = () => {
   const { t } = useI18n();
@@ -27,7 +27,9 @@ const Pronunciation = () => {
     type: '',
   });
 
-  const { settingsData, sourceLanguage, targetLanguage, isLightTheme } = useStorage();
+  const { settingsData, sourceLanguage, targetLanguage, isLightTheme } =
+    useStorage();
+  const { handleTranslateStreaming } = useTranslator();
 
   const {
     state: { selectedText },
@@ -44,18 +46,19 @@ const Pronunciation = () => {
           selectedText
         );
 
-        const translation = await getTranslation({
-          sourceLanguage,
-          targetLanguage,
-          text: selectedText,
-        });
+        const translation = handleTranslateStreaming(selectedText);
 
-        setData({ ...result, translation });
+        let translatedText = '';
+        for await (const chunk of translation) {
+          translatedText += chunk;
+        }
+
+        setData({ ...result, translation: translatedText });
       };
 
       analyzeSentence();
     }
-  }, [selectedText, sourceLanguage, targetLanguage]);
+  }, [handleTranslateStreaming, selectedText, sourceLanguage, targetLanguage]);
 
   const accent = settingsData?.accent === 'british' ? 'uk' : 'us';
 
@@ -68,11 +71,13 @@ const Pronunciation = () => {
           flexDirection: 'column',
         }}
       >
-        <div style={{
-          ...classes.grammarContainer,
-          backgroundColor: isLightTheme ? '#f3f4f6' : '',
-          borderRadius: '4px',
-        }}>
+        <div
+          style={{
+            ...classes.grammarContainer,
+            backgroundColor: isLightTheme ? '#f3f4f6' : '',
+            borderRadius: '4px',
+          }}
+        >
           <div
             style={{
               ...classes.contentText,
@@ -104,18 +109,22 @@ const Pronunciation = () => {
                     marginTop: '8px',
                   }}
                 >
-                  <span style={{ 
-                    ...classes.smallText, 
-                    fontWeight: 'normal',
-                    color: isLightTheme ? '#6b7280' : '#9ca3af',
-                  }}>
+                  <span
+                    style={{
+                      ...classes.smallText,
+                      fontWeight: 'normal',
+                      color: isLightTheme ? '#6b7280' : '#9ca3af',
+                    }}
+                  >
                     <b>{t('definition')}</b>
                   </span>
-                  <span style={{ 
-                    ...classes.smallText, 
-                    fontWeight: 'normal',
-                    color: isLightTheme ? '#6b7280' : '#9ca3af',
-                  }}>
+                  <span
+                    style={{
+                      ...classes.smallText,
+                      fontWeight: 'normal',
+                      color: isLightTheme ? '#6b7280' : '#9ca3af',
+                    }}
+                  >
                     {data.definition || 'N/A'}
                   </span>
                 </div>
@@ -129,8 +138,8 @@ const Pronunciation = () => {
                     }}
                   >
                     <span
-                      style={{ 
-                        ...classes.smallText, 
+                      style={{
+                        ...classes.smallText,
                         fontWeight: 'normal',
                         color: isLightTheme ? '#6b7280' : '#9ca3af',
                       }}
@@ -138,8 +147,8 @@ const Pronunciation = () => {
                       <b>{t('synonyms')}</b>
                     </span>
                     <span
-                      style={{ 
-                        ...classes.smallText, 
+                      style={{
+                        ...classes.smallText,
                         fontWeight: 'normal',
                         color: isLightTheme ? '#6b7280' : '#9ca3af',
                       }}
@@ -160,8 +169,8 @@ const Pronunciation = () => {
                     }}
                   >
                     <span
-                      style={{ 
-                        ...classes.smallText, 
+                      style={{
+                        ...classes.smallText,
                         fontWeight: 'normal',
                         color: isLightTheme ? '#6b7280' : '#9ca3af',
                       }}
