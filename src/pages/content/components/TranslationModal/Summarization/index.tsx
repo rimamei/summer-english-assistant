@@ -4,30 +4,42 @@ import LoadingDots from '../../LoadingDots';
 import { useStorage } from '@/hooks/useStorage';
 import { useExtension } from '@/pages/content/hooks/useContext';
 import { renderMarkdown } from '@/pages/content/utils/renderMarkdown';
-import { getSummary } from '@/service/summarizer';
 import { useI18n } from '@/hooks/useI18n';
+import { useSummarizer, type SummarizerConfig } from '@/hooks/useSummarizer';
 
 const Summarization = () => {
   const { t } = useI18n();
   const [explanation, setExplanation] = useState('');
 
-  const { sourceLanguage, targetLanguage, isLightTheme } = useStorage();
+  const { isLightTheme, sourceLanguage, targetLanguage } = useStorage();
+
+  const { handleSummarizeStreaming } = useSummarizer();
 
   const {
     state: { selectedText },
   } = useExtension();
-  
+
   const isLoading = !explanation;
 
   const handleAnalyzeSentence = useCallback(async () => {
-    const result = await getSummary({
-      sourceLanguage,
-      targetLanguage,
-      text: selectedText,
-    });
+    const config: SummarizerConfig = {
+      expectedInputLanguages: [sourceLanguage || 'en'],
+      expectedContextLanguages: [targetLanguage || 'en'],
+      format: 'plain-text',
+      length: 'medium',
+      outputLanguage: targetLanguage || 'en',
+      type: 'key-points',
+    };
 
-    setExplanation(result);
-  }, [selectedText, sourceLanguage, targetLanguage]);
+    const result = await handleSummarizeStreaming(selectedText, config);
+
+    let text = '';
+    for await (const chunk of result) {
+      text += chunk;
+    }
+
+    setExplanation(text);
+  }, [handleSummarizeStreaming, selectedText, sourceLanguage, targetLanguage]);
 
   useEffect(() => {
     if (selectedText) {
@@ -69,7 +81,9 @@ const Summarization = () => {
             ) : (
               <span
                 dangerouslySetInnerHTML={{
-                  __html: renderMarkdown(explanation || t('no_summary_available')),
+                  __html: renderMarkdown(
+                    explanation || t('no_summary_available')
+                  ),
                 }}
               />
             )}

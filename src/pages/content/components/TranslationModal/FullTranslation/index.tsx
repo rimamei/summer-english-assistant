@@ -27,7 +27,7 @@ const FullTranslation = () => {
     for await (const chunk of stream) {
       result += chunk;
     }
-
+    
     setTranslationText(result || '');
   }, [handleTranslateStreaming, selectedText]);
 

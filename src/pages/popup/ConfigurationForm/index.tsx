@@ -14,6 +14,11 @@ import { Label } from '@/components/ui/label';
 import { useI18n } from '@/hooks/useI18n';
 import { useTranslatedOptions } from '@/hooks/useTranslatedOptions';
 import { useTranslator } from '@/hooks/useTranslator';
+import {
+  useSummarizer,
+  type SummarizerConfig,
+  type SummarizerStatusItem,
+} from '@/hooks/useSummarizer';
 
 const Configuration = () => {
   const { t } = useI18n();
@@ -26,6 +31,7 @@ const Configuration = () => {
   } = useTranslatedOptions();
 
   const { initLanguageTranslator, translatorStatus } = useTranslator();
+  const { initSummarizer, summarizerStatus } = useSummarizer();
 
   const [isLoading, setIsLoading] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -109,11 +115,22 @@ const Configuration = () => {
     try {
       if (data.mode === 'translation') {
         await initLanguageTranslator(data.source_lang, data.target_lang);
+      } else if (data.mode === 'summarizer') {
+        const config: SummarizerConfig = {
+          expectedInputLanguages: [data.source_lang || 'en'],
+          expectedContextLanguages: [data.target_lang || 'en'],
+          format: 'plain-text',
+          length: 'medium',
+          outputLanguage: data.target_lang || 'en',
+          type: 'key-points',
+        };
+
+        await initSummarizer(config);
       }
 
-      await saveToStorage(data);
-    } catch {
-      return;
+      saveToStorage(data);
+    } catch (e) {
+      console.log('err', e);
     } finally {
       setIsLoading(false);
     }
@@ -157,6 +174,28 @@ const Configuration = () => {
     }
   };
 
+  const getStatus = () => {
+    let result: SummarizerStatusItem = {
+      status: 'idle',
+      error: undefined,
+      progress: 0,
+    };
+
+    if (selectedMode === 'translation') {
+      result = translatorStatus;
+    } else if (selectedMode === 'summarizer') {
+      result = summarizerStatus;
+    }
+
+    return {
+      status: result.status,
+      error: result?.error,
+      progress: result?.progress ?? 0,
+    };
+  };
+
+  console.log(getStatus())
+
   return (
     <div className="my-4 border border-gray-200 dark:border-none dark:shadow-lg rounded-lg p-4 bg-card dark:bg-card transition-colors duration-500">
       <h3 className="text-base text-gray-900 dark:text-gray-100 font-semibold transition-colors duration-500 mb-6">
@@ -165,46 +204,44 @@ const Configuration = () => {
 
       {/* Notification Card */}
       {error ||
-        (selectedMode === 'translation' &&
-          translatorStatus?.status !== 'idle' && (
+        (selectedMode === 'translation' && getStatus()?.status !== 'idle') ||
+        (selectedMode === 'summarizer' &&
+          summarizerStatus?.status !== 'idle' && (
             <div
               className={`w-full flex items-center gap-3 min-h-12 px-4 py-3 mb-6 rounded-lg shadow-sm border
             ${
-              translatorStatus.status === 'error'
+              getStatus().status === 'error'
                 ? 'border-red-200 bg-red-50 dark:bg-red-900 dark:border-red-700'
-                : translatorStatus.status === 'downloading'
+                : getStatus().status === 'downloading'
                 ? 'border-blue-200 bg-blue-50 dark:bg-blue-900 dark:border-blue-700'
-                : translatorStatus.status === 'ready'
+                : getStatus().status === 'ready'
                 ? 'border-green-200 bg-green-50 dark:bg-green-900 dark:border-green-700'
                 : 'border-zinc-200 from-zinc-50 to-zinc-100 dark:from-zinc-800 dark:to-zinc-900 dark:border-zinc-700'
             }`}
               style={{ fontWeight: 500 }}
             >
-              {translatorStatus.status === 'error' ||
-                (error && (
-                  <>
-                    <InfoIcon className="w-5 h-5 text-red-500 dark:text-red-400" />
-                    <span className="text-red-800 dark:text-red-100">
-                      {translatorStatus.error?.message
-                        ? translatorStatus.error?.message
-                        : error}
-                    </span>
-                  </>
-                ))}
-              {translatorStatus.status === 'downloading' && (
+              {(getStatus().status === 'error' || error) && (
+                <>
+                  <InfoIcon className="w-5 h-5 text-red-500 dark:text-red-400" />
+                  <span className="text-red-800 dark:text-red-100">
+                    {getStatus().error ? getStatus().error : error}
+                  </span>
+                </>
+              )}
+              {getStatus().status === 'downloading' && (
                 <>
                   <InfoIcon className="w-5 h-5 text-blue-500 dark:text-blue-400 animate-spin" />
                   <span className="text-blue-800 dark:text-blue-100">
                     {t('api_downloading')}
-                    {typeof translatorStatus.progress === 'number' && (
+                    {typeof getStatus().progress === 'number' && (
                       <span className="ml-2">
-                        {Math.round(translatorStatus.progress * 100)}%
+                        {Math.round(getStatus().progress * 100)}%
                       </span>
                     )}
                   </span>
                 </>
               )}
-              {translatorStatus.status === 'ready' && (
+              {getStatus().status === 'ready' && (
                 <>
                   <InfoIcon className="w-5 h-5 text-green-500 dark:text-green-400" />
                   <span className="text-green-800 dark:text-green-100">
