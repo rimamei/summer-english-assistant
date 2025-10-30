@@ -3,14 +3,16 @@ import { classes } from '../style';
 import LoadingDots from '../../LoadingDots';
 import { useStorage } from '@/hooks/useStorage';
 import { useExtension } from '@/pages/content/hooks/useContext';
-import { getTranslation } from '@/service/translator';
 import { useI18n } from '@/hooks/useI18n';
+import { useTranslator } from '@/hooks/useTranslator';
+import { renderMarkdown } from '@/pages/content/utils/renderMarkdown';
 
 const FullTranslation = () => {
   const { t } = useI18n();
   const [translationText, setTranslationText] = useState('');
 
-  const { sourceLanguage, targetLanguage, isLightTheme } = useStorage();
+  const { isLightTheme } = useStorage();
+  const { handleTranslateStreaming } = useTranslator();
 
   const {
     state: { selectedText },
@@ -19,22 +21,21 @@ const FullTranslation = () => {
   const isLoading = !translationText;
 
   const handleFullTranslation = useCallback(async () => {
-    const result = await getTranslation({
-      sourceLanguage,
-      targetLanguage,
-      text: selectedText,
-    });
+    const stream = await handleTranslateStreaming(selectedText);
+   
+    let result = '';
+    for await (const chunk of stream) {
+      result += chunk;
+    }
 
-    setTranslationText(result);
-  }, [sourceLanguage, targetLanguage, selectedText]);
+    setTranslationText(result || '');
+  }, [handleTranslateStreaming, selectedText]);
 
   useEffect(() => {
     if (selectedText) {
       handleFullTranslation();
     }
   }, [handleFullTranslation, selectedText]);
-
-  console.log('text', translationText);
 
   return (
     <div
@@ -58,15 +59,6 @@ const FullTranslation = () => {
         >
           <span
             style={{
-              ...classes.smallText,
-              fontWeight: 'bold',
-              color: isLightTheme ? '#6b7280' : '#9ca3af',
-            }}
-          >
-            {t('translation_label')}
-          </span>
-          <span
-            style={{
               ...classes.contentText,
               color: isLightTheme ? '#374151' : '#9ca3af',
               userSelect: 'text',
@@ -80,7 +72,13 @@ const FullTranslation = () => {
                 <LoadingDots />
               </span>
             ) : (
-              translationText || t('no_translation_available')
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: renderMarkdown(
+                    translationText || t('no_translation_available')
+                  ),
+                }}
+              />
             )}
           </span>
         </div>
