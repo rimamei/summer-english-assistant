@@ -4,19 +4,26 @@
  * @returns {string} The formatted prompt.
  */
 export const createGrammarPrompt = (sentence: string): string => {
-    return `Analyze this sentence for grammar and provide educational feedback.
+    return `Analyze this sentence for grammar and provide brief, educational feedback.
 
 Sentence: "${sentence}"
 
 For correct sentences:
-- Explain the grammar structures used (tenses, clauses, punctuation, etc.)
-- Keep explanations concise (1-2 sentences)
-- Use bold for grammar terms and examples
+- List 2-3 KEY grammar points ONLY (e.g., "Uses present perfect tense", "Contains a relative clause")
+- Each point should be ONE short sentence (max 10 words)
+- Use bold for grammar terms
+- IMPORTANT: Put each bullet point on a NEW LINE (use \\n between points)
 
 For incorrect sentences:
 - Provide the corrected version
-- Explain what was wrong and the correct grammar rule
-- Be encouraging and educational
+- List 1-2 brief points explaining what was wrong
+- Be encouraging
+- IMPORTANT: Put each bullet point on a NEW LINE (use \\n between points)
 
-Focus on practical learning, not just correctness.`;
+Keep it SHORT and focused - users want quick, digestible feedback, not lengthy explanations.
+
+FORMAT EXAMPLE:
+- First point here
+- Second point here
+- Third point here`;
 };

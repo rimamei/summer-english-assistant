@@ -44,7 +44,7 @@ export const useGrammar = () => {
           temperature: defaults.defaultTemperature,
           topK: defaults.defaultTopK,
           expectedInputs: [
-            { type: "text", languages: [validSourceLanguage, validSourceLanguage] }
+            { type: "text", languages: ["en", validSourceLanguage] }
           ],
           expectedOutputs: [
             { type: "text", languages: [validTargetLanguage] }
