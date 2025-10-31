@@ -1,75 +1,136 @@
-# React + TypeScript + Vite
+# Summer English AI
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Learn English effortlessly with Summer, your AI-powered language learning companion.
 
-Currently, two official plugins are available:
+## Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Summer is a Chrome extension that helps users learn and improve their English skills through AI-powered features. It provides real-time grammar analysis, translation, pronunciation guidance, and text summarization directly in your browser.
 
-## React Compiler
+## Features
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+- **Grammar Analysis**: Get instant, concise feedback on sentence grammar with key points highlighted
+- **Translation**: Translate selected text between multiple languages
+- **Pronunciation Guide**: Learn correct pronunciation with phonetic transcriptions and audio examples
+- **Text Summarization**: Generate summaries of lengthy texts
+- **Smart Text Selection**: Simply select any text on a webpage to access AI-powered learning tools
+- **Multi-language Support**: Works with multiple source and target languages
+- **Customizable Settings**: Configure your preferred languages and learning modes
 
-Note: This will impact Vite dev & build performances.
+## Tech Stack
 
-## Expanding the ESLint configuration
+- **Framework**: React 19 + TypeScript
+- **Build Tool**: Vite 7
+- **Extension**: Chrome Extension Manifest V3
+- **UI Components**: Radix UI + TailwindCSS 4
+- **Form Management**: React Hook Form + Zod validation
+- **AI Integration**: Chrome Built-in AI APIs (Prompt API, Translator API, Summarizer API)
+- **Build Plugin**: @crxjs/vite-plugin for Chrome extension development
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Requirements
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Node.js (v18 or higher recommended)
+- Chrome browser with AI features enabled
+- Chrome Canary or Dev channel (for built-in AI APIs)
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Installation
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Development Setup
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd summer-english-ai
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+2. Install dependencies:
+```bash
+pnpm install
 ```
+
+3. Start development server:
+```bash
+pnpm run dev
+```
+
+4. Load the extension in Chrome:
+   - Open Chrome and navigate to `chrome://extensions/`
+   - Enable "Developer mode" (top right)
+   - Click "Load unpacked"
+   - Select the `dist` folder from the project directory
+
+### Production Build
+
+```bash
+pnpm run build
+```
+
+The built extension will be in the `dist` folder.
+
+## Project Structure
+
+```
+src/
+├── components/          # Reusable UI components
+│   ├── base/           # Base component wrappers
+│   └── ui/             # UI primitives (button, card, etc.)
+├── hooks/              # Custom React hooks
+│   ├── useGrammar.ts   # Grammar analysis hook
+│   ├── useTranslator.ts # Translation hook
+│   ├── usePronunciation.ts # Pronunciation hook
+│   └── useSummarizer.ts # Summarization hook
+├── pages/
+│   ├── content/        # Content script (injected into web pages)
+│   ├── popup/          # Extension popup UI
+│   └── background/     # Background service worker
+├── prompt/             # AI prompt templates
+│   ├── grammar/        # Grammar analysis prompts
+│   └── pronunciation/  # Pronunciation prompts
+├── type/               # TypeScript type definitions
+└── utils/              # Utility functions
+```
+
+## How It Works
+
+### Grammar Analysis
+The grammar analyzer uses Chrome's Prompt API to provide concise, educational feedback:
+- Analyzes sentence structure, tenses, and grammar patterns
+- Returns 2-3 key grammar points in bullet format
+- Uses conversational tone for better learning experience
+- Optimized with `temperature: 0.8` and `topK: 5` for natural responses
+
+### AI Configuration
+The extension leverages Chrome's built-in AI APIs with customized parameters:
+- **Temperature**: 0.8 (for more natural, varied responses)
+- **TopK**: 5 (for focused but creative output)
+- **Response Format**: Structured JSON schemas for consistent output
+
+### User Flow
+1. User selects text on any webpage
+2. Translation icon appears near selection
+3. User clicks to open translation modal
+4. Tabs provide access to: Full Translation, Grammar Analysis, Pronunciation, and Summarization
+5. AI processes the request and displays results in a user-friendly format
+
+## Development
+
+### Available Scripts
+
+- `pnpm run dev` - Start development server with HMR
+- `pnpm run build` - Build for production
+- `pnpm run lint` - Run ESLint
+- `pnpm run preview` - Preview production build
+
+### Key Technologies
+
+- **React Compiler**: Enabled for optimized builds
+- **TailwindCSS**: Utility-first styling with v4
+- **Radix UI**: Accessible component primitives
+- **TypeScript**: Full type safety
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
