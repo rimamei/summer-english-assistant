@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Summer",
   "version": "0.0.1",
-  "description": "Learn English effortlessly with Summer, your AI-powered language learning companion.",
+  "description": "AI-powered English learning assistant. Get instant grammar analysis, translations, pronunciation guides, and text summaries while browsing.",
   "icons": {
     "16": "public/icons/icon16.png",
     "48": "public/icons/icon48.png",
