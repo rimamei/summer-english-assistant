@@ -38,36 +38,19 @@ export const usePrompt = () => {
     const initPromptSession = useCallback(async (
         createOptions?: LanguageModelCreateOptions
     ) => {
-        console.log('run initPromptSession');
         const newTemp = createOptions?.temperature;
         const newTopK = createOptions?.topK;
 
         // Check if we need to reinitialize due to config change
         if (sessionRef.current && currentConfigRef.current) {
-            if (
-                currentConfigRef.current.temperature !== newTemp ||
-                currentConfigRef.current.topK !== newTopK
-            ) {
-                initControllerRef.current?.abort();
-                promptControllerRef.current?.abort();
+            initControllerRef.current?.abort();
+            promptControllerRef.current?.abort();
 
-                sessionRef.current.destroy();
-                sessionRef.current = null;
-                currentConfigRef.current = null;
-                setPromptStatus({ status: 'idle' });
-            }
-        }
+            sessionRef.current.destroy();
+            sessionRef.current = null;
+            currentConfigRef.current = null;
+            setPromptStatus({ status: 'idle' });
 
-        // Prevent concurrent initializations
-        if (isInitializingRef.current) {
-            console.log('Already initializing, waiting...');
-            return;
-        }
-        
-        // If session exists and config is unchanged, we're already 'ready'
-        if (sessionRef.current) {
-            console.log('Session already exists');
-            return;
         }
 
         if (!isPromptSupported) {
@@ -88,10 +71,8 @@ export const usePrompt = () => {
 
         try {
             const availability = await window.LanguageModel.availability();
-            console.log('availability:', availability);
 
             if (signal.aborted) {
-                console.log('Signal aborted during availability check');
                 return;
             }
 
@@ -103,15 +84,6 @@ export const usePrompt = () => {
                 throw new Error('LanguageModel model is unavailable.');
             }
 
-            if ((availability === 'downloadable' || availability === 'downloading') && !navigator.userActivation.isActive) {
-                setPromptStatus({
-                    status: 'error',
-                    error: 'User interaction required to download language model.',
-                });
-                throw new Error('User interaction required to download language model.');
-            }
-
-            // Create session with options
             if (availability === 'downloadable' || availability === 'downloading') {
                 sessionRef.current = await window.LanguageModel.create({
                     ...createOptions,
@@ -134,10 +106,7 @@ export const usePrompt = () => {
                 });
             }
 
-            console.log('session created:', sessionRef.current);
-
             if (signal.aborted) {
-                console.log('Signal aborted after session creation');
                 sessionRef.current?.destroy();
                 sessionRef.current = null;
                 currentConfigRef.current = null;
@@ -151,14 +120,11 @@ export const usePrompt = () => {
             };
 
             setPromptStatus({ status: 'ready' });
-            console.log('Session initialized successfully');
         } catch (error) {
             if (signal.aborted) {
-                console.log('Caught aborted error');
                 return;
             }
 
-            console.error('Init error:', error);
             setPromptStatus({
                 status: 'error',
                 error: error instanceof Error ? error?.message : 'Failed to initialize prompt session',
@@ -176,8 +142,7 @@ export const usePrompt = () => {
         input: string | LanguageModelPrompt[],
         operationOptions?: PromptOperationOptions,
         createOptions?: LanguageModelCreateOptions
-    ): Promise<string> => {
-        console.log('handlePrompt called');
+    ) => {
 
         // Don't abort previous prompt here - let it complete or handle externally
         // promptControllerRef.current?.abort();
@@ -188,33 +153,25 @@ export const usePrompt = () => {
 
         try {
             // Initialize if needed
-            if (!sessionRef.current) {
-                console.log('No session, initializing...');
+            if (!sessionRef?.current) {
                 await initPromptSession(createOptions);
-                
-                // Check if session was created
-                if (!sessionRef.current) {
-                    throw new Error('Failed to create session');
+            }
+
+            if (signal.aborted) {
+                throw new DOMException('Prompt aborted', 'AbortError');
+            }
+
+            if (sessionRef?.current) {
+                const result = await sessionRef?.current.prompt(input, combinedOperationOptions);
+
+                if (signal.aborted) {
+                    throw new DOMException('Prompt aborted', 'AbortError');
                 }
+
+                return result;
             }
-
-            if (signal.aborted) {
-                throw new DOMException('Prompt aborted', 'AbortError');
-            }
-
-            console.log('Calling session.prompt...');
-            const result = await sessionRef.current.prompt(input, combinedOperationOptions);
-            console.log('Prompt result received');
-
-            if (signal.aborted) {
-                throw new DOMException('Prompt aborted', 'AbortError');
-            }
-
-            return result;
-
         } catch (error) {
-            console.error('handlePrompt error:', error);
-            
+
             if (signal.aborted || (error instanceof Error && error.name === 'AbortError')) {
                 throw error;
             }
