@@ -1,6 +1,6 @@
 export const translations = {
   en: {
-      'vocabulary': 'Vocabulary',
+    'vocabulary': 'Vocabulary',
     'level': 'Level',
     'type': 'Type',
     'something_went_wrong': 'Something went wrong.',
@@ -56,7 +56,7 @@ export const translations = {
 
     // Language Names
     'english': 'English',
-    'indonesian': 'Indonesian',
+    'indonesia': 'Indonesia',
     'spanish': 'Spanish',
     'japanese': 'Japanese',
 
@@ -69,7 +69,7 @@ export const translations = {
   },
 
   id: {
-      'vocabulary': 'Kosakata',
+    'vocabulary': 'Kosakata',
     'level': 'Tingkat',
     'type': 'Tipe',
     'something_went_wrong': 'Terjadi kesalahan.',
@@ -125,7 +125,7 @@ export const translations = {
 
     // Language Names
     'english': 'Bahasa Inggris',
-    'indonesian': 'Bahasa Indonesia',
+    'indonesia': 'Bahasa Indonesia',
     'spanish': 'Bahasa Spanyol',
     'japanese': 'Bahasa Jepang',
 
@@ -138,7 +138,7 @@ export const translations = {
   },
 
   es: {
-      'vocabulary': 'Vocabulario',
+    'vocabulary': 'Vocabulario',
     'level': 'Nivel',
     'type': 'Tipo',
     'something_went_wrong': 'Algo salió mal.',
@@ -194,7 +194,7 @@ export const translations = {
 
     // Language Names
     'english': 'Inglés',
-    'indonesian': 'Indonesio',
+    'indonesia': 'Indonesio',
     'spanish': 'Español',
     'japanese': 'Japonés',
 
@@ -207,7 +207,7 @@ export const translations = {
   },
 
   ja: {
-      'vocabulary': '語彙',
+    'vocabulary': '語彙',
     'level': 'レベル',
     'type': 'タイプ',
     'something_went_wrong': '問題が発生しました。',
@@ -263,7 +263,7 @@ export const translations = {
 
     // Language Names
     'english': '英語',
-    'indonesian': 'インドネシア語',
+    'indonesia': 'インドネシア語',
     'spanish': 'スペイン語',
     'japanese': '日本語',
 

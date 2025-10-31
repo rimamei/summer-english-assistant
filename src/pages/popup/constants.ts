@@ -8,7 +8,7 @@ export const modeOptionsBase = [
 
 export const targetLangOptionsBase = [
     { value: 'en', labelKey: 'english' as const },
-    { value: 'id', labelKey: 'indonesian' as const },
+    { value: 'id', labelKey: 'indonesia' as const },
     { value: 'es', labelKey: 'spanish' as const },
     { value: 'ja', labelKey: 'japanese' as const },
 ];
@@ -35,7 +35,7 @@ export const themeOptionsBase = [
 
 export const languageExtensionOptionsBase = [
     { value: 'en', labelKey: 'english' as const },
-    { value: 'id', labelKey: 'indonesian' as const },
+    { value: 'id', labelKey: 'indonesia' as const },
     { value: 'es', labelKey: 'spanish' as const },
     { value: 'ja', labelKey: 'japanese' as const },
 ];
@@ -50,7 +50,7 @@ export const modeOptions = [
 
 export const targetLangOptions = [
     { value: 'en', label: 'English' },
-    { value: 'id', label: 'Indonesian' },
+    { value: 'id', label: 'Indonesia' },
     { value: 'es', label: 'Spanish' },
     { value: 'ja', label: 'Japanese' },
 ];
@@ -77,7 +77,7 @@ export const themeOptions = [
 
 export const languageExtensionOptions = [
     { value: 'en', label: 'English' },
-    { value: 'id', label: 'Indonesian' },
+    { value: 'id', label: 'Indonesia' },
     { value: 'es', label: 'Spanish' },
     { value: 'ja', label: 'Japanese' },
 ];
