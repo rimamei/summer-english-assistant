@@ -279,5 +279,6 @@ export const usePrompt = () => {
         handlePromptStreaming,
         abortPrompt,
         abortInitialization,
+        setPromptStatus
     };
 }

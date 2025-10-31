@@ -20,7 +20,7 @@ export const sourceLangOptionsBase = [
 export const selectorOptionsBase = [
     { value: 'word', labelKey: 'word' as const },
     { value: 'sentence', labelKey: 'sentence' as const },
-    { value: 'paragraph', labelKey: 'paragraph' as const },
+    { value: 'context', labelKey: 'context' as const },
 ];
 
 export const accentOptionsBase = [
@@ -62,7 +62,7 @@ export const sourceLangOptions = [
 export const selectorOptions = [
     { value: 'word', label: 'Word' },
     { value: 'sentence', label: 'Sentence' },
-    { value: 'paragraph', label: 'Paragraph' },
+    { value: 'context', label: 'Context' },
 ];
 
 export const accentOptions = [

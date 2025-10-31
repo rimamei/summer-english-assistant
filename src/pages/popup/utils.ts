@@ -8,9 +8,9 @@ export const getEnabledOptions = (mode: string) => {
         case 'grammar':
             return ['sentence'];
         case 'summarizer':
-            return ['sentence', 'paragraph'];
+            return ['context'];
         case 'translation':
-            return ['word', 'sentence', 'paragraph'];
+            return ['context'];
         default:
             return ['word'];
     }

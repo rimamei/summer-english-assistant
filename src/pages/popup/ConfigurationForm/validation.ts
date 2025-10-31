@@ -8,6 +8,6 @@ export const validation = z.object({
     .string()
     .min(1, "Target language must be filled."),
   mode: z.enum(["pronunciation", "grammar", "summarizer", "translation"]),
-  selector: z.enum(["word", "sentence", "paragraph"]),
+  selector: z.enum(["word", "sentence", "context"]),
   accent: z.enum(["british", "american"]),
 })

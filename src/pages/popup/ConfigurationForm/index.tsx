@@ -20,6 +20,7 @@ import {
   type SummarizerStatusItem,
 } from '@/hooks/useSummarizer';
 import { usePrompt } from '@/hooks/usePrompt';
+import type { SelectorOption } from '@/type';
 
 const Configuration = () => {
   const { t } = useI18n();
@@ -33,7 +34,7 @@ const Configuration = () => {
 
   const { initLanguageTranslator, translatorStatus } = useTranslator();
   const { initSummarizer, summarizerStatus } = useSummarizer();
-  const { initPromptSession, promptStatus } = usePrompt();
+  const { initPromptSession, promptStatus, setPromptStatus } = usePrompt();
 
   const [isLoading, setIsLoading] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -302,6 +303,10 @@ const Configuration = () => {
                     shouldDirty: true,
                     shouldValidate: true,
                   });
+
+                  if (promptStatus.status !== 'idle') {
+                    setPromptStatus({ status: 'idle' });
+                  }
                 }}
               />
             )}
@@ -322,6 +327,16 @@ const Configuration = () => {
                     options={translatedSourceLangOptions}
                     defaultValue="en"
                     className="w-full"
+                    onValueChange={(value) => {
+                      form.setValue('source_lang', value, {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      });
+
+                      if (promptStatus.status !== 'idle') {
+                        setPromptStatus({ status: 'idle' });
+                      }
+                    }}
                   />
                 )}
               />
@@ -346,6 +361,10 @@ const Configuration = () => {
                         shouldDirty: true,
                         shouldValidate: true,
                       });
+
+                      if (promptStatus.status !== 'idle') {
+                        setPromptStatus({ status: 'idle' });
+                      }
                     }}
                   />
                 )}
@@ -353,7 +372,7 @@ const Configuration = () => {
             </div>
           </div>
 
-          {selectedMode !== 'translation' && (
+          {selectedMode !== 'translation' && selectedMode !== 'summarizer' && (
             <ControlledField
               form={form}
               name="selector"
@@ -370,6 +389,15 @@ const Configuration = () => {
                     ),
                   }))}
                   className="grid-cols-3"
+                  onValueChange={(value) => {
+                    form.setValue('selector', value as SelectorOption, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    });
+                    if (promptStatus.status !== 'idle') {
+                      setPromptStatus({ status: 'idle' });
+                    }
+                  }}
                 />
               )}
             />
@@ -387,6 +415,16 @@ const Configuration = () => {
                   fieldState={fieldState}
                   options={translatedAccentOptions}
                   className="grid-cols-3"
+                  onValueChange={value => {
+                    form.setValue('accent', value as 'american' | 'british', {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    });
+
+                    if (promptStatus.status !== 'idle') {
+                      setPromptStatus({ status: 'idle' });
+                    }
+                  }}
                 />
               )}
             />

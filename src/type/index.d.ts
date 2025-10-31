@@ -3,3 +3,5 @@ export interface IGrammarData {
     details: string;
     corrections: string;
 }
+
+export type SelectorOption = 'word' | 'sentence' | 'context';
