@@ -1,4 +1,9 @@
-import { HelpCircle, Home, Mic, Settings } from 'lucide-react';
+import {
+  // HelpCircle,
+  Home,
+  // Mic,
+  Settings,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 import Configuration from './ConfigurationForm';
 import PreferencesForm from './PreferencesForm';
@@ -11,8 +16,8 @@ function Popup() {
 
   const menuOption = [
     { name: 'home', label: 'Home', icon: Home },
-    { name: 'mic', label: 'Mic & Audio Test', icon: Mic },
-    { name: 'help', label: 'Help', icon: HelpCircle },
+    // { name: 'mic', label: 'Mic & Audio Test', icon: Mic },
+    // { name: 'help', label: 'Help', icon: HelpCircle },
     { name: 'settings', label: 'Settings', icon: Settings },
   ];
 
@@ -25,8 +30,8 @@ function Popup() {
 
   const view = {
     home: <Configuration />,
-    mic: <div>Mic & Audio Test - Coming Soon!</div>,
-    help: <div>Help Section - Coming Soon!</div>,
+    // mic: <div>Mic & Audio Test - Coming Soon!</div>,
+    // help: <div>Help Section - Coming Soon!</div>,
     settings: <PreferencesForm />,
   };
 

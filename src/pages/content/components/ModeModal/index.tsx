@@ -1,6 +1,11 @@
 import { useState } from 'react';
 import { classes } from './style';
-import { Camera, GripVertical, Highlighter, Power } from 'lucide-react';
+import {
+  // Camera,
+  GripVertical,
+  Highlighter,
+  Power,
+} from 'lucide-react';
 import { Tooltip } from '../Tooltip';
 import { useDraggable } from '../../hooks/useDraggable';
 import { useExtensionMode } from '../../hooks/useExtensionMode';
@@ -18,7 +23,7 @@ const ModeModal = () => {
   const { position, isDragging, handleMouseDown } = useDraggable({});
   const {
     enableHighlightMode,
-    enableScreenshotMode,
+    // enableScreenshotMode,
     mode,
     closeModeModal,
   } = useExtensionMode();
@@ -49,14 +54,14 @@ const ModeModal = () => {
       title: t('enable_text_translation'),
       key: 'highlight',
     },
-    {
-      icon: <Camera size={18} />,
-      action: () => {
-        enableScreenshotMode();
-      },
-      title: t('capture_screenshot'),
-      key: 'screenshot',
-    },
+    // {
+    //   icon: <Camera size={18} />,
+    //   action: () => {
+    //     enableScreenshotMode();
+    //   },
+    //   title: t('capture_screenshot'),
+    //   key: 'screenshot',
+    // },
     {
       icon: <Power size={18} />,
       action: () => {
