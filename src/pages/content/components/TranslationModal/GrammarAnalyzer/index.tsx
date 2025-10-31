@@ -13,16 +13,14 @@ const GrammarAnalyzer = () => {
   const [explanation, setExplanation] = useState<IGrammarData>();
 
   const { sourceLanguage, targetLanguage, isLightTheme } = useStorage();
-  const { analyzeSentence } = useGrammar();
+  const { analyzeSentence, isLoading } = useGrammar();
 
   const lastAnalyzedRef = useRef<string>('');
 
   const {
     state: { selectedText },
   } = useExtension();
-
-  const isLoading = !explanation?.details;
-
+  
   const handleAnalyzeSentence = useCallback(async () => {
     const result = await analyzeSentence({
       sentence: selectedText,
@@ -81,7 +79,7 @@ const GrammarAnalyzer = () => {
               <span
                 dangerouslySetInnerHTML={{
                   __html: renderMarkdown(
-                    explanation.details || t('no_explanation_available')
+                    explanation?.details || t('no_explanation_available')
                   ),
                 }}
               />
