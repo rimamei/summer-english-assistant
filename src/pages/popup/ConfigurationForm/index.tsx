@@ -3,7 +3,7 @@ import Select from '@/components/base/Select';
 import { Button } from '@/components/ui/button';
 import { FieldGroup } from '@/components/ui/field';
 import { ArrowRight, CheckCircle, InfoIcon } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { validation } from './validation';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -51,11 +51,6 @@ const Configuration = () => {
   });
 
   const [selectedMode, setSelectedMode] = useState(form.getValues('mode'));
-
-  const targetLanguageOptions =
-    selectedMode === 'translation'
-      ? translatedTargetLangOptions.filter((option) => option.value !== 'en')
-      : translatedTargetLangOptions;
 
   // Load settings from Chrome storage on component mount
   useEffect(() => {
@@ -121,8 +116,8 @@ const Configuration = () => {
         const config: SummarizerConfig = {
           expectedInputLanguages: [data.source_lang || 'en'],
           expectedContextLanguages: [data.target_lang || 'en'],
-          format: 'plain-text',
-          length: 'medium',
+          format: 'markdown',
+          length: 'short',
           outputLanguage: data.target_lang || 'en',
           type: 'key-points',
         };
@@ -199,7 +194,7 @@ const Configuration = () => {
     }
   };
 
-  const getStatus = () => {
+  const getStatus = useCallback(() => {
     let result: SummarizerStatusItem = {
       status: 'idle',
       error: undefined,
@@ -219,9 +214,16 @@ const Configuration = () => {
       error: result?.error,
       progress: result?.progress ?? 0,
     };
-  };
+  }, [selectedMode, translatorStatus, summarizerStatus, promptStatus]);
 
-  console.log(getStatus());
+  const showNotification = useMemo(() => {
+    return (
+      error ||
+      getStatus()?.status === 'error' ||
+      getStatus()?.status === 'ready' ||
+      getStatus()?.status === 'downloading'
+    );
+  }, [getStatus, error]);
 
   return (
     <div className="my-4 border border-gray-200 dark:border-none dark:shadow-lg rounded-lg p-4 bg-card dark:bg-card transition-colors duration-500">
@@ -230,7 +232,7 @@ const Configuration = () => {
       </h3>
 
       {/* Notification Card */}
-      {(error || getStatus()?.status !== 'idle') && (
+      {showNotification && (
         <div
           className={`w-full flex items-center gap-3 min-h-12 px-4 py-3 mb-6 rounded-lg shadow-sm border
             ${
@@ -332,7 +334,7 @@ const Configuration = () => {
                   <Select
                     field={field}
                     fieldState={fieldState}
-                    options={targetLanguageOptions}
+                    options={translatedTargetLangOptions}
                     defaultValue="in"
                     className="w-full"
                     onValueChange={(value) => {
@@ -369,20 +371,22 @@ const Configuration = () => {
             />
           )}
 
-          <ControlledField
-            form={form}
-            name="accent"
-            htmlId="accent"
-            label={t('accent')}
-            component={(field, fieldState) => (
-              <RadioGroup
-                field={field}
-                fieldState={fieldState}
-                options={translatedAccentOptions}
-                className="grid-cols-3"
-              />
-            )}
-          />
+          {form.getValues('mode') === 'pronunciation' && (
+            <ControlledField
+              form={form}
+              name="accent"
+              htmlId="accent"
+              label={t('accent')}
+              component={(field, fieldState) => (
+                <RadioGroup
+                  field={field}
+                  fieldState={fieldState}
+                  options={translatedAccentOptions}
+                  className="grid-cols-3"
+                />
+              )}
+            />
+          )}
           <div className="flex justify-end">
             <Button
               type="submit"

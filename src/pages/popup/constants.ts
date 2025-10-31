@@ -1,7 +1,7 @@
 // Base options without translations (for static use)
 export const modeOptionsBase = [
     { value: 'grammar', labelKey: 'grammar' as const },
-    { value: 'pronunciation', labelKey: 'pronunciation' as const },
+    { value: 'pronunciation', labelKey: 'vocabulary' as const },
     { value: 'summarizer', labelKey: 'summarizer' as const },
     { value: 'translation', labelKey: 'translation' as const },
 ];
