@@ -10,4 +10,6 @@ export const validation = z.object({
   mode: z.enum(["pronunciation", "grammar", "summarizer", "translation"]),
   selector: z.enum(["word", "sentence", "context"]),
   accent: z.enum(["british", "american"]),
+  summarizer_type: z.enum(["headline", "key-points", "teaser", "tldr"]).optional(),
+  summarizer_length: z.enum(["short", "medium", "long"]).optional(),
 })

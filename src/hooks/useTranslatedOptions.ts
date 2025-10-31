@@ -1,4 +1,4 @@
-import { accentOptionsBase, languageExtensionOptionsBase, modeOptionsBase, selectorOptionsBase, sourceLangOptionsBase, targetLangOptionsBase, themeOptionsBase } from "@/pages/popup/constants";
+import { accentOptionsBase, languageExtensionOptionsBase, modeOptionsBase, selectorOptionsBase, sourceLangOptionsBase, summarizerLengthOptionsBase, summarizerTypeOptionsBase, targetLangOptionsBase, themeOptionsBase } from "@/pages/popup/constants";
 import { useI18n } from "./useI18n";
 
 // Hook to get translated options
@@ -30,12 +30,22 @@ export const useTranslatedOptions = () => {
             value: option.value,
             label: t(option.labelKey)
         })),
-        
+
+        summarizerTypeOptions: summarizerTypeOptionsBase.map(option => ({
+            value: option.value,
+            label: t(option.labelKey)
+        })),
+
+        summarizerLengthOptions: summarizerLengthOptionsBase.map(option => ({
+            value: option.value,
+            label: t(option.labelKey)
+        })),
+
         themeOptions: themeOptionsBase.map(option => ({
             value: option.value,
             label: t(option.labelKey)
         })),
-        
+
         languageExtensionOptions: languageExtensionOptionsBase.map(option => ({
             value: option.value,
             label: t(option.labelKey)

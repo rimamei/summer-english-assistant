@@ -30,6 +30,8 @@ const Configuration = () => {
     sourceLangOptions: translatedSourceLangOptions,
     selectorOptions: translatedSelectorOptions,
     accentOptions: translatedAccentOptions,
+    summarizerTypeOptions: translatedSummarizerTypeOptions,
+    summarizerLengthOptions: translatedSummarizerLengthOptions,
   } = useTranslatedOptions();
 
   const { initLanguageTranslator, translatorStatus } = useTranslator();
@@ -48,6 +50,8 @@ const Configuration = () => {
       mode: 'pronunciation',
       selector: 'word',
       accent: 'american',
+      summarizer_type: 'key-points',
+      summarizer_length: 'short',
     },
   });
 
@@ -88,6 +92,8 @@ const Configuration = () => {
             mode: result?.mode || 'pronunciation',
             selector: result?.selector || 'word',
             accent: result?.accent || 'american',
+            summarizer_type: result?.summarizer_type || 'key-points',
+            summarizer_length: result?.summarizer_length || 'short',
             enabled_extension: result?.enabled_extension || false,
           };
 
@@ -118,9 +124,9 @@ const Configuration = () => {
           expectedInputLanguages: [data.source_lang || 'en'],
           expectedContextLanguages: [data.target_lang || 'en'],
           format: 'markdown',
-          length: 'short',
+          length: (data.summarizer_length || 'short') as 'short' | 'medium' | 'long',
           outputLanguage: data.target_lang || 'en',
-          type: 'key-points',
+          type: (data.summarizer_type || 'key-points') as 'headline' | 'key-points' | 'teaser' | 'tldr',
         };
 
         await initSummarizer(config);
@@ -177,6 +183,8 @@ const Configuration = () => {
         mode: data.mode,
         accent: data.accent,
         ...(data.selector && { selector: data.selector }),
+        ...(data.summarizer_type && { summarizer_type: data.summarizer_type }),
+        ...(data.summarizer_length && { summarizer_length: data.summarizer_length }),
       };
 
       await chrome.storage.local.set({
@@ -371,6 +379,58 @@ const Configuration = () => {
               />
             </div>
           </div>
+
+          {selectedMode === 'summarizer' && (
+            <>
+              <ControlledField
+                form={form}
+                name="summarizer_type"
+                htmlId="summarizer_type"
+                label={t('summarizer_type')}
+                component={(field, fieldState) => (
+                  <Select
+                    field={field}
+                    fieldState={fieldState}
+                    options={translatedSummarizerTypeOptions}
+                    defaultValue="key-points"
+                    className="w-full"
+                    onValueChange={(value) => {
+                      form.setValue('summarizer_type', value as 'headline' | 'key-points' | 'teaser' | 'tldr', {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      });
+                      if (summarizerStatus.status !== 'idle') {
+                        // Reset summarizer status when config changes
+                      }
+                    }}
+                  />
+                )}
+              />
+              <ControlledField
+                form={form}
+                name="summarizer_length"
+                htmlId="summarizer_length"
+                label={t('summarizer_length')}
+                component={(field, fieldState) => (
+                  <RadioGroup
+                    field={field}
+                    fieldState={fieldState}
+                    options={translatedSummarizerLengthOptions}
+                    className="grid-cols-3"
+                    onValueChange={(value) => {
+                      form.setValue('summarizer_length', value as 'short' | 'medium' | 'long', {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      });
+                      if (summarizerStatus.status !== 'idle') {
+                        // Reset summarizer status when config changes
+                      }
+                    }}
+                  />
+                )}
+              />
+            </>
+          )}
 
           {selectedMode !== 'translation' && selectedMode !== 'summarizer' && (
             <ControlledField

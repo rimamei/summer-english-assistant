@@ -28,6 +28,19 @@ export const accentOptionsBase = [
     { value: 'british', labelKey: 'british' as const },
 ];
 
+export const summarizerTypeOptionsBase = [
+    { value: 'headline', labelKey: 'headline' as const },
+    { value: 'key-points', labelKey: 'key_points' as const },
+    { value: 'teaser', labelKey: 'teaser' as const },
+    { value: 'tldr', labelKey: 'tldr' as const },
+];
+
+export const summarizerLengthOptionsBase = [
+    { value: 'short', labelKey: 'short' as const },
+    { value: 'medium', labelKey: 'medium' as const },
+    { value: 'long', labelKey: 'long' as const },
+];
+
 export const themeOptionsBase = [
     { value: 'light', labelKey: 'light' as const },
     { value: 'dark', labelKey: 'dark' as const },
@@ -68,6 +81,19 @@ export const selectorOptions = [
 export const accentOptions = [
     { value: 'american', label: 'American' },
     { value: 'british', label: 'British' },
+];
+
+export const summarizerTypeOptions = [
+    { value: 'headline', label: 'Headline' },
+    { value: 'key-points', label: 'Key Points' },
+    { value: 'teaser', label: 'Teaser' },
+    { value: 'tldr', label: 'TL;DR' },
+];
+
+export const summarizerLengthOptions = [
+    { value: 'short', label: 'Short' },
+    { value: 'medium', label: 'Medium' },
+    { value: 'long', label: 'Long' },
 ];
 
 export const themeOptions = [
