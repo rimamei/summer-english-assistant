@@ -14,7 +14,7 @@ const createAppContainer = () => {
 
   const container = document.createElement('div');
   container.id = 'summer-extension-root';
-  
+
   // Make sure it doesn't interfere with the page
   container.style.cssText = `
     position: fixed !important;
@@ -26,7 +26,7 @@ const createAppContainer = () => {
     z-index: 2147483647 !important;
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
   `;
-  
+
   document.body.appendChild(container);
   return container;
 };
@@ -44,30 +44,25 @@ const initializeApp = () => {
 
   // Initialize Google Fonts preconnects for better performance
   injectFontPreconnects();
+  // host element, which lives on the main page
+  const hostContainer = createAppContainer();
 
-  try {
-    // host element, which lives on the main page
-    const hostContainer = createAppContainer();
+  // Create the Shadow DOM
+  const shadowRoot = hostContainer.attachShadow({ mode: 'open' });
 
-    // Create the Shadow DOM
-    const shadowRoot = hostContainer.attachShadow({ mode: 'open' });
+  // a new element *inside* the shadow DOM for React to attach to
+  const reactRootContainer = document.createElement('div');
+  reactRootContainer.id = 'summer-extension-react-root';
+  shadowRoot.appendChild(reactRootContainer);
 
-    // a new element *inside* the shadow DOM for React to attach to
-    const reactRootContainer = document.createElement('div');
-    reactRootContainer.id = 'summer-extension-react-root';
-    shadowRoot.appendChild(reactRootContainer);
+  // Create the React root on the element *inside* the shadow DOM
+  const root = ReactDOM.createRoot(reactRootContainer);
 
-    // Create the React root on the element *inside* the shadow DOM
-    const root = ReactDOM.createRoot(reactRootContainer);
-    
-    root.render(
-      <React.StrictMode>
-        <Main shadowRoot={shadowRoot} />
-      </React.StrictMode>
-    );
-  } catch (error) {
-    console.error('Summer Extension: Failed to initialize', error);
-  }
+  root.render(
+    <React.StrictMode>
+      <Main shadowRoot={shadowRoot} />
+    </React.StrictMode>
+  );
 };
 
 // Start initialization when DOM is ready

@@ -11,8 +11,7 @@ const Summarization = () => {
   const { t } = useI18n();
   const [explanation, setExplanation] = useState('');
 
-  const { isLightTheme, sourceLanguage, targetLanguage } =
-    useStorage();
+  const { isLightTheme, sourceLanguage, targetLanguage } = useStorage();
   const { handleSummarizeStreaming } = useSummarizer();
 
   const lastAnalyzedRef = useRef<string>('');
@@ -24,31 +23,32 @@ const Summarization = () => {
   const isLoading = !explanation;
 
   const handleAnalyzeSentence = useCallback(async () => {
-    try {
-      const config: SummarizerConfig = {
-        expectedInputLanguages: [sourceLanguage || 'en'],
-        expectedContextLanguages: [targetLanguage || 'en'],
-        format: 'markdown',
-        length: 'medium',
-        outputLanguage: targetLanguage || 'en',
-        type: 'key-points',
-      };
+    const config: SummarizerConfig = {
+      expectedInputLanguages: [sourceLanguage || 'en'],
+      expectedContextLanguages: [targetLanguage || 'en'],
+      format: 'markdown',
+      length: 'medium',
+      outputLanguage: targetLanguage || 'en',
+      type: 'key-points',
+    };
 
-      const result = handleSummarizeStreaming(selectedText, config);
+    const result = handleSummarizeStreaming(selectedText, config);
 
-      let text = '';
-      for await (const chunk of result) {
-        text += chunk;
-      }
-
-      setExplanation(text);
-    } catch (error) {
-      console.error('Error in handleAnalyzeSentence:', error);
+    let text = '';
+    for await (const chunk of result) {
+      text += chunk;
     }
+
+    setExplanation(text);
   }, [handleSummarizeStreaming, selectedText, sourceLanguage, targetLanguage]);
 
   useEffect(() => {
-    if (selectedText && selectedText !== lastAnalyzedRef.current && targetLanguage && sourceLanguage) {
+    if (
+      selectedText &&
+      selectedText !== lastAnalyzedRef.current &&
+      targetLanguage &&
+      sourceLanguage
+    ) {
       lastAnalyzedRef.current = selectedText;
       handleAnalyzeSentence();
     }

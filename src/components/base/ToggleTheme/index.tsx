@@ -11,25 +11,20 @@ const ToggleTheme = () => {
   // Load theme from storage on mount
   useEffect(() => {
     const loadTheme = async () => {
-      try {
-        // Try Chrome storage first (for extension)
-        if (chrome?.storage?.local) {
-          const result = await chrome.storage.local.get(['theme']);
-          const savedTheme = result.theme as Theme;
-          if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
-            setTheme(savedTheme);
-            applyTheme(savedTheme);
-          }
-        } else {
-          // Fallback to localStorage (for development)
-          const savedTheme = localStorage.getItem('theme') as Theme;
-          if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
-            setTheme(savedTheme);
-            applyTheme(savedTheme);
-          }
+      if (chrome?.storage?.local) {
+        const result = await chrome.storage.local.get(['theme']);
+        const savedTheme = result.theme as Theme;
+        if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
+          setTheme(savedTheme);
+          applyTheme(savedTheme);
         }
-      } catch (error) {
-        console.warn('Failed to load theme:', error);
+      } else {
+        // Fallback to localStorage (for development)
+        const savedTheme = localStorage.getItem('theme') as Theme;
+        if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
+          setTheme(savedTheme);
+          applyTheme(savedTheme);
+        }
       }
     };
 
@@ -49,15 +44,10 @@ const ToggleTheme = () => {
     setTheme(newTheme);
     applyTheme(newTheme);
 
-    // Save to storage
-    try {
-      if (chrome?.storage?.local) {
-        await chrome.storage.local.set({ theme: newTheme });
-      } else {
-        localStorage.setItem('theme', newTheme);
-      }
-    } catch (error) {
-      console.warn('Failed to save theme:', error);
+    if (chrome?.storage?.local) {
+      await chrome.storage.local.set({ theme: newTheme });
+    } else {
+      localStorage.setItem('theme', newTheme);
     }
   };
 
@@ -65,7 +55,7 @@ const ToggleTheme = () => {
     <div className="flex items-center space-x-2 p-2">
       <div className="flex items-center justify-center rounded-xl p-3 shadow-theme bg-linear-to-br from-yellow-100 to-orange-100 dark:from-blue-900 dark:to-purple-900 transition-all duration-700 ease-in-out overflow-hidden relative h-12 w-12 mx-2 group">
         <div className="absolute inset-0 bg-linear-to-r from-yellow-400/30 to-orange-400/30 dark:from-blue-400/40 dark:to-purple-400/40 rounded-xl blur-sm opacity-0 transition-opacity duration-500 animate-pulse" />
-        
+
         <div
           className={cn(
             'absolute inset-0 flex items-center justify-center transition-all duration-700 ease-in-out',

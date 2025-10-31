@@ -150,7 +150,7 @@ const Configuration = () => {
 
       saveToStorage(data);
     } catch (e) {
-      console.log('err', e);
+      setError(e instanceof Error ? e?.message : String(e));
     } finally {
       setIsLoading(false);
     }
@@ -179,7 +179,7 @@ const Configuration = () => {
 
       await chrome.storage.local.set({
         settings: JSON.stringify(storageData),
-        ext_status: true
+        ext_status: true,
       });
 
       // Reset form dirty state after successful save

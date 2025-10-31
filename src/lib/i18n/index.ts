@@ -12,16 +12,12 @@ class I18n {
   }
 
   private async loadLanguageFromStorage() {
-    try {
-      if (typeof chrome !== 'undefined' && chrome?.storage?.local) {
-        const data = await chrome.storage.local.get(['preferences']);
-        if (data.preferences) {
-          const preferences = JSON.parse(data.preferences);
-          this.setLanguage(preferences.lang || 'en');
-        }
+    if (typeof chrome !== 'undefined' && chrome?.storage?.local) {
+      const data = await chrome.storage.local.get(['preferences']);
+      if (data.preferences) {
+        const preferences = JSON.parse(data.preferences);
+        this.setLanguage(preferences.lang || 'en');
       }
-    } catch (error) {
-      console.warn('Failed to load language from storage:', error);
     }
   }
 
@@ -29,7 +25,6 @@ class I18n {
     if (translations[language]) {
       this.currentLanguage = language;
     } else {
-      console.warn(`Language ${language} not supported, falling back to ${this.fallbackLanguage}`);
       this.currentLanguage = this.fallbackLanguage;
     }
   }
@@ -39,9 +34,9 @@ class I18n {
   }
 
   t(key: TranslationKey, variables?: Record<string, string | number>): string {
-    const translation = translations[this.currentLanguage]?.[key] || 
-                       translations[this.fallbackLanguage][key] || 
-                       key;
+    const translation = translations[this.currentLanguage]?.[key] ||
+      translations[this.fallbackLanguage][key] ||
+      key;
 
     if (!variables) {
       return translation;
@@ -63,7 +58,7 @@ class I18n {
 export const i18n = new I18n();
 
 // Export function for easy use in components
-export const t = (key: TranslationKey, variables?: Record<string, string | number>) => 
+export const t = (key: TranslationKey, variables?: Record<string, string | number>) =>
   i18n.t(key, variables);
 
 // Hook for React components to listen to language changes

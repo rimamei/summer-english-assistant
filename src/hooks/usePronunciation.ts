@@ -55,7 +55,6 @@ export const usePronunciation = () => {
 
         // Get default params
         const defaults = await window.LanguageModel.params();
-        console.log('Got default params:', defaults);
 
         if (signal.aborted) {
           throw new DOMException('Analysis aborted', 'AbortError');
