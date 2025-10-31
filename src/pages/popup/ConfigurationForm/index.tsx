@@ -177,7 +177,10 @@ const Configuration = () => {
         ...(data.selector && { selector: data.selector }),
       };
 
-      await chrome.storage.local.set({ settings: JSON.stringify(storageData) });
+      await chrome.storage.local.set({
+        settings: JSON.stringify(storageData),
+        ext_status: true
+      });
 
       // Reset form dirty state after successful save
       form.reset(data);
