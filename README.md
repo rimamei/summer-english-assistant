@@ -38,7 +38,7 @@ Summer is a Chrome extension that helps users learn and improve their English sk
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone git@github.com:rimamei/summer-english-assistant.git
 cd summer-english-ai
 ```
 
