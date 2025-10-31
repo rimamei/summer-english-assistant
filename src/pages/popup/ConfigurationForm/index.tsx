@@ -157,6 +157,7 @@ const Configuration = () => {
   };
 
   const saveToStorage = async (data: z.infer<typeof validation>) => {
+    setError('');
     try {
       // Check if chrome.storage is available
       if (!chrome?.storage?.local) {
