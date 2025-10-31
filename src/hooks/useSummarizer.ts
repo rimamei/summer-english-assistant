@@ -103,32 +103,37 @@ export const useSummarizer = () => {
             }
 
             // Check for user activation if a download is required
-            if (availability === 'downloadable') {
-                if (!navigator.userActivation.isActive) {
-                    setSummarizerStatus({ status: 'error', error: 'User interaction required to download summarization model.' });
-                    
-                    throw new Error('User interaction required to download summarization model.');
-                }
-                // Set initial downloading status
-                setSummarizerStatus({ status: 'downloading', progress: 0 });
+            if (availability === 'downloadable' || availability === 'downloading') {
+                console.log('newConfig', newConfig)
+                sessionRef.current = await window.Summarizer.create({
+                    ...newConfig,
+                    signal,
+                    monitor(m) {
+                        m.addEventListener('downloadprogress', (e) => {
+                            if (!signal.aborted) {
+                                setSummarizerStatus({
+                                    status: 'downloading',
+                                    // e.loaded is 0-1, convert to percentage
+                                    progress: Math.round(e.loaded * 100),
+                                });
+                            }
+                        });
+                    },
+                });
+
+                setSummarizerStatus({ status: 'ready' });
             }
 
-            // Create the session
-            sessionRef.current = await window.Summarizer.create({
-                ...newConfig,
-                signal,
-                monitor(m) {
-                    m.addEventListener('downloadprogress', (e) => {
-                        if (!signal.aborted) {
-                            setSummarizerStatus({
-                                status: 'downloading',
-                                // e.loaded is 0-1, convert to percentage
-                                progress: Math.round(e.loaded * 100),
-                            });
-                        }
-                    });
-                },
-            });
+            if (availability === 'available') {
+                // Create the session
+                sessionRef.current = await window.Summarizer.create({
+                    ...newConfig,
+                    signal,
+
+                });
+                setSummarizerStatus({ status: 'ready' });
+            }
+
 
             if (signal.aborted) {
                 sessionRef.current?.destroy();
@@ -139,7 +144,7 @@ export const useSummarizer = () => {
 
             // Store the config used for this session
             currentConfigRef.current = newConfig;
-            setSummarizerStatus({ status: 'ready' });
+             setSummarizerStatus({ status: 'idle' });
 
         } catch (error) {
             if (signal.aborted) return;
@@ -186,7 +191,7 @@ export const useSummarizer = () => {
             if (signal.aborted) return;
 
             if (sessionRef?.current) {
-                const stream = sessionRef.current.summarizeStreaming(text.trim(), { signal });
+                const stream = sessionRef.current.summarizeStreaming(text.trim().replace(/\n/g, '<br>'), { signal });
 
                 if (signal.aborted) return;
 

@@ -1,19 +1,21 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { classes } from '../style';
 import LoadingDots from '../../LoadingDots';
-import { useStorage } from '@/hooks/useStorage';
 import { useExtension } from '@/pages/content/hooks/useContext';
 import { renderMarkdown } from '@/pages/content/utils/renderMarkdown';
 import { useI18n } from '@/hooks/useI18n';
 import { useSummarizer, type SummarizerConfig } from '@/hooks/useSummarizer';
+import { useStorage } from '@/hooks/useStorage';
 
 const Summarization = () => {
   const { t } = useI18n();
   const [explanation, setExplanation] = useState('');
 
-  const { isLightTheme, sourceLanguage, targetLanguage } = useStorage();
-
+  const { isLightTheme, sourceLanguage, targetLanguage } =
+    useStorage();
   const { handleSummarizeStreaming } = useSummarizer();
+
+  const lastAnalyzedRef = useRef<string>('');
 
   const {
     state: { selectedText },
@@ -22,36 +24,41 @@ const Summarization = () => {
   const isLoading = !explanation;
 
   const handleAnalyzeSentence = useCallback(async () => {
-    const config: SummarizerConfig = {
-      expectedInputLanguages: [sourceLanguage || 'en'],
-      expectedContextLanguages: [targetLanguage || 'en'],
-      format: 'plain-text',
-      length: 'medium',
-      outputLanguage: targetLanguage || 'en',
-      type: 'key-points',
-    };
+    try {
+      const config: SummarizerConfig = {
+        expectedInputLanguages: [sourceLanguage || 'en'],
+        expectedContextLanguages: [targetLanguage || 'en'],
+        format: 'markdown',
+        length: 'medium',
+        outputLanguage: targetLanguage || 'en',
+        type: 'key-points',
+      };
 
-    const result = await handleSummarizeStreaming(selectedText, config);
+      const result = handleSummarizeStreaming(selectedText, config);
 
-    let text = '';
-    for await (const chunk of result) {
-      text += chunk;
+      let text = '';
+      for await (const chunk of result) {
+        text += chunk;
+      }
+
+      setExplanation(text);
+    } catch (error) {
+      console.error('Error in handleAnalyzeSentence:', error);
     }
-
-    setExplanation(text);
   }, [handleSummarizeStreaming, selectedText, sourceLanguage, targetLanguage]);
 
   useEffect(() => {
-    if (selectedText) {
+    if (selectedText && selectedText !== lastAnalyzedRef.current && targetLanguage && sourceLanguage) {
+      lastAnalyzedRef.current = selectedText;
       handleAnalyzeSentence();
     }
-  }, [handleAnalyzeSentence, selectedText]);
+  }, [handleAnalyzeSentence, selectedText, sourceLanguage, targetLanguage]);
 
   return (
     <div>
       <div
         style={{
-          marginBottom: '12px',
+          margin: '8px',
           display: 'flex',
           flexDirection: 'column',
         }}
