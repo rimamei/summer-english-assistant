@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { classes } from '../style';
 import LoadingDots from '../../LoadingDots';
 import { useStorage } from '@/hooks/useStorage';
@@ -15,58 +15,41 @@ const Pronunciation = () => {
   const { settingsData, sourceLanguage, targetLanguage, isLightTheme } =
     useStorage();
   const { analyzeWord, promptStatus, isLoading } = usePronunciation();
+  const lastAnalyzedRef = useRef<string>('');
 
   const {
     state: { selectedText },
   } = useExtension();
 
-  // Track what we've analyzed
-  const lastAnalyzedRef = useRef<string>('');
-  const isAnalyzingRef = useRef(false);
+  const handlePronunciation = useCallback(async () => {
+    try {
+      const result = await analyzeWord({
+        word: selectedText,
+        sourceLanguage: sourceLanguage!,
+        targetLanguage: targetLanguage!,
+      });
+
+      setData(result);
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : 'Unknown error occurred';
+      setError(errorMessage);
+    }
+  }, [analyzeWord, selectedText, sourceLanguage, targetLanguage]);
 
   useEffect(() => {
-    // Only analyze if we have text and haven't analyzed this exact text yet
     if (
       selectedText &&
       selectedText !== lastAnalyzedRef.current &&
-      !isAnalyzingRef.current
+      sourceLanguage &&
+      targetLanguage
     ) {
-      isAnalyzingRef.current = true;
       lastAnalyzedRef.current = selectedText;
-      setError(null);
-      setData(null);
-
-      console.log('Starting analysis for:', selectedText);
-
-      const analyzeSentence = async () => {
-        try {
-          const result = await analyzeWord({
-            word: selectedText,
-            sourceLanguage,
-            targetLanguage,
-          });
-
-          setData(result);
-        } catch (err) {
-          console.error('Analysis failed:', err);
-          const errorMessage =
-            err instanceof Error ? err.message : 'Unknown error occurred';
-          setError(errorMessage);
-        } finally {
-          isAnalyzingRef.current = false;
-        }
-      };
-
-      analyzeSentence();
+      handlePronunciation();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedText, sourceLanguage, targetLanguage]);
+  }, [handlePronunciation, selectedText, sourceLanguage, targetLanguage]);
 
   const accent = settingsData?.accent === 'british' ? 'uk' : 'us';
-
-  console.log('promptStatus:', promptStatus);
-  console.log('isLoading:', isLoading);
-  console.log('data:', data);
 
   return (
     <div>
