@@ -19,6 +19,7 @@ import {
   type SummarizerConfig,
   type SummarizerStatusItem,
 } from '@/hooks/useSummarizer';
+import { usePrompt } from '@/hooks/usePrompt';
 
 const Configuration = () => {
   const { t } = useI18n();
@@ -32,6 +33,7 @@ const Configuration = () => {
 
   const { initLanguageTranslator, translatorStatus } = useTranslator();
   const { initSummarizer, summarizerStatus } = useSummarizer();
+  const { initPromptSession, promptStatus } = usePrompt();
 
   const [isLoading, setIsLoading] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -126,6 +128,29 @@ const Configuration = () => {
         };
 
         await initSummarizer(config);
+      } else {
+        const config: LanguageModelCreateOptions = {
+          initialPrompts: [
+            {
+              role: 'system',
+              content: 'You are a helpful and friendly assistant.',
+            },
+          ],
+          temperature: 0.2,
+          topK: 1,
+          expectedInputs: [
+            {
+              type: 'text',
+              languages: [
+                data.source_lang /* system prompt */,
+                data.source_lang /* user prompt */,
+              ],
+            },
+          ],
+          expectedOutputs: [{ type: 'text', languages: [data.target_lang] }],
+        };
+
+        await initPromptSession(config);
       }
 
       saveToStorage(data);
@@ -185,6 +210,8 @@ const Configuration = () => {
       result = translatorStatus;
     } else if (selectedMode === 'summarizer') {
       result = summarizerStatus;
+    } else {
+      result = promptStatus;
     }
 
     return {
@@ -194,6 +221,8 @@ const Configuration = () => {
     };
   };
 
+  console.log(getStatus());
+
   return (
     <div className="my-4 border border-gray-200 dark:border-none dark:shadow-lg rounded-lg p-4 bg-card dark:bg-card transition-colors duration-500">
       <h3 className="text-base text-gray-900 dark:text-gray-100 font-semibold transition-colors duration-500 mb-6">
@@ -201,12 +230,9 @@ const Configuration = () => {
       </h3>
 
       {/* Notification Card */}
-      {error ||
-        (selectedMode === 'translation' && getStatus()?.status !== 'idle') ||
-        (selectedMode === 'summarizer' &&
-          summarizerStatus?.status !== 'idle' && (
-            <div
-              className={`w-full flex items-center gap-3 min-h-12 px-4 py-3 mb-6 rounded-lg shadow-sm border
+      {(error || getStatus()?.status !== 'idle') && (
+        <div
+          className={`w-full flex items-center gap-3 min-h-12 px-4 py-3 mb-6 rounded-lg shadow-sm border
             ${
               getStatus().status === 'error'
                 ? 'border-red-200 bg-red-50 dark:bg-red-900 dark:border-red-700'
@@ -216,39 +242,39 @@ const Configuration = () => {
                 ? 'border-green-200 bg-green-50 dark:bg-green-900 dark:border-green-700'
                 : 'border-zinc-200 from-zinc-50 to-zinc-100 dark:from-zinc-800 dark:to-zinc-900 dark:border-zinc-700'
             }`}
-              style={{ fontWeight: 500 }}
-            >
-              {(getStatus().status === 'error' || error) && (
-                <>
-                  <InfoIcon className="w-5 h-5 text-red-500 dark:text-red-400" />
-                  <span className="text-red-800 dark:text-red-100">
-                    {getStatus().error ? getStatus().error : error}
+          style={{ fontWeight: 500 }}
+        >
+          {(getStatus().status === 'error' || error) && (
+            <>
+              <InfoIcon className="w-5 h-5 text-red-500 dark:text-red-400" />
+              <span className="text-red-800 dark:text-red-100">
+                {getStatus().error ? getStatus().error : error}
+              </span>
+            </>
+          )}
+          {getStatus().status === 'downloading' && (
+            <>
+              <InfoIcon className="w-5 h-5 text-blue-500 dark:text-blue-400 animate-spin" />
+              <span className="text-blue-800 dark:text-blue-100">
+                {t('api_downloading')}
+                {typeof getStatus().progress === 'number' && (
+                  <span className="ml-2">
+                    {Math.round(getStatus().progress * 100)}%
                   </span>
-                </>
-              )}
-              {getStatus().status === 'downloading' && (
-                <>
-                  <InfoIcon className="w-5 h-5 text-blue-500 dark:text-blue-400 animate-spin" />
-                  <span className="text-blue-800 dark:text-blue-100">
-                    {t('api_downloading')}
-                    {typeof getStatus().progress === 'number' && (
-                      <span className="ml-2">
-                        {Math.round(getStatus().progress * 100)}%
-                      </span>
-                    )}
-                  </span>
-                </>
-              )}
-              {getStatus().status === 'ready' && (
-                <>
-                  <InfoIcon className="w-5 h-5 text-green-500 dark:text-green-400" />
-                  <span className="text-green-800 dark:text-green-100">
-                    {t('api_ready')}
-                  </span>
-                </>
-              )}
-            </div>
-          ))}
+                )}
+              </span>
+            </>
+          )}
+          {getStatus().status === 'ready' && (
+            <>
+              <InfoIcon className="w-5 h-5 text-green-500 dark:text-green-400" />
+              <span className="text-green-800 dark:text-green-100">
+                {t('api_ready')}
+              </span>
+            </>
+          )}
+        </div>
+      )}
 
       <form id="form-rhf-demo" onSubmit={form.handleSubmit(onSubmit)}>
         <FieldGroup>

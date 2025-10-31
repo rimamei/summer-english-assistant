@@ -52,7 +52,7 @@ declare interface LanguageModelExpected {
     /** The type of content expected */
     type: 'text' | 'image';
     /** Supported languages (optional) */
-    languages?: string[];
+    languages: string[];
 }
 
 /**
@@ -220,7 +220,7 @@ declare interface PromptOperationOptions {
  * JSON Schema type for response constraints
  */
 declare type JSONSchema = {
-    type?: 'boolean' | 'string' | 'number' | 'object' | 'array' | 'null';
+    type?: boolean | string | number | object | array | null;
     properties?: Record<string, JSONSchema>;
     items?: JSONSchema;
     required?: string[];

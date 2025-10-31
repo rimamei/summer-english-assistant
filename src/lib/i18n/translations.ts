@@ -1,9 +1,12 @@
 export const translations = {
   en: {
+    'level': 'Level',
+    'type': 'Type',
+    'something_went_wrong': 'Something went wrong.',
     // Popup - Extension Status
     'extension_status': 'Extension Status',
     'enabled': 'Enabled',
-    
+
     // Popup - Preferences
     'preferences': 'Preferences',
     'theme': 'Theme',
@@ -12,7 +15,7 @@ export const translations = {
     'language': 'Language',
     'apply': 'Apply',
     'saved': 'Saved!',
-    
+
     // Popup - Configuration
     'configuration': 'Configuration',
     'mode': 'Mode',
@@ -31,31 +34,31 @@ export const translations = {
     'api_downloading': 'Model is being downloaded...',
     'api_error_default': 'An error occurred with the translator.',
     'api_ready': 'Model is ready to use.',
-    
+
     // Content Script - Translation Modal
     'loading': 'Loading',
     'translation_label': 'Translation:',
     'no_translation_available': 'No translation available',
     'no_explanation_available': 'No explanation available',
     'no_summary_available': 'No summary available',
-    
+
     // Content Script - Pronunciation
     'definition': 'Definition:',
     'synonyms': 'Synonyms:',
     'sound_by_sound': 'Sound by Sound:',
     'as_in': 'as in',
-    
+
     // Content Script - Mode Modal
     'enable_text_translation': 'Highlight',
     'capture_screenshot': 'Screenshot',
     'extension_off': 'Disable Extension',
-    
+
     // Language Names
     'english': 'English',
     'indonesian': 'Indonesian',
     'spanish': 'Spanish',
     'japanese': 'Japanese',
-    
+
     // Common
     'close': 'Close',
     'cancel': 'Cancel',
@@ -63,12 +66,15 @@ export const translations = {
     'yes': 'Yes',
     'no': 'No',
   },
-  
+
   id: {
+    'level': 'Tingkat',
+    'type': 'Tipe',
+    'something_went_wrong': 'Terjadi kesalahan.',
     // Popup - Extension Status
     'extension_status': 'Status Ekstensi',
     'enabled': 'Aktif',
-    
+
     // Popup - Preferences
     'preferences': 'Preferensi',
     'theme': 'Tema',
@@ -77,7 +83,7 @@ export const translations = {
     'language': 'Bahasa',
     'apply': 'Terapkan',
     'saved': 'Tersimpan!',
-    
+
     // Popup - Configuration
     'configuration': 'Konfigurasi',
     'mode': 'Mode',
@@ -96,31 +102,31 @@ export const translations = {
     'api_downloading': 'Model sedang diunduh...',
     'api_error_default': 'Terjadi kesalahan pada penerjemah.',
     'api_ready': 'Model siap digunakan.',
-    
+
     // Content Script - Translation Modal
     'loading': 'Memuat',
     'translation_label': 'Terjemahan:',
     'no_translation_available': 'Terjemahan tidak tersedia',
     'no_explanation_available': 'Penjelasan tidak tersedia',
     'no_summary_available': 'Ringkasan tidak tersedia',
-    
+
     // Content Script - Pronunciation
     'definition': 'Definisi:',
     'synonyms': 'Sinonim:',
     'sound_by_sound': 'Bunyi per Bunyi:',
     'as_in': 'seperti dalam',
-    
+
     // Content Script - Mode Modal
     'enable_text_translation': 'Highlight Teks',
     'capture_screenshot': 'Ambil Screenshot',
     'extension_off': 'Nonaktifkan Ekstensi',
-    
+
     // Language Names
     'english': 'Bahasa Inggris',
     'indonesian': 'Bahasa Indonesia',
     'spanish': 'Bahasa Spanyol',
     'japanese': 'Bahasa Jepang',
-    
+
     // Common
     'close': 'Tutup',
     'cancel': 'Batal',
@@ -128,12 +134,15 @@ export const translations = {
     'yes': 'Ya',
     'no': 'Tidak',
   },
-  
+
   es: {
+    'level': 'Nivel',
+    'type': 'Tipo',
+    'something_went_wrong': 'Algo salió mal.',
     // Popup - Extension Status
     'extension_status': 'Estado de Extensión',
     'enabled': 'Habilitado',
-    
+
     // Popup - Preferences
     'preferences': 'Preferencias',
     'theme': 'Tema',
@@ -142,7 +151,7 @@ export const translations = {
     'language': 'Idioma',
     'apply': 'Aplicar',
     'saved': '¡Guardado!',
-    
+
     // Popup - Configuration
     'configuration': 'Configuración',
     'mode': 'Modo',
@@ -161,31 +170,31 @@ export const translations = {
     'api_downloading': 'El modelo se está descargando...',
     'api_error_default': 'Ocurrió un error con el traductor.',
     'api_ready': 'El modelo está listo para usar.',
-    
+
     // Content Script - Translation Modal
     'loading': 'Cargando',
     'translation_label': 'Traducción:',
     'no_translation_available': 'Traducción no disponible',
     'no_explanation_available': 'Explicación no disponible',
     'no_summary_available': 'Resumen no disponible',
-    
+
     // Content Script - Pronunciation
     'definition': 'Definición:',
     'synonyms': 'Sinónimos:',
     'sound_by_sound': 'Sonido por Sonido:',
     'as_in': 'como en',
-    
+
     // Content Script - Mode Modal
     'enable_text_translation': 'Highlight',
     'capture_screenshot': 'Screenshot',
     'extension_off': 'Desactivar Extensión',
-    
+
     // Language Names
     'english': 'Inglés',
     'indonesian': 'Indonesio',
     'spanish': 'Español',
     'japanese': 'Japonés',
-    
+
     // Common
     'close': 'Cerrar',
     'cancel': 'Cancelar',
@@ -193,12 +202,15 @@ export const translations = {
     'yes': 'Sí',
     'no': 'No',
   },
-  
+
   ja: {
+    'level': 'レベル',
+    'type': 'タイプ',
+    'something_went_wrong': '問題が発生しました。',
     // Popup - Extension Status
     'extension_status': '拡張機能の状態',
     'enabled': '有効',
-    
+
     // Popup - Preferences
     'preferences': '設定',
     'theme': 'テーマ',
@@ -207,7 +219,7 @@ export const translations = {
     'language': '言語',
     'apply': '適用',
     'saved': '保存されました！',
-    
+
     // Popup - Configuration
     'configuration': '構成',
     'mode': 'モード',
@@ -226,31 +238,31 @@ export const translations = {
     'api_downloading': 'モデルをダウンロード中...',
     'api_error_default': '翻訳機能でエラーが発生しました。',
     'api_ready': 'モデルの使用準備ができました。',
-    
+
     // Content Script - Translation Modal
     'loading': '読み込み中',
     'translation_label': '翻訳：',
     'no_translation_available': '翻訳が利用できません',
     'no_explanation_available': '説明が利用できません',
     'no_summary_available': '要約が利用できません',
-    
+
     // Content Script - Pronunciation
     'definition': '定義：',
     'synonyms': '同義語：',
     'sound_by_sound': '音ごと：',
     'as_in': 'のように',
-    
+
     // Content Script - Mode Modal
     'enable_text_translation': 'テキスト翻訳を有効にする',
     'capture_screenshot': 'スクリーンショットを撮る',
     'extension_off': '拡張機能を無効化',
-    
+
     // Language Names
     'english': '英語',
     'indonesian': 'インドネシア語',
     'spanish': 'スペイン語',
     'japanese': '日本語',
-    
+
     // Common
     'close': '閉じる',
     'cancel': 'キャンセル',

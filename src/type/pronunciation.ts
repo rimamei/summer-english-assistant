@@ -11,6 +11,5 @@ export type TPronunciationState = {
     },
     synonyms: string[];
     text: string;
-    translation: string;
     type: string;
 }

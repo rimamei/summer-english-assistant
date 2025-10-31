@@ -113,6 +113,6 @@ export const classes = {
     grammarContainer: {
         display: 'flex',
         flexDirection: 'column',
-        padding: '6px 8px',
+        padding: '8px',
     } as CSSProperties,
 }
