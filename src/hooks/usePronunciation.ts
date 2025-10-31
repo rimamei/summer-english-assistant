@@ -27,7 +27,7 @@ export const usePronunciation = () => {
   const [isLoading, setIsLoading] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  const { handlePrompt, destroySession, promptStatus, isPromptSupported, } =
+  const { handlePrompt, promptStatus, isPromptSupported, } =
     usePrompt();
 
   const analyzeWord = useCallback(
@@ -36,7 +36,6 @@ export const usePronunciation = () => {
 
       // Abort previous request if still running
       if (abortControllerRef.current) {
-        console.log('Aborting previous analysis');
         abortControllerRef.current.abort();
       }
 
@@ -46,16 +45,13 @@ export const usePronunciation = () => {
       setIsLoading(true);
 
       try {
-        console.log('Starting analysis for word:', word);
-
         // Get the prompt text
         const prompt = createPronunciationPrompt(word, targetLanguage);
-        console.log('Prompt created');
+
 
         // Validate languages
         const validSourceLanguage = normalizeLanguage(sourceLanguage);
         const validTargetLanguage = normalizeLanguage(targetLanguage);
-        console.log('Languages validated:', { validSourceLanguage, validTargetLanguage });
 
         // Get default params
         const defaults = await window.LanguageModel.params();
@@ -75,14 +71,18 @@ export const usePronunciation = () => {
           ],
           temperature: defaults.defaultTemperature,
           topK: defaults.defaultTopK,
+          expectedInputs: [
+            { type: "text", languages: [validSourceLanguage, validSourceLanguage] }
+          ],
+          expectedOutputs: [
+            { type: "text", languages: [validTargetLanguage] }
+          ]
         };
 
         // Define prompt operation options
         const operationOptions: PromptOperationOptions = {
           responseConstraint: pronunciationSchema,
         };
-
-        console.log('Calling handlePrompt...');
 
         // Call the generic handlePrompt function
         const resultString = await handlePrompt(
@@ -91,30 +91,20 @@ export const usePronunciation = () => {
           createOptions,
         );
 
-        console.log('Got result:', resultString);
-
         if (signal.aborted) {
           throw new DOMException('Analysis aborted', 'AbortError');
         }
 
         // Parse and return the successful result
-        const parsedResult: PronunciationAnalysis = JSON.parse(resultString);
-        console.log('Parsed result:', parsedResult);
+        const parsedResult: PronunciationAnalysis = JSON.parse(resultString!);
 
         setIsLoading(false);
         return parsedResult;
 
       } catch (error: unknown) {
-        console.error('Analysis error:', error);
         setIsLoading(false);
 
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-
-        // Don't destroy session on abort
-        if (error instanceof Error && error.name !== 'AbortError') {
-          console.log('Destroying session due to error');
-          destroySession();
-        }
 
         throw new Error(`Failed to analyze pronunciation: ${errorMessage}`);
       } finally {
@@ -123,7 +113,7 @@ export const usePronunciation = () => {
         }
       }
     },
-    [handlePrompt, destroySession],
+    [handlePrompt],
   );
 
   return {
