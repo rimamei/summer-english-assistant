@@ -14,7 +14,7 @@ interface AnalyzeSentenceParams {
 export const useGrammar = () => {
   const [isLoading, setIsLoading] = useState(false);
 
-  const { handlePrompt, destroySession, promptStatus, isPromptSupported } =
+  const { handlePrompt, promptStatus, isPromptSupported } =
     usePrompt();
 
   const analyzeSentence = useCallback(
@@ -28,7 +28,7 @@ export const useGrammar = () => {
 
         // Get default params
         const defaults = await window.LanguageModel.params();
-
+        
         // Validate languages
         const validSourceLanguage = normalizeLanguage(sourceLanguage);
         const validTargetLanguage = normalizeLanguage(targetLanguage);
@@ -64,7 +64,7 @@ export const useGrammar = () => {
         );
 
         // Parse and return the successful result
-        const parsedResult: IGrammarData = JSON.parse(resultString);
+        const parsedResult: IGrammarData = JSON.parse(resultString!);
 
         setIsLoading(false);
         return parsedResult;
@@ -78,13 +78,10 @@ export const useGrammar = () => {
 
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
-        // Only destroy session for real errors (not aborts)
-        destroySession();
-
         throw new Error(`Failed to analyze grammar: ${errorMessage}`);
       }
     },
-    [handlePrompt, destroySession],
+    [handlePrompt],
   );
 
   return {

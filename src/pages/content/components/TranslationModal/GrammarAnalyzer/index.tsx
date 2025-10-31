@@ -20,25 +20,30 @@ const GrammarAnalyzer = () => {
   const {
     state: { selectedText },
   } = useExtension();
-  
+
   const handleAnalyzeSentence = useCallback(async () => {
-    const result = await analyzeSentence({
-      sentence: selectedText,
-      sourceLanguage,
-      targetLanguage,
-    });
+    if (sourceLanguage && targetLanguage) {
+      const result = await analyzeSentence({
+        sentence: selectedText,
+        sourceLanguage,
+        targetLanguage,
+      });
 
-    setExplanation({
-      isCorrect: result?.isCorrect || true,
-      details: result?.details || t('no_explanation_available'),
-      corrections: result?.corrections ?? '',
-    });
-
-    console.log('res', result)
+      setExplanation({
+        isCorrect: result?.isCorrect || true,
+        details: result?.details || t('no_explanation_available'),
+        corrections: result?.corrections ?? '',
+      });
+    }
   }, [analyzeSentence, selectedText, sourceLanguage, t, targetLanguage]);
 
   useEffect(() => {
-    if (selectedText && selectedText !== lastAnalyzedRef.current) {
+    if (
+      selectedText &&
+      selectedText !== lastAnalyzedRef.current &&
+      sourceLanguage &&
+      targetLanguage
+    ) {
       lastAnalyzedRef.current = selectedText;
       handleAnalyzeSentence();
     }
