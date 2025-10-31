@@ -14,14 +14,6 @@ export interface IPreferences {
   lang: string;
 }
 
-const defaultSettings: SettingsData = {
-  source_lang: 'en',
-  target_lang: 'id', // Changed to Indonesian as target language
-  mode: 'pronunciation',
-  selector: 'word',
-  accent: 'american',
-};
-
 const defaultPreferences: IPreferences = {
   lang: 'en',
   theme: 'light',
@@ -29,7 +21,7 @@ const defaultPreferences: IPreferences = {
 };
 
 export const useStorage = () => {
-  const [settingsData, setSettingsData] = useState<SettingsData>(defaultSettings);
+  const [settingsData, setSettingsData] = useState<SettingsData | undefined>();
   const [preferencesData, setPreferencesData] = useState<IPreferences>(defaultPreferences);
 
   const [isLoading, setIsLoading] = useState(true);
@@ -38,7 +30,6 @@ export const useStorage = () => {
   const getPreferencesStorage = useCallback(async (): Promise<IPreferences | null> => {
     try {
       if (!chrome?.storage?.local) {
-        console.warn('Chrome storage not available');
         return null;
       }
 
@@ -51,7 +42,6 @@ export const useStorage = () => {
 
       return null;
     } catch (err) {
-      console.error('Error getting storage:', err);
       setError(err instanceof Error ? err.message : 'Failed to get theme');
       return null;
     }
@@ -60,7 +50,6 @@ export const useStorage = () => {
   const getSettingStorage = useCallback(async (): Promise<SettingsData | null> => {
     try {
       if (!chrome?.storage?.local) {
-        console.warn('Chrome storage not available');
         return null;
       }
 
@@ -73,7 +62,6 @@ export const useStorage = () => {
 
       return null;
     } catch (err) {
-      console.error('Error getting storage:', err);
       setError(err instanceof Error ? err.message : 'Failed to get settings');
       return null;
     }
@@ -94,13 +82,9 @@ export const useStorage = () => {
   }, [getSettingStorage]);
 
   const loadTheme = useCallback(async () => {
-    try {
-      const data = await getPreferencesStorage();
-      if (data) {
-        setPreferencesData(data);
-      }
-    } catch (err) {
-      console.error('Error loading theme:', err);
+    const data = await getPreferencesStorage();
+    if (data) {
+      setPreferencesData(data);
     }
   }, [getPreferencesStorage]);
 
@@ -120,39 +104,23 @@ export const useStorage = () => {
     const handleStorageChange = (changes: { [key: string]: chrome.storage.StorageChange }) => {
 
       if (changes.settings) {
-        try {
-          const newSettings = JSON.parse(changes.settings.newValue || '{}');
-          setSettingsData(newSettings);
-        } catch (err) {
-          console.error('Error parsing storage change:', err);
-        }
+        const newSettings = JSON.parse(changes.settings.newValue || '{}');
+        setSettingsData(newSettings);
       }
 
       if (changes.theme) {
-        try {
-          const newTheme = changes.theme.newValue || 'light';
-          setPreferencesData((prev) => ({ ...prev, theme: newTheme }));
-        } catch (err) {
-          console.error('Error parsing storage change:', err);
-        }
+        const newTheme = changes.theme.newValue || 'light';
+        setPreferencesData((prev) => ({ ...prev, theme: newTheme }));
       }
 
       if (changes.preferences) {
-        try {
-          const newPreferences = JSON.parse(changes.preferences.newValue || '{}');
-          setPreferencesData((prev) => ({ ...prev, ...newPreferences }));
-        } catch (err) {
-          console.error('Error parsing preferences change:', err);
-        }
+        const newPreferences = JSON.parse(changes.preferences.newValue || '{}');
+        setPreferencesData((prev) => ({ ...prev, ...newPreferences }));
       }
 
       if (changes.ext_status) {
-        try {
-          const newStatus = changes.ext_status.newValue || false;
-          setPreferencesData((prev) => ({ ...prev, ext_status: newStatus }));
-        } catch (err) {
-          console.error('Error parsing ext_status change:', err);
-        }
+        const newStatus = changes.ext_status.newValue || false;
+        setPreferencesData((prev) => ({ ...prev, ext_status: newStatus }));
       }
     };
 
@@ -168,9 +136,9 @@ export const useStorage = () => {
     isLoading,
     error,
     loadSettings,
-    sourceLanguage: settingsData.source_lang,
-    targetLanguage: settingsData.target_lang,
-    mode: settingsData.mode,
+    sourceLanguage: settingsData?.source_lang,
+    targetLanguage: settingsData?.target_lang,
+    mode: settingsData?.mode,
     enableExtension: preferencesData.ext_status,
     isLightTheme: preferencesData.theme === 'light',
     lang: preferencesData.lang,

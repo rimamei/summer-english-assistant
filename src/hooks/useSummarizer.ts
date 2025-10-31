@@ -104,7 +104,6 @@ export const useSummarizer = () => {
 
             // Check for user activation if a download is required
             if (availability === 'downloadable' || availability === 'downloading') {
-                console.log('newConfig', newConfig)
                 sessionRef.current = await window.Summarizer.create({
                     ...newConfig,
                     signal,
