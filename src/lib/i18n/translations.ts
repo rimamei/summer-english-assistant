@@ -1,5 +1,6 @@
 export const translations = {
   en: {
+      'vocabulary': 'Vocabulary',
     'level': 'Level',
     'type': 'Type',
     'something_went_wrong': 'Something went wrong.',
@@ -68,6 +69,7 @@ export const translations = {
   },
 
   id: {
+      'vocabulary': 'Kosakata',
     'level': 'Tingkat',
     'type': 'Tipe',
     'something_went_wrong': 'Terjadi kesalahan.',
@@ -136,6 +138,7 @@ export const translations = {
   },
 
   es: {
+      'vocabulary': 'Vocabulario',
     'level': 'Nivel',
     'type': 'Tipo',
     'something_went_wrong': 'Algo salió mal.',
@@ -204,6 +207,7 @@ export const translations = {
   },
 
   ja: {
+      'vocabulary': '語彙',
     'level': 'レベル',
     'type': 'タイプ',
     'something_went_wrong': '問題が発生しました。',
