@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { classes } from '../style';
 import LoadingDots from '../../LoadingDots';
 import { useStorage } from '@/hooks/useStorage';
@@ -10,32 +10,35 @@ import { renderMarkdown } from '@/pages/content/utils/renderMarkdown';
 const FullTranslation = () => {
   const { t } = useI18n();
   const [translationText, setTranslationText] = useState('');
+  const { sourceLanguage, targetLanguage } = useStorage();
 
   const { isLightTheme } = useStorage();
   const { handleTranslateStreaming } = useTranslator();
-
   const {
     state: { selectedText },
   } = useExtension();
 
+  const lastAnalyzedRef = useRef<string>('');
+
   const isLoading = !translationText;
 
   const handleFullTranslation = useCallback(async () => {
-    const stream = await handleTranslateStreaming(selectedText);
-   
+    const stream = await handleTranslateStreaming(selectedText, sourceLanguage!, targetLanguage!);
+
     let result = '';
     for await (const chunk of stream) {
       result += chunk;
     }
-    
+
     setTranslationText(result || '');
-  }, [handleTranslateStreaming, selectedText]);
+  }, [handleTranslateStreaming, selectedText, sourceLanguage, targetLanguage]);
 
   useEffect(() => {
-    if (selectedText) {
+    if (selectedText && selectedText !== lastAnalyzedRef.current && sourceLanguage && targetLanguage) {
+      lastAnalyzedRef.current = selectedText;
       handleFullTranslation();
     }
-  }, [handleFullTranslation, selectedText]);
+  }, [handleFullTranslation, selectedText, sourceLanguage, targetLanguage]);
 
   return (
     <div
