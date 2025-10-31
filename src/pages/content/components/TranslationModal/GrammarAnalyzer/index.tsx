@@ -1,53 +1,56 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { classes } from '../style';
 import LoadingDots from '../../LoadingDots';
 import { useStorage } from '@/hooks/useStorage';
 import { useExtension } from '@/pages/content/hooks/useContext';
-import { analyzeSentence } from '@/pages/content/prompt/grammar/grammarPrompt';
 import { renderMarkdown } from '@/pages/content/utils/renderMarkdown';
 import { useI18n } from '@/hooks/useI18n';
+import { useGrammar } from '@/hooks/useGrammar';
+import type { IGrammarData } from '@/type';
 
 const GrammarAnalyzer = () => {
   const { t } = useI18n();
-  const [explanation, setExplanation] = useState({
-    isCorrect: true,
-    details: '',
-    correctedSentence: '',
-  });
+  const [explanation, setExplanation] = useState<IGrammarData>();
 
   const { sourceLanguage, targetLanguage, isLightTheme } = useStorage();
+  const { analyzeSentence } = useGrammar();
+
+  const lastAnalyzedRef = useRef<string>('');
 
   const {
     state: { selectedText },
   } = useExtension();
-  
-  const isLoading = !explanation.details;
+
+  const isLoading = !explanation?.details;
 
   const handleAnalyzeSentence = useCallback(async () => {
-    const result = await analyzeSentence(
+    const result = await analyzeSentence({
+      sentence: selectedText,
       sourceLanguage,
       targetLanguage,
-      selectedText
-    );
+    });
 
     setExplanation({
-      isCorrect: result.isCorrect,
-      details: result?.explanation || t('no_explanation_available'),
-      correctedSentence: result?.correctedSentence ?? '',
+      isCorrect: result?.isCorrect || true,
+      details: result?.details || t('no_explanation_available'),
+      corrections: result?.corrections ?? '',
     });
-  }, [selectedText, sourceLanguage, t, targetLanguage]);
+
+    console.log('res', result)
+  }, [analyzeSentence, selectedText, sourceLanguage, t, targetLanguage]);
 
   useEffect(() => {
-    if (selectedText) {
+    if (selectedText && selectedText !== lastAnalyzedRef.current) {
+      lastAnalyzedRef.current = selectedText;
       handleAnalyzeSentence();
     }
-  }, [handleAnalyzeSentence, selectedText]);
+  }, [handleAnalyzeSentence, selectedText, sourceLanguage, targetLanguage]);
 
   return (
     <div>
       <div
         style={{
-          marginBottom: '12px',
+          margin: '8px',
           display: 'flex',
           flexDirection: 'column',
         }}

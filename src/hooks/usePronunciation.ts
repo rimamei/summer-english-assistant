@@ -2,6 +2,7 @@ import { useState, useCallback, useRef } from 'react';
 import { usePrompt } from './usePrompt';
 import { createPronunciationPrompt } from '@/prompt/pronunciation';
 import { pronunciationSchema } from '@/prompt/pronunciation/schema';
+import { normalizeLanguage } from '@/utils/normalizeLanguage';
 
 export interface PronunciationAnalysis {
   text: string;
@@ -22,30 +23,23 @@ interface AnalyzeWordParams {
   targetLanguage: string;
 }
 
-const normalizeLanguage = (lang: string): string => {
-  const supportedLanguages = ['en', 'ja', 'es'];
-  if (!lang || !lang.trim()) return 'en';
-  const cleanLang = lang.trim().toLowerCase();
-  return supportedLanguages.includes(cleanLang) ? cleanLang : 'en';
-};
-
 export const usePronunciation = () => {
   const [isLoading, setIsLoading] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  const { handlePrompt, destroySession, promptStatus, isPromptSupported, initPromptSession } =
+  const { handlePrompt, destroySession, promptStatus, isPromptSupported, } =
     usePrompt();
 
   const analyzeWord = useCallback(
     async ({ word, sourceLanguage, targetLanguage }: AnalyzeWordParams
     ): Promise<PronunciationAnalysis> => {
-      
+
       // Abort previous request if still running
       if (abortControllerRef.current) {
         console.log('Aborting previous analysis');
         abortControllerRef.current.abort();
       }
-      
+
       abortControllerRef.current = new AbortController();
       const signal = abortControllerRef.current.signal;
 
@@ -53,7 +47,7 @@ export const usePronunciation = () => {
 
       try {
         console.log('Starting analysis for word:', word);
-        
+
         // Get the prompt text
         const prompt = createPronunciationPrompt(word, targetLanguage);
         console.log('Prompt created');
@@ -89,7 +83,7 @@ export const usePronunciation = () => {
         };
 
         console.log('Calling handlePrompt...');
-        
+
         // Call the generic handlePrompt function
         const resultString = await handlePrompt(
           prompt,
@@ -106,14 +100,14 @@ export const usePronunciation = () => {
         // Parse and return the successful result
         const parsedResult: PronunciationAnalysis = JSON.parse(resultString);
         console.log('Parsed result:', parsedResult);
-        
+
         setIsLoading(false);
         return parsedResult;
 
       } catch (error: unknown) {
         console.error('Analysis error:', error);
         setIsLoading(false);
-        
+
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
         // Don't destroy session on abort
@@ -137,6 +131,5 @@ export const usePronunciation = () => {
     isLoading,
     promptStatus,
     isPromptSupported,
-    initPromptSession
   };
 };
