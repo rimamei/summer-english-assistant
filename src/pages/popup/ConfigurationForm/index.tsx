@@ -124,9 +124,16 @@ const Configuration = () => {
           expectedInputLanguages: [data.source_lang || 'en'],
           expectedContextLanguages: [data.target_lang || 'en'],
           format: 'markdown',
-          length: (data.summarizer_length || 'short') as 'short' | 'medium' | 'long',
+          length: (data.summarizer_length || 'short') as
+            | 'short'
+            | 'medium'
+            | 'long',
           outputLanguage: data.target_lang || 'en',
-          type: (data.summarizer_type || 'key-points') as 'headline' | 'key-points' | 'teaser' | 'tldr',
+          type: (data.summarizer_type || 'key-points') as
+            | 'headline'
+            | 'key-points'
+            | 'teaser'
+            | 'tldr',
         };
 
         await initSummarizer(config);
@@ -184,7 +191,9 @@ const Configuration = () => {
         accent: data.accent,
         ...(data.selector && { selector: data.selector }),
         ...(data.summarizer_type && { summarizer_type: data.summarizer_type }),
-        ...(data.summarizer_length && { summarizer_length: data.summarizer_length }),
+        ...(data.summarizer_length && {
+          summarizer_length: data.summarizer_length,
+        }),
       };
 
       await chrome.storage.local.set({
@@ -259,15 +268,14 @@ const Configuration = () => {
             }`}
           style={{ fontWeight: 500 }}
         >
-          {(getStatus().status === 'error' || error) && (
+          {getStatus().status === 'error' || error ? (
             <>
               <InfoIcon className="w-5 h-5 text-red-500 dark:text-red-400" />
               <span className="text-red-800 dark:text-red-100">
                 {getStatus().error ? getStatus().error : error}
               </span>
             </>
-          )}
-          {getStatus().status === 'downloading' && (
+          ) : getStatus().status === 'downloading' ? (
             <>
               <InfoIcon className="w-5 h-5 text-blue-500 dark:text-blue-400 animate-spin" />
               <span className="text-blue-800 dark:text-blue-100">
@@ -279,14 +287,15 @@ const Configuration = () => {
                 )}
               </span>
             </>
-          )}
-          {getStatus().status === 'ready' && (
-            <>
-              <InfoIcon className="w-5 h-5 text-green-500 dark:text-green-400" />
-              <span className="text-green-800 dark:text-green-100">
-                {t('api_ready')}
-              </span>
-            </>
+          ) : (
+            getStatus().status === 'ready' && (
+              <>
+                <InfoIcon className="w-5 h-5 text-green-500 dark:text-green-400" />
+                <span className="text-green-800 dark:text-green-100">
+                  {t('api_ready')}
+                </span>
+              </>
+            )
           )}
         </div>
       )}
@@ -395,10 +404,14 @@ const Configuration = () => {
                     defaultValue="key-points"
                     className="w-full"
                     onValueChange={(value) => {
-                      form.setValue('summarizer_type', value as 'headline' | 'key-points' | 'teaser' | 'tldr', {
-                        shouldDirty: true,
-                        shouldValidate: true,
-                      });
+                      form.setValue(
+                        'summarizer_type',
+                        value as 'headline' | 'key-points' | 'teaser' | 'tldr',
+                        {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        }
+                      );
                       if (summarizerStatus.status !== 'idle') {
                         // Reset summarizer status when config changes
                       }
@@ -418,10 +431,14 @@ const Configuration = () => {
                     options={translatedSummarizerLengthOptions}
                     className="grid-cols-3"
                     onValueChange={(value) => {
-                      form.setValue('summarizer_length', value as 'short' | 'medium' | 'long', {
-                        shouldDirty: true,
-                        shouldValidate: true,
-                      });
+                      form.setValue(
+                        'summarizer_length',
+                        value as 'short' | 'medium' | 'long',
+                        {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        }
+                      );
                       if (summarizerStatus.status !== 'idle') {
                         // Reset summarizer status when config changes
                       }
@@ -475,7 +492,7 @@ const Configuration = () => {
                   fieldState={fieldState}
                   options={translatedAccentOptions}
                   className="grid-cols-3"
-                  onValueChange={value => {
+                  onValueChange={(value) => {
                     form.setValue('accent', value as 'american' | 'british', {
                       shouldDirty: true,
                       shouldValidate: true,
