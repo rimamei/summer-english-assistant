@@ -14,7 +14,9 @@ import { useI18n } from '@/hooks/useI18n';
 
 const ModeModal = () => {
   const { t } = useI18n();
-  const { isLightTheme } = useStorage();
+  const { isLightTheme, preferences } = useStorage();
+
+  console.log(preferences)
 
   const [hoveredButtonIndex, setHoveredButtonIndex] = useState<number | null>(
     null

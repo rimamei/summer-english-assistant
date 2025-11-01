@@ -85,6 +85,19 @@ export const useStorage = () => {
     const data = await getPreferencesStorage();
     if (data) {
       setPreferencesData(data);
+    } else {
+      // Initialize storage with default preferences when empty
+      try {
+        if (chrome?.storage?.local) {
+          await chrome.storage.local.set({
+            preferences: JSON.stringify(defaultPreferences),
+            ext_status: defaultPreferences.ext_status,
+          });
+          setPreferencesData(defaultPreferences);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to initialize preferences');
+      }
     }
   }, [getPreferencesStorage]);
 
