@@ -139,9 +139,9 @@ export const useStorage = () => {
     sourceLanguage: settingsData?.source_lang,
     targetLanguage: settingsData?.target_lang,
     mode: settingsData?.mode,
-    enableExtension: preferencesData.ext_status,
-    isLightTheme: preferencesData.theme === 'light',
-    lang: preferencesData.lang,
+    enableExtension: preferencesData?.ext_status,
+    isLightTheme: preferencesData?.theme ? preferencesData.theme === 'light' : true,
+    lang: preferencesData?.lang,
     preferences: preferencesData,
   };
 };
