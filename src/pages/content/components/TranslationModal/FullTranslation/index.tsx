@@ -5,7 +5,7 @@ import { useStorage } from '@/hooks/useStorage';
 import { useExtension } from '@/pages/content/hooks/useContext';
 import { useI18n } from '@/hooks/useI18n';
 import { useTranslator } from '@/hooks/useTranslator';
-import { renderMarkdown } from '@/pages/content/utils/renderMarkdown';
+import { useSafeMarkdown } from '@/hooks/useSafeMarkdown';
 
 const FullTranslation = () => {
   const { t } = useI18n();
@@ -60,6 +60,8 @@ const FullTranslation = () => {
     }
   }, [handleFullTranslation, selectedText, sourceLanguage, targetLanguage]);
 
+  const sanitizedHtml = useSafeMarkdown(translationText);
+
   return (
     <div
       style={{
@@ -98,14 +100,16 @@ const FullTranslation = () => {
               <span style={{ color: '#ef4444' }}>
                 {error || translatorStatus.error || 'Translation failed'}
               </span>
-            ) : (
+            ) : sanitizedHtml ? (
               <span
                 dangerouslySetInnerHTML={{
-                  __html: renderMarkdown(
-                    translationText || t('no_translation_available')
-                  ),
+                  __html: sanitizedHtml,
                 }}
               />
+            ) : (
+              <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
+                {t('no_translation_available')}
+              </span>
             )}
           </span>
         </div>
