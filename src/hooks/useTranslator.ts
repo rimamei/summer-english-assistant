@@ -231,9 +231,14 @@ export const useTranslator = () => {
         }
     }, []);
 
+    const isLoading = useMemo(() => {
+        return translatorStatus.status === 'checking' || translatorStatus.status === 'downloading';
+    }, [translatorStatus.status]);
+
     return {
         translatorStatus,
         isTranslatorSupported,
+        isLoading,
         initLanguageTranslator,
         destroySession,
         handleTranslateStreaming,

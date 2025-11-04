@@ -12,29 +12,49 @@ const FullTranslation = () => {
   const [translationText, setTranslationText] = useState('');
   const { sourceLanguage, targetLanguage } = useStorage();
 
+  const [error, setError] = useState<string>('');
+
   const { isLightTheme } = useStorage();
-  const { handleTranslateStreaming } = useTranslator();
+  const { handleTranslateStreaming, isLoading, translatorStatus } =
+    useTranslator();
   const {
     state: { selectedText },
   } = useExtension();
 
   const lastAnalyzedRef = useRef<string>('');
 
-  const isLoading = !translationText;
-
   const handleFullTranslation = useCallback(async () => {
-    const stream = await handleTranslateStreaming(selectedText, sourceLanguage!, targetLanguage!);
+    try {
+      setError('');
+      setTranslationText('');
 
-    let result = '';
-    for await (const chunk of stream) {
-      result += chunk;
+      const stream = await handleTranslateStreaming(
+        selectedText,
+        sourceLanguage!,
+        targetLanguage!
+      );
+
+      let result = '';
+      for await (const chunk of stream) {
+        result += chunk;
+      }
+
+      setTranslationText(result || '');
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : 'Translation failed';
+      setError(errorMessage);
+      setTranslationText('');
     }
-
-    setTranslationText(result || '');
   }, [handleTranslateStreaming, selectedText, sourceLanguage, targetLanguage]);
 
   useEffect(() => {
-    if (selectedText && selectedText !== lastAnalyzedRef.current && sourceLanguage && targetLanguage) {
+    if (
+      selectedText &&
+      selectedText !== lastAnalyzedRef.current &&
+      sourceLanguage &&
+      targetLanguage
+    ) {
       lastAnalyzedRef.current = selectedText;
       handleFullTranslation();
     }
@@ -73,6 +93,10 @@ const FullTranslation = () => {
               <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
                 {t('loading')}
                 <LoadingDots />
+              </span>
+            ) : error || translatorStatus.status === 'error' ? (
+              <span style={{ color: '#ef4444' }}>
+                {error || translatorStatus.error || 'Translation failed'}
               </span>
             ) : (
               <span
