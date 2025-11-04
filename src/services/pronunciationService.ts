@@ -219,8 +219,28 @@ class PronunciationService {
                 signal
             };
 
-            // Call the prompt API
-            const resultString = await this.session.prompt(prompt, operationOptions);
+            // Call the prompt streaming API
+            const stream = this.session.promptStreaming(prompt, operationOptions);
+
+            // Read the stream and concatenate chunks
+            let resultString = '';
+            const reader = stream.getReader();
+
+            try {
+                while (true) {
+                    const { done, value } = await reader.read();
+
+                    if (signal.aborted) {
+                        reader.cancel();
+                        throw new DOMException('Analysis aborted', 'AbortError');
+                    }
+
+                    if (done) break;
+                    resultString += value;
+                }
+            } finally {
+                reader.releaseLock();
+            }
 
             if (signal.aborted) {
                 throw new DOMException('Analysis aborted', 'AbortError');

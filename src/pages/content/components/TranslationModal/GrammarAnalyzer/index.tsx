@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { classes } from '../style';
 import LoadingDots from '../../LoadingDots';
 import { useStorage } from '@/hooks/useStorage';
@@ -10,7 +10,7 @@ import type { IGrammarData } from '@/type';
 
 const GrammarAnalyzer = () => {
   const { t } = useI18n();
-  const [explanation, setExplanation] = useState<IGrammarData>();
+  const [streamingContent, setStreamingContent] = useState<string>('');
 
   const { sourceLanguage, targetLanguage, isLightTheme } = useStorage();
   const { analyzeSentence, isLoading } = useGrammar();
@@ -23,19 +23,20 @@ const GrammarAnalyzer = () => {
 
   const handleAnalyzeSentence = useCallback(async () => {
     if (sourceLanguage && targetLanguage) {
-      const result = await analyzeSentence({
+      // Reset streaming content at the start
+      setStreamingContent('');
+
+      await analyzeSentence({
         sentence: selectedText,
         sourceLanguage,
         targetLanguage,
-      });
-
-      setExplanation({
-        isCorrect: result?.isCorrect || true,
-        details: result?.details || t('no_explanation_available'),
-        corrections: result?.corrections ?? '',
+        onChunk: (chunk) => {
+          // Update streaming content as chunks arrive
+          setStreamingContent(chunk);
+        },
       });
     }
-  }, [analyzeSentence, selectedText, sourceLanguage, t, targetLanguage]);
+  }, [analyzeSentence, selectedText, sourceLanguage, targetLanguage]);
 
   useEffect(() => {
     if (
@@ -49,7 +50,39 @@ const GrammarAnalyzer = () => {
     }
   }, [handleAnalyzeSentence, selectedText, sourceLanguage, targetLanguage]);
 
-  const sanitizedHtml = useSafeMarkdown(explanation?.details || '');
+  // Parse the JSON and extract the markdown content
+  const parsedGrammarData = useMemo(() => {
+    if (!streamingContent) return null;
+
+    try {
+      const data: IGrammarData = JSON.parse(streamingContent);
+      return data;
+    } catch {
+      // JSON is incomplete during streaming, return null
+      return null;
+    }
+  }, [streamingContent]);
+
+  // Create the display content from parsed data
+  const displayContent = useMemo(() => {
+    if (!parsedGrammarData) return '';
+
+    let content = '';
+
+    // Show corrections if the sentence is incorrect
+    if (!parsedGrammarData.isCorrect && parsedGrammarData.corrections) {
+      content += `**Correction:** ${parsedGrammarData.corrections}\n\n`;
+    }
+
+    // Add the details (grammar explanation)
+    if (parsedGrammarData.details) {
+      content += parsedGrammarData.details;
+    }
+
+    return content;
+  }, [parsedGrammarData]);
+
+  const sanitizedStreamingHtml = useSafeMarkdown(displayContent);
 
   return (
     <div>
@@ -77,15 +110,15 @@ const GrammarAnalyzer = () => {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {isLoading ? (
+            {isLoading && !parsedGrammarData ? (
               <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
                 {t('loading')}
                 <LoadingDots />
               </span>
-            ) : sanitizedHtml ? (
+            ) : parsedGrammarData && displayContent ? (
               <span
                 dangerouslySetInnerHTML={{
-                  __html: sanitizedHtml,
+                  __html: sanitizedStreamingHtml,
                 }}
               />
             ) : (

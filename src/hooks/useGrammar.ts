@@ -12,6 +12,7 @@ interface AnalyzeSentenceParams {
   sentence: string;
   sourceLanguage: string;
   targetLanguage: string;
+  onChunk?: (chunk: string) => void;
 }
 
 export const useGrammar = () => {
@@ -34,11 +35,11 @@ export const useGrammar = () => {
   }, []);
 
   const analyzeSentence = useCallback(
-    async ({ sentence, sourceLanguage, targetLanguage }: AnalyzeSentenceParams): Promise<IGrammarData | null> => {
+    async ({ sentence, sourceLanguage, targetLanguage, onChunk }: AnalyzeSentenceParams): Promise<IGrammarData | null> => {
       setIsLoading(true);
 
       try {
-        const result = await grammarService.analyzeSentence(sentence, sourceLanguage, targetLanguage);
+        const result = await grammarService.analyzeSentence(sentence, sourceLanguage, targetLanguage, onChunk);
         setIsLoading(false);
         return result;
       } catch (error: unknown) {

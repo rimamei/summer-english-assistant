@@ -150,7 +150,8 @@ class GrammarService {
     async analyzeSentence(
         sentence: string,
         sourceLanguage: string,
-        targetLanguage: string
+        targetLanguage: string,
+        onChunk?: (chunk: string) => void
     ): Promise<IGrammarData | null> {
         // Abort previous analysis
         this.analyzeController?.abort();
@@ -207,8 +208,33 @@ class GrammarService {
                 signal
             };
 
-            // Call the prompt API
-            const resultString = await this.session.prompt(prompt, operationOptions);
+            // Call the prompt streaming API
+            const stream = this.session.promptStreaming(prompt, operationOptions);
+
+            // Read the stream and concatenate chunks
+            let resultString = '';
+            const reader = stream.getReader();
+
+            try {
+                while (true) {
+                    const { done, value } = await reader.read();
+
+                    if (signal.aborted) {
+                        reader.cancel();
+                        return null;
+                    }
+
+                    if (done) break;
+                    resultString += value;
+
+                    // Call the onChunk callback if provided
+                    if (onChunk) {
+                        onChunk(resultString);
+                    }
+                }
+            } finally {
+                reader.releaseLock();
+            }
 
             if (signal.aborted) {
                 return null;

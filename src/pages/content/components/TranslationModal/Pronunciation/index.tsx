@@ -14,7 +14,7 @@ const Pronunciation = () => {
 
   const { settingsData, sourceLanguage, targetLanguage, isLightTheme } =
     useStorage();
-  const { analyzeWord, promptStatus, isLoading } = usePronunciation();
+  const { analyzeWord, pronunciationStatus, isLoading } = usePronunciation();
   const lastAnalyzedRef = useRef<string>('');
 
   const {
@@ -82,10 +82,10 @@ const Pronunciation = () => {
                 {t('loading')}
                 <LoadingDots />
               </span>
-            ) : error || promptStatus.status === 'error' ? (
+            ) : error || pronunciationStatus.status === 'error' ? (
               <div>
                 <span style={{ color: '#ef4444' }}>
-                  {error || promptStatus.error || t('something_went_wrong')}
+                  {error || pronunciationStatus.error || t('something_went_wrong')}
                 </span>
               </div>
             ) : (
