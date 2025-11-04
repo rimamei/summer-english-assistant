@@ -52,11 +52,11 @@ const App = ({ shadowRoot }: MainProps) => {
           <ModeModal />
 
           {/* Translation Icon - appears when text is selected */}
-          {selection?.position && (
+          {selection && (
             <TranslationIcon
-              position={selection?.position || { x: 0, y: 0 }}
+              position={selection.position}
               onClick={handleTranslationClick}
-              isVisible={!!selection && !showTranslationModal}
+              isVisible={!showTranslationModal}
             />
           )}
 

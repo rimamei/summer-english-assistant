@@ -29,10 +29,39 @@ export function useTextSelection(): UseTextSelectionReturn {
     }
     const range = sel.getRangeAt(0);
     const rect = range.getBoundingClientRect();
-    const position = {
-      x: rect.right + 10,
-      y: rect.top - 5,
-    };
+
+    // Icon dimensions
+    const iconSize = 32; // Width and height of the icon
+    const offset = 4; // Small offset from selection
+
+    // Viewport boundaries
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    // Calculate position at the end of selected text (aligned with the text line)
+    let x = rect.right + offset;
+    let y = rect.top + (rect.height - iconSize) / 2; // Vertically centered with selection
+
+    // Prevent icon from going off-screen horizontally
+    if (x + iconSize > viewportWidth - offset) {
+      // Position to the left of selection if not enough space on the right
+      x = rect.left - iconSize - offset;
+
+      // If still off-screen, position above the end of selection
+      if (x < offset) {
+        x = rect.right - iconSize / 2;
+        y = rect.top - iconSize - offset;
+      }
+    }
+
+    // Prevent icon from going off-screen vertically
+    if (y < offset) {
+      y = offset;
+    } else if (y + iconSize > viewportHeight - offset) {
+      y = viewportHeight - iconSize - offset;
+    }
+
+    const position = { x, y };
     setSelection({
       text: selectedText,
       position,
