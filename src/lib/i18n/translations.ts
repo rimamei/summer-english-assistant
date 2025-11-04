@@ -47,6 +47,7 @@ export const translations = {
 
     // Content Script - Translation Modal
     'loading': 'Loading',
+    'downloading': 'Downloading',
     'translation_label': 'Translation:',
     'no_translation_available': 'No translation available',
     'no_explanation_available': 'No explanation available',
@@ -125,6 +126,7 @@ export const translations = {
 
     // Content Script - Translation Modal
     'loading': 'Memuat',
+    'downloading': 'Mengunduh',
     'translation_label': 'Terjemahan:',
     'no_translation_available': 'Terjemahan tidak tersedia',
     'no_explanation_available': 'Penjelasan tidak tersedia',
@@ -203,6 +205,7 @@ export const translations = {
 
     // Content Script - Translation Modal
     'loading': 'Cargando',
+    'downloading': 'Descargando',
     'translation_label': 'Traducción:',
     'no_translation_available': 'Traducción no disponible',
     'no_explanation_available': 'Explicación no disponible',
@@ -281,6 +284,7 @@ export const translations = {
 
     // Content Script - Translation Modal
     'loading': '読み込み中',
+    'downloading': 'ダウンロード中',
     'translation_label': '翻訳：',
     'no_translation_available': '翻訳が利用できません',
     'no_explanation_available': '説明が利用できません',

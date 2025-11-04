@@ -101,7 +101,7 @@ class SummarizerService {
                         if (!signal.aborted) {
                             SummarizerService.getInstance().notifyStatusChange({
                                 status: 'downloading',
-                                progress: Math.round(e.loaded * 10),
+                                progress: Math.round(e.loaded * 100),
                             });
                         }
                     });

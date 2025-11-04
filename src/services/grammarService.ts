@@ -105,7 +105,7 @@ class GrammarService {
                             if (!signal.aborted) {
                                 GrammarService.getInstance().notifyStatusChange({
                                     status: 'downloading',
-                                    progress: e.loaded,
+                                    progress: e.loaded * 100,
                                 });
                             }
                         });

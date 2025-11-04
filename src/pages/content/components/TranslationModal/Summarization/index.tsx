@@ -96,10 +96,36 @@ const Summarization = () => {
             onClick={(e) => e.stopPropagation()}
           >
             {isLoading ? (
-              <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
-                {t('loading')}
-                <LoadingDots />
-              </span>
+              summarizerStatus.status === 'downloading' ? (
+                <div style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
+                  <div style={{ marginBottom: '8px' }}>
+                    {t('downloading')} {summarizerStatus.progress || 0}%
+                  </div>
+                  <div
+                    style={{
+                      width: '100%',
+                      height: '4px',
+                      backgroundColor: isLightTheme ? '#e5e7eb' : '#4b5563',
+                      borderRadius: '2px',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: `${summarizerStatus.progress || 0}%`,
+                        height: '100%',
+                        backgroundColor: '#3b82f6',
+                        transition: 'width 0.3s ease',
+                      }}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
+                  {t('loading')}
+                  <LoadingDots />
+                </span>
+              )
             ) : error || summarizerStatus.status === 'error' ? (
               <span style={{ color: '#ef4444' }}>
                 {error || summarizerStatus.error || 'Summarization failed'}

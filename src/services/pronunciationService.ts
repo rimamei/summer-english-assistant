@@ -117,7 +117,7 @@ class PronunciationService {
                             if (!signal.aborted) {
                                 PronunciationService.getInstance().notifyStatusChange({
                                     status: 'downloading',
-                                    progress: e.loaded,
+                                    progress: e.loaded * 100,
                                 });
                             }
                         });
