@@ -10,9 +10,11 @@ import { useSafeMarkdown } from '@/hooks/useSafeMarkdown';
 const Summarization = () => {
   const { t } = useI18n();
   const [explanation, setExplanation] = useState('');
+  const [error, setError] = useState<string>('');
 
   const { isLightTheme, sourceLanguage, targetLanguage } = useStorage();
-  const { handleSummarizeStreaming } = useSummarizer();
+  const { handleSummarizeStreaming, isLoading, summarizerStatus } =
+    useSummarizer();
 
   const lastAnalyzedRef = useRef<string>('');
 
@@ -20,26 +22,34 @@ const Summarization = () => {
     state: { selectedText },
   } = useExtension();
 
-  const isLoading = !explanation;
-
   const handleAnalyzeSentence = useCallback(async () => {
-    const config: SummarizerConfig = {
-      expectedInputLanguages: [sourceLanguage || 'en'],
-      expectedContextLanguages: [targetLanguage || 'en'],
-      format: 'markdown',
-      length: 'medium',
-      outputLanguage: targetLanguage || 'en',
-      type: 'key-points',
-    };
+    try {
+      setError('');
+      setExplanation('');
 
-    const result = handleSummarizeStreaming(selectedText, config);
+      const config: SummarizerConfig = {
+        expectedInputLanguages: [sourceLanguage || 'en'],
+        expectedContextLanguages: [targetLanguage || 'en'],
+        format: 'markdown',
+        length: 'medium',
+        outputLanguage: targetLanguage || 'en',
+        type: 'key-points',
+      };
+      
+      const result = handleSummarizeStreaming(selectedText, config);
 
-    let text = '';
-    for await (const chunk of result) {
-      text += chunk;
+      let text = '';
+      for await (const chunk of result) {
+        text += chunk;
+      }
+
+      setExplanation(text || '');
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : 'Summarization failed';
+      setError(errorMessage);
+      setExplanation('');
     }
-
-    setExplanation(text);
   }, [handleSummarizeStreaming, selectedText, sourceLanguage, targetLanguage]);
 
   useEffect(() => {
@@ -57,28 +67,31 @@ const Summarization = () => {
   const sanitizedHtml = useSafeMarkdown(explanation);
 
   return (
-    <div>
+    <div
+      style={{
+        padding: '8px',
+      }}
+    >
       <div
         style={{
-          margin: '8px',
+          marginBottom: '12px',
           display: 'flex',
           flexDirection: 'column',
+          gap: '4px',
         }}
       >
         <div
           style={{
-            ...classes.grammarContainer,
+            ...classes.translationContainer,
             backgroundColor: isLightTheme ? '#f3f4f6' : '#374151',
-            borderRadius: '4px',
           }}
         >
-          <div
+          <span
             style={{
               ...classes.contentText,
-              color: isLightTheme ? '#374151' : '',
+              color: isLightTheme ? '#374151' : '#9ca3af',
               userSelect: 'text',
               cursor: 'text',
-              lineHeight: '1.6',
             }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -87,18 +100,18 @@ const Summarization = () => {
                 {t('loading')}
                 <LoadingDots />
               </span>
-            ) : sanitizedHtml ? (
+            ) : error || summarizerStatus.status === 'error' ? (
+              <span style={{ color: '#ef4444' }}>
+                {error || summarizerStatus.error || 'Summarization failed'}
+              </span>
+            ) : (
               <span
                 dangerouslySetInnerHTML={{
-                  __html: sanitizedHtml,
+                  __html: sanitizedHtml || '',
                 }}
               />
-            ) : (
-              <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
-                {t('no_summary_available')}
-              </span>
             )}
-          </div>
+          </span>
         </div>
       </div>
     </div>
