@@ -2,10 +2,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { classes } from '../style';
 import LoadingDots from '../../LoadingDots';
 import { useExtension } from '@/pages/content/hooks/useContext';
-import { renderMarkdown } from '@/pages/content/utils/renderMarkdown';
 import { useI18n } from '@/hooks/useI18n';
 import { useSummarizer, type SummarizerConfig } from '@/hooks/useSummarizer';
 import { useStorage } from '@/hooks/useStorage';
+import { useSafeMarkdown } from '@/hooks/useSafeMarkdown';
 
 const Summarization = () => {
   const { t } = useI18n();
@@ -54,6 +54,8 @@ const Summarization = () => {
     }
   }, [handleAnalyzeSentence, selectedText, sourceLanguage, targetLanguage]);
 
+  const sanitizedHtml = useSafeMarkdown(explanation);
+
   return (
     <div>
       <div
@@ -85,14 +87,16 @@ const Summarization = () => {
                 {t('loading')}
                 <LoadingDots />
               </span>
-            ) : (
+            ) : sanitizedHtml ? (
               <span
                 dangerouslySetInnerHTML={{
-                  __html: renderMarkdown(
-                    explanation || t('no_summary_available')
-                  ),
+                  __html: sanitizedHtml,
                 }}
               />
+            ) : (
+              <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
+                {t('no_summary_available')}
+              </span>
             )}
           </div>
         </div>

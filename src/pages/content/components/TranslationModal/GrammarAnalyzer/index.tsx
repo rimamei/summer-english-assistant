@@ -3,9 +3,9 @@ import { classes } from '../style';
 import LoadingDots from '../../LoadingDots';
 import { useStorage } from '@/hooks/useStorage';
 import { useExtension } from '@/pages/content/hooks/useContext';
-import { renderMarkdown } from '@/pages/content/utils/renderMarkdown';
 import { useI18n } from '@/hooks/useI18n';
 import { useGrammar } from '@/hooks/useGrammar';
+import { useSafeMarkdown } from '@/hooks/useSafeMarkdown';
 import type { IGrammarData } from '@/type';
 
 const GrammarAnalyzer = () => {
@@ -49,6 +49,8 @@ const GrammarAnalyzer = () => {
     }
   }, [handleAnalyzeSentence, selectedText, sourceLanguage, targetLanguage]);
 
+  const sanitizedHtml = useSafeMarkdown(explanation?.details || '');
+
   return (
     <div>
       <div
@@ -80,14 +82,16 @@ const GrammarAnalyzer = () => {
                 {t('loading')}
                 <LoadingDots />
               </span>
-            ) : (
+            ) : sanitizedHtml ? (
               <span
                 dangerouslySetInnerHTML={{
-                  __html: renderMarkdown(
-                    explanation?.details || t('no_explanation_available')
-                  ),
+                  __html: sanitizedHtml,
                 }}
               />
+            ) : (
+              <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
+                {t('no_explanation_available')}
+              </span>
             )}
           </div>
         </div>
