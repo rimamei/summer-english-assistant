@@ -107,9 +107,7 @@ const FullTranslation = () => {
                 }}
               />
             ) : (
-              <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
-                {t('no_translation_available')}
-              </span>
+              <span></span>
             )}
           </span>
         </div>
