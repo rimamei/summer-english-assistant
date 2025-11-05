@@ -14,6 +14,7 @@ import { useTranslatedOptions } from '@/hooks/useTranslatedOptions';
 import type { TTheme } from '@/type/theme';
 import { applyTheme } from '../utils';
 import { useStorage } from '@/hooks/useStorage';
+import { agentOptions, modelOptions } from '@/constants/agent';
 
 const PreferencesForm = () => {
   const { t, changeLanguage } = useI18n();
@@ -31,19 +32,29 @@ const PreferencesForm = () => {
     defaultValues: {
       lang: 'en',
       theme: 'light',
+      agent: 'chrome',
     },
   });
 
   const loadSettings = useCallback(async () => {
     try {
       // Check if we have actual saved values (not just empty object)
-      const hasValidData = preferences && preferences.lang && preferences.theme;
+      const hasValidData =
+        preferences &&
+        preferences.lang &&
+        preferences.theme &&
+        preferences.agent;
 
       if (hasValidData) {
         // Create new data object with loaded values and defaults
         const loadedData = {
           lang: preferences.lang || 'en',
           theme: preferences.theme || 'light',
+          agent: preferences.agent || 'chrome',
+          ...(preferences.agent === 'gemini' && {
+            model: preferences.model,
+            apiKey: preferences.apiKey,
+          }),
         };
 
         // Reset form with loaded data (this updates both values and default values)
@@ -79,6 +90,11 @@ const PreferencesForm = () => {
       const storageData = {
         theme: data.theme,
         lang: data.lang,
+        agent: data.agent,
+        ...(data.agent === 'gemini' && {
+          model: data.model,
+          apiKey: data.apiKey,
+        }),
       };
 
       await chrome.storage.local.set({
@@ -130,6 +146,82 @@ const PreferencesForm = () => {
           <FieldGroup>
             <ControlledField
               form={form}
+              name="agent"
+              htmlId="agent"
+              className="col-span-5"
+              label="Agent"
+              component={(field, fieldState) => (
+                <Select
+                  field={field}
+                  fieldState={fieldState}
+                  options={agentOptions}
+                  defaultValue="en"
+                  className="w-full"
+                  onValueChange={(value) => {
+                    form.setValue('agent', value, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    });
+                  }}
+                />
+              )}
+            />
+
+            {form.getValues('agent') === 'gemini' && (
+              <>
+                <ControlledField
+                  form={form}
+                  name="model"
+                  htmlId="model"
+                  className="col-span-5"
+                  label="Model"
+                  component={(field, fieldState) => (
+                    <Select
+                      field={field}
+                      fieldState={fieldState}
+                      options={
+                        modelOptions[form.getValues('agent') as 'gemini']
+                      }
+                      defaultValue="en"
+                      className="w-full"
+                      onValueChange={(value) => {
+                        form.setValue('model', value, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        });
+                      }}
+                    />
+                  )}
+                />
+                <ControlledField
+                  form={form}
+                  name="apiKey"
+                  htmlId="apiKey"
+                  className="col-span-5"
+                  label="API Key"
+                  component={(field, fieldState) => (
+                    <Select
+                      field={field}
+                      fieldState={fieldState}
+                      options={
+                        modelOptions[form.getValues('agent') as 'gemini']
+                      }
+                      defaultValue="en"
+                      className="w-full"
+                      onValueChange={(value) => {
+                        form.setValue('model', value, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        });
+                      }}
+                    />
+                  )}
+                />
+              </>
+            )}
+
+            <ControlledField
+              form={form}
               label={t('theme')}
               name="theme"
               htmlId="theme"
@@ -150,30 +242,28 @@ const PreferencesForm = () => {
               )}
             />
 
-            <div className="w-full">
-              <ControlledField
-                form={form}
-                name="lang"
-                htmlId="lang"
-                className="col-span-5"
-                label={t('language')}
-                component={(field, fieldState) => (
-                  <Select
-                    field={field}
-                    fieldState={fieldState}
-                    options={translatedLanguageOptions}
-                    defaultValue="en"
-                    className="w-full"
-                    onValueChange={(value) => {
-                      form.setValue('lang', value, {
-                        shouldDirty: true,
-                        shouldValidate: true,
-                      });
-                    }}
-                  />
-                )}
-              />
-            </div>
+            <ControlledField
+              form={form}
+              name="lang"
+              htmlId="lang"
+              className="col-span-5"
+              label={t('language')}
+              component={(field, fieldState) => (
+                <Select
+                  field={field}
+                  fieldState={fieldState}
+                  options={translatedLanguageOptions}
+                  defaultValue="en"
+                  className="w-full"
+                  onValueChange={(value) => {
+                    form.setValue('lang', value, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    });
+                  }}
+                />
+              )}
+            />
 
             <div className="flex justify-end">
               <Button

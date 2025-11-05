@@ -12,12 +12,16 @@ export interface IPreferences {
   theme: 'light' | 'dark';
   ext_status: boolean;
   lang: string;
+  agent: string;
+  model?: string;
+  apiKey?: string;
 }
 
 const defaultPreferences: IPreferences = {
   lang: 'en',
   theme: 'light',
   ext_status: false,
+  agent: 'chrome'
 };
 
 export const useStorage = () => {

@@ -8,7 +8,8 @@ chrome.runtime.onInstalled.addListener((details) => {
 
         const preferenceData = {
             lang: defautLanguage,
-            theme: 'light'
+            theme: 'light',
+            agent: 'chrome',
         };
 
         const configurationData = {
