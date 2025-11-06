@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, useMemo } from "react"
-import { translatorService } from "@/services/translatorService"
+import { translatorService } from "@/services/chrome/translatorService"
 
 interface TranslatorStatusItem {
     status: 'idle' | 'checking' | 'downloading' | 'ready' | 'error';

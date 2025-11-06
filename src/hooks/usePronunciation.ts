@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import { pronunciationService } from '@/services/pronunciationService';
-import type { PronunciationAnalysis } from '@/services/pronunciationService';
+import { pronunciationService } from '@/services/chrome/pronunciationService';
+import type { PronunciationAnalysis } from '@/services/chrome/pronunciationService';
 
 export type { PronunciationAnalysis };
 

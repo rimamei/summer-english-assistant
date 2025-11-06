@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import { grammarService } from '@/services/grammarService';
+import { grammarService } from '@/services/chrome/grammarService';
 import type { IGrammarData } from '@/type';
 
 interface GrammarStatusItem {

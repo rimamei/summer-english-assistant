@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { summarizerService } from "../services/summarizerService";
-import type { SummarizerConfig } from "../services/summarizerService";
+import { summarizerService } from "../services/chrome/summarizerService";
+import type { SummarizerConfig } from "../services/chrome/summarizerService";
 
 /**
  * Status item for the summarizer state.
