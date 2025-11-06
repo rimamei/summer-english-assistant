@@ -3,8 +3,8 @@
  * Persists across component lifecycles
  */
 
-import { createGrammarPrompt } from '@/prompt/grammar';
-import { grammarSchema } from '@/prompt/grammar/schema';
+import { createGrammarPrompt } from '@/prompt/chrome/grammar';
+import { grammarSchema } from '@/prompt/schema/grammarSchema';
 import { normalizeLanguage } from '@/utils/normalizeLanguage';
 import type { IGrammarData } from '@/type';
 

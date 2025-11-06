@@ -3,8 +3,8 @@
  * Persists across component lifecycles
  */
 
-import { createPronunciationPrompt } from '@/prompt/pronunciation';
-import { pronunciationSchema } from '@/prompt/pronunciation/schema';
+import { createPronunciationPrompt } from '@/prompt/chrome/pronunciation';
+import { pronunciationSchema } from '@/prompt/schema/pronunciationSchema';
 import { normalizeLanguage } from '@/utils/normalizeLanguage';
 
 export interface PronunciationAnalysis {
