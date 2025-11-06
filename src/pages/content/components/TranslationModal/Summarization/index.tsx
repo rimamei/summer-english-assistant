@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { classes } from '../style';
 import LoadingDots from '../../LoadingDots';
 import { useExtension } from '@/pages/content/hooks/useContext';
@@ -6,13 +6,19 @@ import { useI18n } from '@/hooks/useI18n';
 import { useSummarizer, type SummarizerConfig } from '@/hooks/useSummarizer';
 import { useStorage } from '@/hooks/useStorage';
 import { useSafeMarkdown } from '@/hooks/useSafeMarkdown';
+import type { ISummarizerData } from '@/type';
+import { generateStream } from '@/services/gemini';
+import { createSummarizerPrompt } from '@/prompt/gemini/summarizer';
+import { summarizerSchema } from '@/prompt/schema/summarizerSchema';
 
 const Summarization = () => {
   const { t } = useI18n();
   const [explanation, setExplanation] = useState('');
+  const [streamingContent, setStreamingContent] = useState<string>('');
   const [error, setError] = useState<string>('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  const { isLightTheme, sourceLanguage, targetLanguage } = useStorage();
+  const { isLightTheme, sourceLanguage, targetLanguage, preferences } = useStorage();
   const { handleSummarizeStreaming, isLoading, summarizerStatus } =
     useSummarizer();
 
@@ -23,48 +29,119 @@ const Summarization = () => {
   } = useExtension();
 
   const handleAnalyzeSentence = useCallback(async () => {
-    try {
+    if (sourceLanguage && targetLanguage) {
+      // Reset content at the start
+      setStreamingContent('');
+      setExplanation('');
       setError('');
-      setExplanation('');
+      setIsAnalyzing(true);
 
-      const config: SummarizerConfig = {
-        expectedInputLanguages: [sourceLanguage || 'en'],
-        expectedContextLanguages: [targetLanguage || 'en'],
-        format: 'markdown',
-        length: 'medium',
-        outputLanguage: targetLanguage || 'en',
-        type: 'key-points',
-      };
-      
-      const result = handleSummarizeStreaming(selectedText, config);
+      try {
+        if (preferences?.agent === 'chrome') {
+          const config: SummarizerConfig = {
+            expectedInputLanguages: [sourceLanguage || 'en'],
+            expectedContextLanguages: [targetLanguage || 'en'],
+            format: 'markdown',
+            length: 'medium',
+            outputLanguage: targetLanguage || 'en',
+            type: 'key-points',
+          };
 
-      let text = '';
-      for await (const chunk of result) {
-        text += chunk;
+          const result = handleSummarizeStreaming(selectedText, config);
+
+          let text = '';
+          for await (const chunk of result) {
+            text += chunk;
+          }
+
+          setExplanation(text || '');
+        } else if (preferences?.agent === 'gemini' && preferences.model) {
+          const config = {
+            temperature: 0.3,
+            responseMimeType: 'application/json',
+            responseSchema: summarizerSchema,
+          };
+
+          const contents = [
+            {
+              role: 'user',
+              parts: [
+                {
+                  text: createSummarizerPrompt(
+                    selectedText,
+                    'Keypoints',
+                    'medium',
+                    targetLanguage
+                  ),
+                },
+              ],
+            },
+          ];
+
+          await generateStream(
+            {
+              model: preferences.model,
+              contents,
+              config,
+            },
+            (chunk) => {
+              setStreamingContent(chunk);
+            }
+          );
+        }
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Summarization failed';
+        setError(errorMessage);
+        setExplanation('');
+        setStreamingContent('');
+      } finally {
+        setIsAnalyzing(false);
       }
-
-      setExplanation(text || '');
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Summarization failed';
-      setError(errorMessage);
-      setExplanation('');
     }
-  }, [handleSummarizeStreaming, selectedText, sourceLanguage, targetLanguage]);
+  }, [
+    handleSummarizeStreaming,
+    preferences,
+    selectedText,
+    sourceLanguage,
+    targetLanguage,
+  ]);
 
   useEffect(() => {
     if (
       selectedText &&
       selectedText !== lastAnalyzedRef.current &&
       targetLanguage &&
-      sourceLanguage
+      sourceLanguage &&
+      preferences
     ) {
       lastAnalyzedRef.current = selectedText;
       handleAnalyzeSentence();
     }
-  }, [handleAnalyzeSentence, selectedText, sourceLanguage, targetLanguage]);
+  }, [handleAnalyzeSentence, preferences, selectedText, sourceLanguage, targetLanguage]);
 
-  const sanitizedHtml = useSafeMarkdown(explanation);
+  // Parse the JSON and extract the summary content for Gemini
+  const parsedSummarizerData = useMemo(() => {
+    if (!streamingContent) return null;
+
+    try {
+      const data: ISummarizerData = JSON.parse(streamingContent);
+      return data;
+    } catch {
+      // JSON is incomplete during streaming, return null
+      return null;
+    }
+  }, [streamingContent]);
+
+  // Determine which content to display
+  const displayContent = useMemo(() => {
+    if (preferences?.agent === 'gemini') {
+      return parsedSummarizerData?.summary || '';
+    }
+    return explanation;
+  }, [preferences, parsedSummarizerData, explanation]);
+
+  const sanitizedHtml = useSafeMarkdown(displayContent);
 
   return (
     <div
@@ -95,47 +172,70 @@ const Summarization = () => {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {isLoading ? (
-              summarizerStatus.status === 'downloading' ? (
-                <div style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
-                  <div style={{ marginBottom: '8px' }}>
-                    {t('downloading')} {summarizerStatus.progress || 0}%
-                  </div>
-                  <div
-                    style={{
-                      width: '100%',
-                      height: '4px',
-                      backgroundColor: isLightTheme ? '#e5e7eb' : '#4b5563',
-                      borderRadius: '2px',
-                      overflow: 'hidden',
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: `${summarizerStatus.progress || 0}%`,
-                        height: '100%',
-                        backgroundColor: '#3b82f6',
-                        transition: 'width 0.3s ease',
-                      }}
-                    />
-                  </div>
-                </div>
-              ) : (
+            {preferences?.agent === 'gemini' ? (
+              // Gemini agent rendering
+              isAnalyzing && !parsedSummarizerData ? (
                 <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
                   {t('loading')}
                   <LoadingDots />
                 </span>
+              ) : error ? (
+                <span style={{ color: '#ef4444' }}>{error}</span>
+              ) : parsedSummarizerData && displayContent ? (
+                <span
+                  dangerouslySetInnerHTML={{
+                    __html: sanitizedHtml,
+                  }}
+                />
+              ) : (
+                <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
+                  {t('no_explanation_available')}
+                </span>
               )
-            ) : error || summarizerStatus.status === 'error' ? (
-              <span style={{ color: '#ef4444' }}>
-                {error || summarizerStatus.error || 'Summarization failed'}
-              </span>
             ) : (
-              <span
-                dangerouslySetInnerHTML={{
-                  __html: sanitizedHtml || '',
-                }}
-              />
+              // Chrome agent rendering
+              isLoading ? (
+                summarizerStatus.status === 'downloading' ? (
+                  <div style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
+                    <div style={{ marginBottom: '8px' }}>
+                      {t('downloading')} {summarizerStatus.progress || 0}%
+                    </div>
+                    <div
+                      style={{
+                        width: '100%',
+                        height: '4px',
+                        backgroundColor: isLightTheme ? '#e5e7eb' : '#4b5563',
+                        borderRadius: '2px',
+                        overflow: 'hidden',
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: `${summarizerStatus.progress || 0}%`,
+                          height: '100%',
+                          backgroundColor: '#3b82f6',
+                          transition: 'width 0.3s ease',
+                        }}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
+                    {t('loading')}
+                    <LoadingDots />
+                  </span>
+                )
+              ) : error || summarizerStatus.status === 'error' ? (
+                <span style={{ color: '#ef4444' }}>
+                  {error || summarizerStatus.error || 'Summarization failed'}
+                </span>
+              ) : (
+                <span
+                  dangerouslySetInnerHTML={{
+                    __html: sanitizedHtml || '',
+                  }}
+                />
+              )
             )}
           </span>
         </div>

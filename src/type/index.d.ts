@@ -4,4 +4,8 @@ export interface IGrammarData {
     corrections: string;
 }
 
+export interface ISummarizerData {
+    summary: string;
+}
+
 export type SelectorOption = 'word' | 'sentence' | 'context';
