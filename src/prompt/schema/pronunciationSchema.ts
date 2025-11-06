@@ -32,42 +32,46 @@ export const pronunciationSchema = {
             description: 'CEFR level of language difficulty.',
         },
         soundBySound: {
-            uk: {
-                type: 'array',
-                description:
-                    'Sound-by-sound pronunciation breakdown (like Cambridge Dictionary).',
-                items: {
-                    type: 'object',
-                    properties: {
-                        symbol: {
-                            type: 'string',
-                            description: 'Phonetic symbol for each sound.',
+            type: 'object',
+            description: 'Sound-by-sound pronunciation breakdown for UK and US pronunciations.',
+            properties: {
+                uk: {
+                    type: 'array',
+                    description:
+                        'Sound-by-sound pronunciation breakdown (like Cambridge Dictionary).',
+                    items: {
+                        type: 'object',
+                        properties: {
+                            symbol: {
+                                type: 'string',
+                                description: 'Phonetic symbol for each sound.',
+                            },
+                            exampleWord: {
+                                type: 'string',
+                                description: 'Example word containing the same sound.',
+                            },
                         },
-                        exampleWord: {
-                            type: 'string',
-                            description: 'Example word containing the same sound.',
-                        },
+                        required: ['symbol', 'exampleWord'],
                     },
-                    required: ['symbol', 'exampleWord'],
                 },
-            },
-            us: {
-                type: 'array',
-                description:
-                    'Sound-by-sound pronunciation breakdown (like Cambridge Dictionary).',
-                items: {
-                    type: 'object',
-                    properties: {
-                        symbol: {
-                            type: 'string',
-                            description: 'Phonetic symbol for each sound.',
+                us: {
+                    type: 'array',
+                    description:
+                        'Sound-by-sound pronunciation breakdown (like Cambridge Dictionary).',
+                    items: {
+                        type: 'object',
+                        properties: {
+                            symbol: {
+                                type: 'string',
+                                description: 'Phonetic symbol for each sound.',
+                            },
+                            exampleWord: {
+                                type: 'string',
+                                description: 'Example word containing the same sound.',
+                            },
                         },
-                        exampleWord: {
-                            type: 'string',
-                            description: 'Example word containing the same sound.',
-                        },
+                        required: ['symbol', 'exampleWord'],
                     },
-                    required: ['symbol', 'exampleWord'],
                 },
             },
             required: ['uk', 'us'],
