@@ -21,6 +21,7 @@ import {
 } from '@/hooks/useSummarizer';
 import { usePrompt } from '@/hooks/usePrompt';
 import type { SelectorOption } from '@/type';
+import { useStorage } from '@/hooks/useStorage';
 
 const Configuration = () => {
   const { t } = useI18n();
@@ -33,6 +34,7 @@ const Configuration = () => {
     summarizerTypeOptions: translatedSummarizerTypeOptions,
     summarizerLengthOptions: translatedSummarizerLengthOptions,
   } = useTranslatedOptions();
+  const { preferences, settingsData } = useStorage();
 
   const { initLanguageTranslator, translatorStatus } = useTranslator();
   const { initSummarizer, summarizerStatus } = useSummarizer();
@@ -67,41 +69,45 @@ const Configuration = () => {
           return;
         }
 
-        const getLocalStorageData = await chrome.storage.local.get([
-          'settings',
-        ]);
+        const result = settingsData;
 
-        const result = getLocalStorageData.settings
-          ? JSON.parse(getLocalStorageData.settings)
-          : null;
-
-        // Check if we have actual saved values (not just empty object)
-        const hasValidData =
-          result &&
-          (result?.source_lang ||
-            result?.target_lang ||
-            result?.mode ||
-            result?.selector ||
-            result?.accent);
-
-        if (hasValidData) {
+        if (result) {
           // Create new data object with loaded values and defaults
           const loadedData = {
             source_lang: result?.source_lang || 'en',
             target_lang: result?.target_lang || 'in',
-            mode: result?.mode || 'pronunciation',
-            selector: result?.selector || 'word',
-            accent: result?.accent || 'american',
-            summarizer_type: result?.summarizer_type || 'key-points',
-            summarizer_length: result?.summarizer_length || 'short',
-            enabled_extension: result?.enabled_extension || false,
+            mode: (result?.mode || 'pronunciation') as
+              | 'pronunciation'
+              | 'grammar'
+              | 'summarizer'
+              | 'translation',
+            selector: (result?.selector || 'word') as
+              | 'word'
+              | 'sentence'
+              | 'context',
+            accent: (result?.accent || 'american') as 'american' | 'british',
+            summarizer_type: (result?.summarizer_type || 'key-points') as
+              | 'headline'
+              | 'key-points'
+              | 'teaser'
+              | 'tldr',
+            summarizer_length: (result?.summarizer_length || 'short') as
+              | 'short'
+              | 'medium'
+              | 'long',
           };
 
           // Reset form with loaded data (this updates both values and default values)
           form.reset(loadedData);
 
           // Update selectedMode state
-          setSelectedMode(loadedData.mode);
+          setSelectedMode(
+            loadedData.mode as
+              | 'pronunciation'
+              | 'grammar'
+              | 'summarizer'
+              | 'translation'
+          );
         }
       } catch {
         // Silently handle storage errors
@@ -111,55 +117,57 @@ const Configuration = () => {
     };
 
     loadSettings();
-  }, [form]);
+  }, [form, settingsData]);
 
   const onSubmit = async (data: z.infer<typeof validation>) => {
     setIsLoading(true);
 
     try {
-      if (data.mode === 'translation') {
-        await initLanguageTranslator(data.source_lang, data.target_lang);
-      } else if (data.mode === 'summarizer') {
-        const config: SummarizerConfig = {
-          expectedInputLanguages: [data.source_lang || 'en'],
-          expectedContextLanguages: [data.target_lang || 'en'],
-          format: 'markdown',
-          length: (data.summarizer_length || 'short') as
-            | 'short'
-            | 'medium'
-            | 'long',
-          outputLanguage: data.target_lang || 'en',
-          type: (data.summarizer_type || 'key-points') as
-            | 'headline'
-            | 'key-points'
-            | 'teaser'
-            | 'tldr',
-        };
+      if (preferences?.agent === 'chrome') {
+        if (data.mode === 'translation') {
+          await initLanguageTranslator(data.source_lang, data.target_lang);
+        } else if (data.mode === 'summarizer') {
+          const config: SummarizerConfig = {
+            expectedInputLanguages: [data.source_lang || 'en'],
+            expectedContextLanguages: [data.target_lang || 'en'],
+            format: 'markdown',
+            length: (data.summarizer_length || 'short') as
+              | 'short'
+              | 'medium'
+              | 'long',
+            outputLanguage: data.target_lang || 'en',
+            type: (data.summarizer_type || 'key-points') as
+              | 'headline'
+              | 'key-points'
+              | 'teaser'
+              | 'tldr',
+          };
 
-        await initSummarizer(config);
-      } else {
-        const config: LanguageModelCreateOptions = {
-          initialPrompts: [
-            {
-              role: 'system',
-              content: 'You are a helpful and friendly assistant.',
-            },
-          ],
-          temperature: 0.2,
-          topK: 1,
-          expectedInputs: [
-            {
-              type: 'text',
-              languages: [
-                data.source_lang /* system prompt */,
-                data.source_lang /* user prompt */,
-              ],
-            },
-          ],
-          expectedOutputs: [{ type: 'text', languages: [data.target_lang] }],
-        };
+          await initSummarizer(config);
+        } else {
+          const config: LanguageModelCreateOptions = {
+            initialPrompts: [
+              {
+                role: 'system',
+                content: 'You are a helpful and friendly assistant.',
+              },
+            ],
+            temperature: 0.2,
+            topK: 1,
+            expectedInputs: [
+              {
+                type: 'text',
+                languages: [
+                  data.source_lang /* system prompt */,
+                  data.source_lang /* user prompt */,
+                ],
+              },
+            ],
+            expectedOutputs: [{ type: 'text', languages: [data.target_lang] }],
+          };
 
-        await initPromptSession(config);
+          await initPromptSession(config);
+        }
       }
 
       saveToStorage(data);

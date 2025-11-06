@@ -15,6 +15,7 @@ import type { TTheme } from '@/type/theme';
 import { applyTheme } from '../utils';
 import { useStorage } from '@/hooks/useStorage';
 import { agentOptions, modelOptions } from '@/constants/agent';
+import { Input } from '@/components/ui/input';
 
 const PreferencesForm = () => {
   const { t, changeLanguage } = useI18n();
@@ -155,7 +156,7 @@ const PreferencesForm = () => {
                   field={field}
                   fieldState={fieldState}
                   options={agentOptions}
-                  defaultValue="en"
+                  defaultValue={preferences?.agent || 'chrome'}
                   className="w-full"
                   onValueChange={(value) => {
                     form.setValue('agent', value, {
@@ -182,7 +183,7 @@ const PreferencesForm = () => {
                       options={
                         modelOptions[form.getValues('agent') as 'gemini']
                       }
-                      defaultValue="en"
+                      defaultValue={preferences?.model || modelOptions[form.getValues('agent') as 'gemini'][0].value}
                       className="w-full"
                       onValueChange={(value) => {
                         form.setValue('model', value, {
@@ -199,21 +200,19 @@ const PreferencesForm = () => {
                   htmlId="apiKey"
                   className="col-span-5"
                   label="API Key"
-                  component={(field, fieldState) => (
-                    <Select
-                      field={field}
-                      fieldState={fieldState}
-                      options={
-                        modelOptions[form.getValues('agent') as 'gemini']
-                      }
-                      defaultValue="en"
+                  component={(field) => (
+                    <Input
+                      name={field.name}
+                      defaultValue={preferences?.apiKey || ''}
                       className="w-full"
-                      onValueChange={(value) => {
-                        form.setValue('model', value, {
+                      placeholder='Enter your API Key'
+                      onChange={(e) => {
+                        form.setValue('apiKey', e.target.value, {
                           shouldDirty: true,
                           shouldValidate: true,
                         });
                       }}
+                      value={form.getValues('apiKey')}
                     />
                   )}
                 />
