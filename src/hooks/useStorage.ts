@@ -6,6 +6,8 @@ export interface SettingsData {
   mode: string;
   selector: string;
   accent: string;
+  summarizer_type: string;
+  summarizer_length: string;
 }
 
 export interface IPreferences {
@@ -13,20 +15,13 @@ export interface IPreferences {
   ext_status: boolean;
   lang: string;
   agent: string;
-  model?: string;
-  apiKey?: string;
+  model?: string | undefined;
+  apiKey?: string | undefined;
 }
-
-const defaultPreferences: IPreferences = {
-  lang: 'en',
-  theme: 'light',
-  ext_status: false,
-  agent: 'chrome'
-};
 
 export const useStorage = () => {
   const [settingsData, setSettingsData] = useState<SettingsData | undefined>();
-  const [preferencesData, setPreferencesData] = useState<IPreferences>(defaultPreferences);
+  const [preferencesData, setPreferencesData] = useState<IPreferences>();
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -114,7 +109,18 @@ export const useStorage = () => {
 
       if (changes.theme) {
         const newTheme = changes.theme.newValue || 'light';
-        setPreferencesData((prev) => ({ ...prev, theme: newTheme }));
+        setPreferencesData((prev) => {
+          if (!prev) return undefined;
+          return {
+            ...prev,
+            theme: newTheme,
+            ext_status: prev.ext_status,
+            lang: prev.lang,
+            agent: prev.agent,
+            model: prev.model,
+            apiKey: prev.apiKey,
+          };
+        });
       }
 
       if (changes.preferences) {
@@ -124,7 +130,18 @@ export const useStorage = () => {
 
       if (changes.ext_status) {
         const newStatus = changes.ext_status.newValue || false;
-        setPreferencesData((prev) => ({ ...prev, ext_status: newStatus }));
+        setPreferencesData((prev) => {
+          if (!prev) return undefined;
+          return {
+            ...prev,
+            ext_status: newStatus,
+            theme: prev.theme,
+            lang: prev.lang,
+            agent: prev.agent,
+            model: prev.model,
+            apiKey: prev.apiKey,
+          };
+        });
       }
     };
 
