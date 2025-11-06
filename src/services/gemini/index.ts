@@ -1,4 +1,4 @@
-import { GoogleGenAI, type FunctionDeclaration } from '@google/genai';
+import { GoogleGenAI, type GenerateContentParameters } from '@google/genai';
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_TOKEN;
 
 const getApiKey = async (): Promise<string> => {
@@ -7,17 +7,33 @@ const getApiKey = async (): Promise<string> => {
     return result.gemini_api_key || GEMINI_API_KEY;
 }
 
-export const generateStream = async (model: string, content: string, config?: FunctionDeclaration) => {
+export const generateStream = async ({ model, contents, config }: GenerateContentParameters, onChunk?: (text: string) => void) => {
     const apiKey: string = await getApiKey();
-    const ai = new GoogleGenAI({ apiKey });
+    const ai = new GoogleGenAI({ apiKey })
 
     const response = await ai.models.generateContentStream({
-        model: model,
-        contents: content,
+        model,
+        contents,
         config
     });
 
-    return response;
+    let resultText = '';
+
+    try {
+        for await (const chunk of response) {
+            const chunkText = chunk.text || '';
+            resultText += chunkText;
+
+            if (onChunk) {
+                onChunk(resultText);
+            }
+        }
+    } catch (error) {
+        console.error('Error streaming Gemini response:', error);
+        throw error;
+    }
+
+    return resultText;
 }
 
 

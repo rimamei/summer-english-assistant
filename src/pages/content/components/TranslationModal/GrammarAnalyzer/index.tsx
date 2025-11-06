@@ -7,13 +7,18 @@ import { useI18n } from '@/hooks/useI18n';
 import { useGrammar } from '@/hooks/useGrammar';
 import { useSafeMarkdown } from '@/hooks/useSafeMarkdown';
 import type { IGrammarData } from '@/type';
+import { generateStream } from '@/services/gemini';
+import { createGrammarPrompt } from '@/prompt/gemini/grammar';
+import { grammarSchema } from '@/prompt/schema/grammarSchema';
 
 const GrammarAnalyzer = () => {
   const { t } = useI18n();
   const [streamingContent, setStreamingContent] = useState<string>('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  const { sourceLanguage, targetLanguage, isLightTheme } = useStorage();
-  const { analyzeSentence, isLoading } = useGrammar();
+  const { sourceLanguage, targetLanguage, isLightTheme, preferences } =
+    useStorage();
+  const { analyzeSentence } = useGrammar();
 
   const lastAnalyzedRef = useRef<string>('');
 
@@ -25,30 +30,74 @@ const GrammarAnalyzer = () => {
     if (sourceLanguage && targetLanguage) {
       // Reset streaming content at the start
       setStreamingContent('');
+      setIsAnalyzing(true);
 
-      await analyzeSentence({
-        sentence: selectedText,
-        sourceLanguage,
-        targetLanguage,
-        onChunk: (chunk) => {
-          // Update streaming content as chunks arrive
-          setStreamingContent(chunk);
-        },
-      });
+      try {
+        if (preferences?.agent === 'chrome') {
+          await analyzeSentence({
+            sentence: selectedText,
+            sourceLanguage,
+            targetLanguage,
+            onChunk: (chunk) => {
+              setStreamingContent(chunk);
+            },
+          });
+        } else if (preferences?.agent === 'gemini' && preferences.model) {
+          const config = {
+            temperature: 0.2,
+            responseMimeType: 'application/json',
+            responseSchema: grammarSchema,
+          };
+
+          const contents = [
+            {
+              role: 'user',
+              parts: [
+                {
+                  text: createGrammarPrompt(
+                    selectedText,
+                    sourceLanguage,
+                    targetLanguage
+                  ),
+                },
+              ],
+            },
+          ];
+
+          await generateStream(
+            {
+              model: preferences.model,
+              contents,
+              config,
+            },
+            (chunk) => {
+              setStreamingContent(chunk);
+            }
+          );
+        }
+      } finally {
+        setIsAnalyzing(false);
+      }
     }
-  }, [analyzeSentence, selectedText, sourceLanguage, targetLanguage]);
+  }, [
+    analyzeSentence,
+    preferences,
+    selectedText,
+    sourceLanguage,
+    targetLanguage,
+  ]);
 
   useEffect(() => {
     if (
       selectedText &&
       selectedText !== lastAnalyzedRef.current &&
       sourceLanguage &&
-      targetLanguage
+      targetLanguage && preferences
     ) {
       lastAnalyzedRef.current = selectedText;
       handleAnalyzeSentence();
     }
-  }, [handleAnalyzeSentence, selectedText, sourceLanguage, targetLanguage]);
+  }, [handleAnalyzeSentence, preferences, selectedText, sourceLanguage, targetLanguage]);
 
   // Parse the JSON and extract the markdown content
   const parsedGrammarData = useMemo(() => {
@@ -74,9 +123,11 @@ const GrammarAnalyzer = () => {
       content += `**Correction:** ${parsedGrammarData.corrections}\n\n`;
     }
 
-    // Add the details (grammar explanation)
     if (parsedGrammarData.details) {
-      content += parsedGrammarData.details;
+      const details = parsedGrammarData.details
+        .replace(/\\n/g, '\n')  // Replace literal \n with actual newlines
+        .replace(/\n\n+/g, '\n\n');  // Normalize multiple newlines
+      content += details;
     }
 
     return content;
@@ -110,13 +161,16 @@ const GrammarAnalyzer = () => {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {isLoading && !parsedGrammarData ? (
+            {isAnalyzing && !parsedGrammarData ? (
               <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
                 {t('loading')}
                 <LoadingDots />
               </span>
             ) : parsedGrammarData && displayContent ? (
               <span
+                style={{
+                  listStylePosition: 'outside',
+                }}
                 dangerouslySetInnerHTML={{
                   __html: sanitizedStreamingHtml,
                 }}
