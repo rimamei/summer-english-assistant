@@ -8,18 +8,17 @@ const getApiKey = async (): Promise<string> => {
 }
 
 export const generateStream = async ({ model, contents, config }: GenerateContentParameters, onChunk?: (text: string) => void) => {
-    const apiKey: string = await getApiKey();
-    const ai = new GoogleGenAI({ apiKey })
-
-    const response = await ai.models.generateContentStream({
-        model,
-        contents,
-        config
-    });
-
-    let resultText = '';
-
     try {
+        const apiKey: string = await getApiKey();
+        const ai = new GoogleGenAI({ apiKey })
+
+        const response = await ai.models.generateContentStream({
+            model,
+            contents,
+            config
+        });
+
+        let resultText = '';
         for await (const chunk of response) {
             const chunkText = chunk.text || '';
             resultText += chunkText;
@@ -28,12 +27,13 @@ export const generateStream = async ({ model, contents, config }: GenerateConten
                 onChunk(resultText);
             }
         }
+
+        return resultText;
     } catch (error) {
         console.error('Error streaming Gemini response:', error);
         throw error;
     }
 
-    return resultText;
 }
 
 

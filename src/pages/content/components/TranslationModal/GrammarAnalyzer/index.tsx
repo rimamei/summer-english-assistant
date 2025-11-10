@@ -15,6 +15,7 @@ const GrammarAnalyzer = () => {
   const { t } = useI18n();
   const [streamingContent, setStreamingContent] = useState<string>('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [error, setError] = useState<string>('');
 
   const { sourceLanguage, targetLanguage, isLightTheme, preferences } =
     useStorage();
@@ -28,12 +29,15 @@ const GrammarAnalyzer = () => {
 
   const handleAnalyzeSentence = useCallback(async () => {
     if (sourceLanguage && targetLanguage) {
-      // Reset streaming content at the start
+      // Reset streaming content and error at the start
       setStreamingContent('');
+      setError('');
       setIsAnalyzing(true);
 
+      const agent = preferences?.agent || 'chrome';
+
       try {
-        if (preferences?.agent === 'chrome') {
+        if (agent === 'chrome') {
           await analyzeSentence({
             sentence: selectedText,
             sourceLanguage,
@@ -42,7 +46,7 @@ const GrammarAnalyzer = () => {
               setStreamingContent(chunk);
             },
           });
-        } else if (preferences?.agent === 'gemini' && preferences.model) {
+        } else if (agent === 'gemini' && preferences?.model) {
           const config = {
             temperature: 0.2,
             responseMimeType: 'application/json',
@@ -75,6 +79,10 @@ const GrammarAnalyzer = () => {
             }
           );
         }
+      } catch (error) {
+        setError(
+          error instanceof Error ? error.message : 'Failed to analyze grammar'
+        );
       } finally {
         setIsAnalyzing(false);
       }
@@ -87,17 +95,26 @@ const GrammarAnalyzer = () => {
     targetLanguage,
   ]);
 
+  console.log('content', streamingContent);
+
   useEffect(() => {
     if (
       selectedText &&
       selectedText !== lastAnalyzedRef.current &&
       sourceLanguage &&
-      targetLanguage && preferences
+      targetLanguage &&
+      preferences
     ) {
       lastAnalyzedRef.current = selectedText;
       handleAnalyzeSentence();
     }
-  }, [handleAnalyzeSentence, preferences, selectedText, sourceLanguage, targetLanguage]);
+  }, [
+    handleAnalyzeSentence,
+    preferences,
+    selectedText,
+    sourceLanguage,
+    targetLanguage,
+  ]);
 
   // Parse the JSON and extract the markdown content
   const parsedGrammarData = useMemo(() => {
@@ -125,8 +142,8 @@ const GrammarAnalyzer = () => {
 
     if (parsedGrammarData.details) {
       const details = parsedGrammarData.details
-        .replace(/\\n/g, '\n')  // Replace literal \n with actual newlines
-        .replace(/\n\n+/g, '\n\n');  // Normalize multiple newlines
+        .replace(/\\n/g, '\n') // Replace literal \n with actual newlines
+        .replace(/\n\n+/g, '\n\n'); // Normalize multiple newlines
       content += details;
     }
 
@@ -161,7 +178,11 @@ const GrammarAnalyzer = () => {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {isAnalyzing && !parsedGrammarData ? (
+            {error ? (
+              <span style={{ color: '#ef4444' }}>
+                {error}
+              </span>
+            ) : isAnalyzing && !parsedGrammarData ? (
               <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
                 {t('loading')}
                 <LoadingDots />
