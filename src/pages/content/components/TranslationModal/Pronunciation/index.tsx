@@ -85,7 +85,7 @@ const Pronunciation = () => {
       }
     }
   }, [analyzeWord, preferences, selectedText, sourceLanguage, targetLanguage]);
-console.log('streaming', streamingContent)
+  
   useEffect(() => {
     if (
       selectedText &&
