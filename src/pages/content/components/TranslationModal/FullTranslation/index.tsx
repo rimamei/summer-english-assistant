@@ -58,7 +58,6 @@ const FullTranslation = () => {
     return error || translatorStatus.error || 'Translation failed';
   }, [error, translatorStatus.error]);
 
-  console.log('pref', preferences)
   const handleFullTranslation = useCallback(async () => {
     setIsLoading(true);
 
@@ -95,7 +94,6 @@ const FullTranslation = () => {
 
         for await (const chunk of stream) {
           setTranslationText(chunk);
-          console.log(chunk);
         }
 
         setIsLoading(false);
