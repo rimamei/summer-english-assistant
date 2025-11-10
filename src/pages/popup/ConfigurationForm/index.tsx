@@ -122,8 +122,10 @@ const Configuration = () => {
   const onSubmit = async (data: z.infer<typeof validation>) => {
     setIsLoading(true);
 
+    const agent = preferences?.agent || 'chrome';
+
     try {
-      if (preferences?.agent === 'chrome') {
+      if (agent === 'chrome') {
         if (data.mode === 'translation') {
           await initLanguageTranslator(data.source_lang, data.target_lang);
         } else if (data.mode === 'summarizer') {
@@ -290,7 +292,7 @@ const Configuration = () => {
                 {t('api_downloading')}
                 {typeof getStatus().progress === 'number' && (
                   <span className="ml-2">
-                    {Math.round(getStatus().progress * 100)}%
+                    {Math.round(getStatus().progress)}%
                   </span>
                 )}
               </span>
