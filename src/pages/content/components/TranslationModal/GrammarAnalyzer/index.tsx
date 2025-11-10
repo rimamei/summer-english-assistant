@@ -95,8 +95,6 @@ const GrammarAnalyzer = () => {
     targetLanguage,
   ]);
 
-  console.log('content', streamingContent);
-
   useEffect(() => {
     if (
       selectedText &&
@@ -137,10 +135,13 @@ const GrammarAnalyzer = () => {
 
     // Show corrections if the sentence is incorrect
     if (!parsedGrammarData.isCorrect && parsedGrammarData.corrections) {
-      content += `**Correction:** ${parsedGrammarData.corrections}\n\n`;
+      const correction = t('correction');
+      content += `**${correction.charAt(0).toUpperCase() + correction.slice(1)}:**\n ${parsedGrammarData.corrections}\n\n`;
     }
 
     if (parsedGrammarData.details) {
+      const explanation = t('explanation');
+      content += `**${explanation.charAt(0).toUpperCase() + explanation.slice(1)}:**\n`;
       const details = parsedGrammarData.details
         .replace(/\\n/g, '\n') // Replace literal \n with actual newlines
         .replace(/\n\n+/g, '\n\n'); // Normalize multiple newlines
@@ -148,7 +149,7 @@ const GrammarAnalyzer = () => {
     }
 
     return content;
-  }, [parsedGrammarData]);
+  }, [parsedGrammarData, t]);
 
   const sanitizedStreamingHtml = useSafeMarkdown(displayContent);
 

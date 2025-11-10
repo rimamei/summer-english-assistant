@@ -52,6 +52,8 @@ export const translations = {
     'no_translation_available': 'No translation available',
     'no_explanation_available': 'No explanation available',
     'no_summary_available': 'No summary available',
+    'explanation': 'Explanation',
+    'correction': 'Correction',
 
     // Content Script - Pronunciation
     'definition': 'Definition:',
@@ -143,6 +145,8 @@ export const translations = {
     'no_translation_available': 'Terjemahan tidak tersedia',
     'no_explanation_available': 'Penjelasan tidak tersedia',
     'no_summary_available': 'Ringkasan tidak tersedia',
+    'explanation': 'Penjelasan',
+    'correction': 'Koreksi',
 
     // Content Script - Pronunciation
     'definition': 'Definisi:',
@@ -234,6 +238,8 @@ export const translations = {
     'no_translation_available': 'Traducción no disponible',
     'no_explanation_available': 'Explicación no disponible',
     'no_summary_available': 'Resumen no disponible',
+    'explanation': 'Explicación',
+    'correction': 'Corrección',
 
     // Content Script - Pronunciation
     'definition': 'Definición:',
@@ -325,6 +331,8 @@ export const translations = {
     'no_translation_available': '翻訳が利用できません',
     'no_explanation_available': '説明が利用できません',
     'no_summary_available': '要約が利用できません',
+    'explanation': '説明',
+    'correction': '訂正',
 
     // Content Script - Pronunciation
     'definition': '定義：',
