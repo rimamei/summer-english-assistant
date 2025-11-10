@@ -91,9 +91,13 @@ const FullTranslation = () => {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {isLoading ? (
+            {isLoading || translatorStatus.status === 'checking' || translatorStatus.status === 'downloading' ? (
               <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
-                {t('loading')}
+                {translatorStatus.status === 'checking' && 'Checking availability'}
+                {translatorStatus.status === 'downloading' &&
+                  `Downloading model${translatorStatus.progress ? ` ${Math.round(translatorStatus.progress)}%` : ''}`
+                }
+                {translatorStatus.status !== 'checking' && translatorStatus.status !== 'downloading' && t('loading')}
                 <LoadingDots />
               </span>
             ) : error || translatorStatus.status === 'error' ? (
