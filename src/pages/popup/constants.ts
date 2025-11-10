@@ -11,6 +11,18 @@ export const targetLangOptionsBase = [
     { value: 'id', labelKey: 'indonesia' as const },
     { value: 'es', labelKey: 'spanish' as const },
     { value: 'ja', labelKey: 'japanese' as const },
+    { value: 'fr', labelKey: 'french' as const },
+    { value: 'de', labelKey: 'german' as const },
+    { value: 'zh', labelKey: 'chinese' as const },
+    { value: 'ko', labelKey: 'korean' as const },
+    { value: 'pt', labelKey: 'portuguese' as const },
+    { value: 'it', labelKey: 'italian' as const },
+    { value: 'ar', labelKey: 'arabic' as const },
+    { value: 'ru', labelKey: 'russian' as const },
+    { value: 'nl', labelKey: 'dutch' as const },
+    { value: 'tr', labelKey: 'turkish' as const },
+    { value: 'hi', labelKey: 'hindi' as const },
+    { value: 'vi', labelKey: 'vietnamese' as const },
 ];
 
 export const sourceLangOptionsBase = [
@@ -66,10 +78,37 @@ export const targetLangOptions = [
     { value: 'id', label: 'Indonesia' },
     { value: 'es', label: 'Spanish' },
     { value: 'ja', label: 'Japanese' },
+    { value: 'fr', label: 'French' },
+    { value: 'de', label: 'German' },
+    { value: 'zh', label: 'Chinese' },
+    { value: 'ko', label: 'Korean' },
+    { value: 'pt', label: 'Portuguese' },
+    { value: 'it', label: 'Italian' },
+    { value: 'ar', label: 'Arabic' },
+    { value: 'ru', label: 'Russian' },
+    { value: 'nl', label: 'Dutch' },
+    { value: 'tr', label: 'Turkish' },
+    { value: 'hi', label: 'Hindi' },
+    { value: 'vi', label: 'Vietnamese' },
 ];
 
 export const sourceLangOptions = [
-    { value: 'en', label: 'English' }
+    { value: 'en', label: 'English' },
+    { value: 'id', label: 'Indonesia' },
+    { value: 'es', label: 'Spanish' },
+    { value: 'ja', label: 'Japanese' },
+    { value: 'fr', label: 'French' },
+    { value: 'de', label: 'German' },
+    { value: 'zh', label: 'Chinese' },
+    { value: 'ko', label: 'Korean' },
+    { value: 'pt', label: 'Portuguese' },
+    { value: 'it', label: 'Italian' },
+    { value: 'ar', label: 'Arabic' },
+    { value: 'ru', label: 'Russian' },
+    { value: 'nl', label: 'Dutch' },
+    { value: 'tr', label: 'Turkish' },
+    { value: 'hi', label: 'Hindi' },
+    { value: 'vi', label: 'Vietnamese' },
 ];
 
 export const selectorOptions = [
