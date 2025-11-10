@@ -12,4 +12,16 @@ export const validation = z.object({
   accent: z.enum(["british", "american"]),
   summarizer_type: z.enum(["headline", "key-points", "teaser", "tldr"]).optional(),
   summarizer_length: z.enum(["short", "medium", "long"]).optional(),
-})
+}).refine(
+  (data) => data.mode !== "summarizer" || data.summarizer_type !== undefined,
+  {
+    message: "Summarizer type is required when mode is summarizer",
+    path: ["summarizer_type"],
+  }
+).refine(
+  (data) => data.mode !== "summarizer" || data.summarizer_length !== undefined,
+  {
+    message: "Summarizer length is required when mode is summarizer",
+    path: ["summarizer_length"],
+  }
+)
