@@ -36,8 +36,10 @@ const Summarization = () => {
       setError('');
       setIsAnalyzing(true);
 
+      const agent = preferences?.agent || 'chrome';
+
       try {
-        if (preferences?.agent === 'chrome') {
+        if (agent === 'chrome') {
           const config: SummarizerConfig = {
             expectedInputLanguages: [sourceLanguage || 'en'],
             expectedContextLanguages: [targetLanguage || 'en'],
@@ -55,7 +57,7 @@ const Summarization = () => {
           }
 
           setExplanation(text || '');
-        } else if (preferences?.agent === 'gemini' && preferences.model) {
+        } else if (agent === 'gemini') {
           const config = {
             temperature: 0.3,
             responseMimeType: 'application/json',
@@ -80,7 +82,7 @@ const Summarization = () => {
 
           await generateStream(
             {
-              model: preferences.model,
+              model: preferences?.model ?? 'gemini-2.5-flash',
               contents,
               config,
             },
