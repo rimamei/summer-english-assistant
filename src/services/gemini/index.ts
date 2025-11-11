@@ -8,7 +8,6 @@ const getApiKey = async (): Promise<string> => {
 }
 
 export const generateStream = async ({ model, contents, config }: GenerateContentParameters, onChunk?: (text: string) => void) => {
-    try {
         const apiKey: string = await getApiKey();
         const ai = new GoogleGenAI({ apiKey })
 
@@ -29,10 +28,6 @@ export const generateStream = async ({ model, contents, config }: GenerateConten
         }
 
         return resultText;
-    } catch (error) {
-        console.error('Error streaming Gemini response:', error);
-        throw error;
-    }
 
 }
 
