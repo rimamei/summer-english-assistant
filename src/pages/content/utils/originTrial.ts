@@ -8,7 +8,6 @@ export const injectOriginTrialToken = (): void => {
   const token = import.meta.env.VITE_CHROME_PROMPT_TOKEN || '';
 
   if (!token || token.trim() === '') {
-    console.warn('Summer Extension: No origin trial token found. Chrome AI features may not work.');
     return;
   }
 
