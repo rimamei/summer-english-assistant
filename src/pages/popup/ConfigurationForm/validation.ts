@@ -10,8 +10,14 @@ export const validation = z.object({
   mode: z.enum(["pronunciation", "grammar", "summarizer", "translation"]),
   selector: z.enum(["word", "sentence", "context"]),
   accent: z.enum(["british", "american"]),
-  summarizer_type: z.enum(["headline", "key-points", "teaser", "tldr"]).optional(),
-  summarizer_length: z.enum(["short", "medium", "long"]).optional(),
+  summarizer_type: z.union([
+    z.enum(["headline", "key-points", "teaser", "tldr"]),
+    z.undefined()
+  ]),
+  summarizer_length: z.union([
+    z.enum(["short", "medium", "long"]),
+    z.undefined()
+  ]),
 }).refine(
   (data) => data.mode !== "summarizer" || data.summarizer_type !== undefined,
   {

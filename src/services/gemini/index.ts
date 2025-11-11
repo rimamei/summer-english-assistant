@@ -1,10 +1,12 @@
+
+import type { IPreferences } from '@/type';
+import { getLocalStorage } from '@/utils/storage';
 import { GoogleGenAI, type GenerateContentParameters } from '@google/genai';
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_TOKEN;
 
 const getApiKey = async (): Promise<string> => {
-    // Retrieve the API key from Chrome storage with fallback to environment variable
-    const result = await chrome.storage.local.get('gemini_api_key');
-    return result.gemini_api_key || GEMINI_API_KEY;
+    const result: IPreferences | null = await getLocalStorage('preferences');
+    return result?.apiKey || GEMINI_API_KEY;
 }
 
 export const generateStream = async ({ model, contents, config }: GenerateContentParameters, onChunk?: (text: string) => void) => {

@@ -20,8 +20,12 @@ import {
   type SummarizerStatusItem,
 } from '@/hooks/useSummarizer';
 import { usePrompt } from '@/hooks/usePrompt';
-import type { SelectorOption } from '@/type';
+import type { IConfiguration, SelectorOption } from '@/type';
 import { useStorage } from '@/hooks/useStorage';
+import Form from '@/components/base/Form';
+import { initialValues } from './constant';
+import { generateStream } from '@/services/gemini';
+import { setLocalStorageMultiple } from '@/utils/storage';
 
 const Configuration = () => {
   const { t } = useI18n();
@@ -38,26 +42,18 @@ const Configuration = () => {
 
   const { initLanguageTranslator, translatorStatus } = useTranslator();
   const { initSummarizer, summarizerStatus } = useSummarizer();
-  const { initPromptSession, promptStatus, setPromptStatus } = usePrompt();
+  const { initPromptSession, promptStatus } = usePrompt();
 
   const [isLoading, setIsLoading] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [error, setError] = useState('');
 
+  const [selectedMode, setSelectedMode] = useState(initialValues.mode);
+
   const form = useForm<z.infer<typeof validation>>({
     resolver: zodResolver(validation),
-    defaultValues: {
-      source_lang: 'en',
-      target_lang: 'in',
-      mode: 'pronunciation',
-      selector: 'word',
-      accent: 'american',
-      summarizer_type: 'key-points',
-      summarizer_length: 'short',
-    },
+    defaultValues: initialValues,
   });
-
-  const [selectedMode, setSelectedMode] = useState(form.getValues('mode'));
 
   // Load settings from Chrome storage on component mount
   useEffect(() => {
@@ -69,40 +65,28 @@ const Configuration = () => {
           return;
         }
 
-        const result = settingsData;
+        const result: IConfiguration | undefined = settingsData;
 
         if (result) {
           // Create new data object with loaded values and defaults
-          const loadedData = {
+          const loadedData: IConfiguration = {
             source_lang: result?.source_lang || 'en',
             target_lang: result?.target_lang || 'in',
-            mode: (result?.mode || 'pronunciation') as
-              | 'pronunciation'
-              | 'grammar'
-              | 'summarizer'
-              | 'translation',
-            selector: (result?.selector || 'word') as
-              | 'word'
-              | 'sentence'
-              | 'context',
-            accent: (result?.accent || 'american') as 'american' | 'british',
-            summarizer_type: (result?.summarizer_type || 'key-points') as
-              | 'headline'
-              | 'key-points'
-              | 'teaser'
-              | 'tldr',
+            mode: result?.mode || 'pronunciation',
+            selector: result?.selector || 'word',
+            accent: (result?.accent || 'american'),
+            summarizer_type: (result?.summarizer_type || 'key-points'),
             summarizer_length: (result?.summarizer_length || 'short') as
               | 'short'
               | 'medium'
               | 'long',
           };
 
-          // Reset form with loaded data (this updates both values and default values)
           form.reset(loadedData);
 
           // Update selectedMode state
           setSelectedMode(
-            loadedData.mode as
+            loadedData?.mode as
               | 'pronunciation'
               | 'grammar'
               | 'summarizer'
@@ -119,7 +103,7 @@ const Configuration = () => {
     loadSettings();
   }, [form, settingsData]);
 
-  const onSubmit = async (data: z.infer<typeof validation>) => {
+  const handleSubmit = async (data: z.infer<typeof validation>) => {
     setIsLoading(true);
 
     const agent = preferences?.agent || 'chrome';
@@ -170,9 +154,37 @@ const Configuration = () => {
 
           await initPromptSession(config);
         }
-      }
 
-      saveToStorage(data);
+        await saveToStorage(data);
+      } else {
+        if (!preferences?.apiKey) {
+          throw new Error(
+            'Gemini API key not found. Please add your API key to Chrome storage or .env file.'
+          );
+        }
+
+        // Test the connection with the model
+        const model = preferences?.model ?? '';
+        if (!model) {
+          throw new Error(
+            'No model specified in preferences. Please configure a model.'
+          );
+        }
+
+        const testResult = await generateStream({
+          model,
+          contents: [
+            {
+              text: 'Hello, Gemini! return OK to verify the API connection.',
+            },
+          ],
+        });
+
+        if (testResult.includes('OK')) {
+          await saveToStorage(data);
+        }
+        
+      }
     } catch (e) {
       setError(e instanceof Error ? e?.message : String(e));
     } finally {
@@ -206,8 +218,8 @@ const Configuration = () => {
         }),
       };
 
-      await chrome.storage.local.set({
-        settings: JSON.stringify(storageData),
+      await setLocalStorageMultiple({
+        settings: storageData,
         ext_status: true,
       });
 
@@ -310,233 +322,123 @@ const Configuration = () => {
         </div>
       )}
 
-      <form id="form-rhf-demo" onSubmit={form.handleSubmit(onSubmit)}>
-        <FieldGroup>
-          <ControlledField
-            form={form}
-            label={t('mode')}
-            name="mode"
-            htmlId="mode"
-            component={(field, fieldState) => (
-              <Select
-                field={field}
-                fieldState={fieldState}
-                className="w-full"
+      <Form form={form} initialValues={initialValues} onSubmit={handleSubmit}>
+        {({ formState: { isDirty, isValid }, setValue, getValues }) => {
+          return (
+            <FieldGroup>
+              <ControlledField
+                label={t('mode')}
+                name="mode"
                 options={translatedModeOptions}
-                defaultValue="pronunciation"
+                component={Select}
                 onValueChange={(value) => {
                   setSelectedMode(value as 'pronunciation' | 'grammar');
-                  form.setValue('selector', getDefaultSelectorValue(value), {
+                  setValue('selector', getDefaultSelectorValue(value), {
                     shouldDirty: true,
                     shouldValidate: true,
                   });
-
-                  if (promptStatus.status !== 'idle') {
-                    setPromptStatus({ status: 'idle' });
-                  }
                 }}
               />
-            )}
-          />
 
-          <div className="w-full">
-            <Label>{t('language')}</Label>
-            <div className="w-full grid grid-cols-12 place-content-center items-center mt-2">
-              <ControlledField
-                form={form}
-                name="source_lang"
-                htmlId="source_lang"
-                className="col-span-5"
-                component={(field, fieldState) => (
-                  <Select
-                    field={field}
-                    fieldState={fieldState}
-                    options={translatedSourceLangOptions}
-                    defaultValue="en"
-                    className="w-full"
-                    onValueChange={(value) => {
-                      form.setValue('source_lang', value, {
-                        shouldDirty: true,
-                        shouldValidate: true,
-                      });
+              <div className="w-full">
+                <Label>{t('language')}</Label>
+                <div className="w-full grid grid-cols-12 place-content-center items-center mt-2">
+                  <div className="col-span-5">
+                    <ControlledField
+                      name="source_lang"
+                      options={translatedSourceLangOptions}
+                      component={Select}
+                    />
+                  </div>
 
-                      if (promptStatus.status !== 'idle') {
-                        setPromptStatus({ status: 'idle' });
-                      }
-                    }}
-                  />
-                )}
-              />
+                  <div className="col-span-2 flex justify-center">
+                    <ArrowRight className="mx-2" />
+                  </div>
 
-              <div className="col-span-2 flex justify-center">
-                <ArrowRight className="mx-2" />
+                  <div className="col-span-5">
+                    <ControlledField
+                      name="target_lang"
+                      options={translatedTargetLangOptions}
+                      defaultValue={getValues('target_lang')}
+                      component={Select}
+                    />
+                  </div>
+                </div>
               </div>
-              <ControlledField
-                className="col-span-5"
-                form={form}
-                name="target_lang"
-                htmlId="target_lang"
-                component={(field, fieldState) => (
-                  <Select
-                    field={field}
-                    fieldState={fieldState}
-                    options={translatedTargetLangOptions}
-                    defaultValue="in"
-                    className="w-full"
-                    onValueChange={(value) => {
-                      form.setValue('target_lang', value, {
-                        shouldDirty: true,
-                        shouldValidate: true,
-                      });
 
-                      if (promptStatus.status !== 'idle') {
-                        setPromptStatus({ status: 'idle' });
-                      }
-                    }}
-                  />
-                )}
-              />
-            </div>
-          </div>
-
-          {selectedMode === 'summarizer' && (
-            <>
-              <ControlledField
-                form={form}
-                name="summarizer_type"
-                htmlId="summarizer_type"
-                label={t('summarizer_type')}
-                component={(field, fieldState) => (
-                  <Select
-                    field={field}
-                    fieldState={fieldState}
+              {selectedMode === 'summarizer' && (
+                <>
+                  <ControlledField
+                    name="summarizer_type"
+                    label={t('summarizer_type')}
+                    component={Select}
                     options={translatedSummarizerTypeOptions}
                     defaultValue="key-points"
-                    className="w-full"
-                    onValueChange={(value) => {
-                      form.setValue(
-                        'summarizer_type',
-                        value as 'headline' | 'key-points' | 'teaser' | 'tldr',
-                        {
-                          shouldDirty: true,
-                          shouldValidate: true,
-                        }
-                      );
-                      if (summarizerStatus.status !== 'idle') {
-                        // Reset summarizer status when config changes
-                      }
-                    }}
                   />
-                )}
-              />
-              <ControlledField
-                form={form}
-                name="summarizer_length"
-                htmlId="summarizer_length"
-                label={t('summarizer_length')}
-                component={(field, fieldState) => (
-                  <RadioGroup
-                    field={field}
-                    fieldState={fieldState}
+                  <ControlledField
+                    name="summarizer_length"
+                    label={t('summarizer_length')}
+                    component={RadioGroup}
                     options={translatedSummarizerLengthOptions}
                     className="grid-cols-3"
+                  />
+                </>
+              )}
+
+              {selectedMode !== 'translation' &&
+                selectedMode !== 'summarizer' && (
+                  <ControlledField
+                    name="selector"
+                    label={t('selector')}
+                    component={RadioGroup}
+                    options={translatedSelectorOptions.map((option) => ({
+                      ...option,
+                      disabled: !getEnabledOptions(selectedMode).includes(
+                        option.value
+                      ),
+                    }))}
                     onValueChange={(value) => {
-                      form.setValue(
-                        'summarizer_length',
-                        value as 'short' | 'medium' | 'long',
-                        {
-                          shouldDirty: true,
-                          shouldValidate: true,
-                        }
-                      );
-                      if (summarizerStatus.status !== 'idle') {
-                        // Reset summarizer status when config changes
-                      }
+                      form.setValue('selector', value as SelectorOption, {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      });
                     }}
+                    className="grid-cols-3"
                   />
                 )}
-              />
-            </>
-          )}
 
-          {selectedMode !== 'translation' && selectedMode !== 'summarizer' && (
-            <ControlledField
-              form={form}
-              name="selector"
-              htmlId="selector"
-              label={t('selector')}
-              component={(field, fieldState) => (
-                <RadioGroup
-                  field={field}
-                  fieldState={fieldState}
-                  options={translatedSelectorOptions.map((option) => ({
-                    ...option,
-                    disabled: !getEnabledOptions(selectedMode).includes(
-                      option.value
-                    ),
-                  }))}
-                  className="grid-cols-3"
-                  onValueChange={(value) => {
-                    form.setValue('selector', value as SelectorOption, {
-                      shouldDirty: true,
-                      shouldValidate: true,
-                    });
-                    if (promptStatus.status !== 'idle') {
-                      setPromptStatus({ status: 'idle' });
-                    }
-                  }}
-                />
-              )}
-            />
-          )}
-
-          {form.getValues('mode') === 'pronunciation' && (
-            <ControlledField
-              form={form}
-              name="accent"
-              htmlId="accent"
-              label={t('accent')}
-              component={(field, fieldState) => (
-                <RadioGroup
-                  field={field}
-                  fieldState={fieldState}
+              {selectedMode === 'pronunciation' && (
+                <ControlledField
+                  name="accent"
+                  label={t('accent')}
+                  component={RadioGroup}
                   options={translatedAccentOptions}
                   className="grid-cols-3"
-                  onValueChange={(value) => {
-                    form.setValue('accent', value as 'american' | 'british', {
-                      shouldDirty: true,
-                      shouldValidate: true,
-                    });
-
-                    if (promptStatus.status !== 'idle') {
-                      setPromptStatus({ status: 'idle' });
-                    }
-                  }}
                 />
               )}
-            />
-          )}
-          <div className="flex justify-end">
-            <Button
-              type="submit"
-              isLoading={isLoading}
-              disabled={
-                !form.formState.isDirty || !form.formState.isValid || isLoading
-              }
-              className={saveSuccess ? 'bg-green-600 hover:bg-green-700' : ''}
-            >
-              {saveSuccess ? (
-                <>
-                  <CheckCircle className="w-4 h-4 mr-2" />
-                  {t('saved')}
-                </>
-              ) : (
-                <>{t('save_activate')}</>
-              )}
-            </Button>
-          </div>
-        </FieldGroup>
-      </form>
+              <div className="flex justify-end">
+                <Button
+                  type="submit"
+                  isLoading={isLoading}
+                  disabled={!isDirty || !isValid || isLoading}
+                  className={
+                    saveSuccess ? 'bg-green-600 hover:bg-green-700' : ''
+                  }
+                >
+                  {saveSuccess ? (
+                    <>
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      {t('saved')}
+                    </>
+                  ) : (
+                    <>{t('save_activate')}</>
+                  )}
+                </Button>
+              </div>
+            </FieldGroup>
+          );
+        }}
+      </Form>
     </div>
   );
 };

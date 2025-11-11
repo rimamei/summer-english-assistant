@@ -1,27 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getLocalStorage, getLocalStorageMultiple } from '@/utils/storage';
-
-export interface SettingsData {
-  source_lang: string;
-  target_lang: string;
-  mode: string;
-  selector: string;
-  accent: string;
-  summarizer_type: string;
-  summarizer_length: string;
-}
-
-export interface IPreferences {
-  theme: 'light' | 'dark';
-  ext_status: boolean;
-  lang: string;
-  agent: string;
-  model?: string | undefined;
-  apiKey?: string | undefined;
-}
+import type { IConfiguration, IPreferences } from '@/type';
 
 export const useStorage = () => {
-  const [settingsData, setSettingsData] = useState<SettingsData | undefined>();
+  const [settingsData, setSettingsData] = useState<IConfiguration | undefined>();
   const [preferencesData, setPreferencesData] = useState<IPreferences>();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -47,13 +29,13 @@ export const useStorage = () => {
     }
   }, []);
 
-  const getSettingStorage = useCallback(async (): Promise<SettingsData | null> => {
+  const getSettingStorage = useCallback(async (): Promise<IConfiguration | null> => {
     try {
       if (!chrome?.storage?.local) {
         return null;
       }
 
-      const settings = await getLocalStorage<SettingsData>('settings');
+      const settings = await getLocalStorage<IConfiguration>('settings');
 
       if (settings) {
         return settings;
