@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import ModeModal from './components/ModeModal';
 import { TranslationIcon } from './components/TranslationIcon';
-import { TranslationModal } from './components/TranslationModal';
+import { ResultModal } from './components/ResultModal';
 import { useTextSelection } from './hooks/useTextSelection';
 import { useTranslationModal } from './hooks/useTranslationModal';
 import { injectStyles } from './styles';
@@ -60,8 +60,8 @@ const App = ({ shadowRoot }: MainProps) => {
             />
           )}
 
-          {/* Translation Modal */}
-          <TranslationModal
+          {/* Result Modal */}
+          <ResultModal
             isVisible={showTranslationModal}
             onClose={handleCloseTranslationModal}
             position={translationPosition}

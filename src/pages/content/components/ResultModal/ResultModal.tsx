@@ -10,17 +10,17 @@ import { useTranslatedOptions } from '@/hooks/useTranslatedOptions';
 import { useCallback, useRef } from 'react';
 import { useClickOutside } from '../../hooks/useClickOutside';
 
-interface TranslationModalProps {
+interface ResultModalProps {
   isVisible: boolean;
   onClose: () => void;
   position?: { x: number; y: number };
 }
 
-export function TranslationModal({
+const ResultModal = ({
   isVisible,
   onClose,
   position = { x: 0, y: 0 },
-}: TranslationModalProps) {
+}: ResultModalProps) => {
   const { mode, isLightTheme } = useStorage();
   const { modeOptions } = useTranslatedOptions();
 
@@ -101,3 +101,5 @@ export function TranslationModal({
     </div>
   );
 }
+
+export default ResultModal;
