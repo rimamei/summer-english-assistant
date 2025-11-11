@@ -1,15 +1,12 @@
-import ControlledField from '@/components/base/ControlledField';
-import Select from '@/components/base/Select';
 import { Button } from '@/components/ui/button';
 import { FieldGroup } from '@/components/ui/field';
-import { ArrowRight, CheckCircle, InfoIcon } from 'lucide-react';
+import { ArrowRight, CheckCircle } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { validation } from './validation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type z from 'zod';
 import { getDefaultSelectorValue, getEnabledOptions } from '../utils';
-import RadioGroup from '@/components/base/RadioGroup';
 import { Label } from '@/components/ui/label';
 import { useI18n } from '@/hooks/useI18n';
 import { useTranslatedOptions } from '@/hooks/useTranslatedOptions';
@@ -20,14 +17,21 @@ import {
   type SummarizerStatusItem,
 } from '@/hooks/useSummarizer';
 import { usePrompt } from '@/hooks/usePrompt';
-import type { IConfiguration, SelectorOption } from '@/type';
+import type { SelectorOption } from '@/type';
 import { useStorage } from '@/hooks/useStorage';
-import Form from '@/components/base/Form';
+import {
+  Form,
+  ControlledField,
+  Select,
+  RadioGroup,
+} from '@/components/base';
 import { initialValues } from './constant';
 import { generateStream } from '@/services/gemini';
 import { setLocalStorageMultiple } from '@/utils/storage';
+import { buildFormData, buildStorageData, hasValidConfiguration } from './utils';
+import NotificationCard from './components/NotificationCard';
 
-const Configuration = () => {
+const ConfigurationForm = () => {
   const { t } = useI18n();
   const {
     modeOptions: translatedModeOptions,
@@ -44,10 +48,9 @@ const Configuration = () => {
   const { initSummarizer, summarizerStatus } = useSummarizer();
   const { initPromptSession, promptStatus } = usePrompt();
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [error, setError] = useState('');
-
   const [selectedMode, setSelectedMode] = useState(initialValues.mode);
 
   const form = useForm<z.infer<typeof validation>>({
@@ -55,189 +58,13 @@ const Configuration = () => {
     defaultValues: initialValues,
   });
 
-  // Load settings from Chrome storage on component mount
-  useEffect(() => {
-    const loadSettings = async () => {
-      try {
-        // Check if chrome.storage is available
-        if (!chrome?.storage?.local) {
-          setIsLoading(false);
-          return;
-        }
-
-        const result: IConfiguration | undefined = settingsData;
-
-        if (result) {
-          // Create new data object with loaded values and defaults
-          const loadedData: IConfiguration = {
-            source_lang: result?.source_lang || 'en',
-            target_lang: result?.target_lang || 'in',
-            mode: result?.mode || 'pronunciation',
-            selector: result?.selector || 'word',
-            accent: (result?.accent || 'american'),
-            summarizer_type: (result?.summarizer_type || 'key-points'),
-            summarizer_length: (result?.summarizer_length || 'short') as
-              | 'short'
-              | 'medium'
-              | 'long',
-          };
-
-          form.reset(loadedData);
-
-          // Update selectedMode state
-          setSelectedMode(
-            loadedData?.mode as
-              | 'pronunciation'
-              | 'grammar'
-              | 'summarizer'
-              | 'translation'
-          );
-        }
-      } catch {
-        // Silently handle storage errors
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadSettings();
-  }, [form, settingsData]);
-
-  const handleSubmit = async (data: z.infer<typeof validation>) => {
-    setIsLoading(true);
-
-    const agent = preferences?.agent || 'chrome';
-
-    try {
-      if (agent === 'chrome') {
-        if (data.mode === 'translation') {
-          await initLanguageTranslator(data.source_lang, data.target_lang);
-        } else if (data.mode === 'summarizer') {
-          const config: SummarizerConfig = {
-            expectedInputLanguages: [data.source_lang || 'en'],
-            expectedContextLanguages: [data.target_lang || 'en'],
-            format: 'markdown',
-            length: (data.summarizer_length || 'short') as
-              | 'short'
-              | 'medium'
-              | 'long',
-            outputLanguage: data.target_lang || 'en',
-            type: (data.summarizer_type || 'key-points') as
-              | 'headline'
-              | 'key-points'
-              | 'teaser'
-              | 'tldr',
-          };
-
-          await initSummarizer(config);
-        } else {
-          const config: LanguageModelCreateOptions = {
-            initialPrompts: [
-              {
-                role: 'system',
-                content: 'You are a helpful and friendly assistant.',
-              },
-            ],
-            temperature: 0.2,
-            topK: 1,
-            expectedInputs: [
-              {
-                type: 'text',
-                languages: [
-                  data.source_lang /* system prompt */,
-                  data.source_lang /* user prompt */,
-                ],
-              },
-            ],
-            expectedOutputs: [{ type: 'text', languages: [data.target_lang] }],
-          };
-
-          await initPromptSession(config);
-        }
-
-        await saveToStorage(data);
-      } else {
-        if (!preferences?.apiKey) {
-          throw new Error(
-            'Gemini API key not found. Please add your API key to Chrome storage or .env file.'
-          );
-        }
-
-        // Test the connection with the model
-        const model = preferences?.model ?? '';
-        if (!model) {
-          throw new Error(
-            'No model specified in preferences. Please configure a model.'
-          );
-        }
-
-        const testResult = await generateStream({
-          model,
-          contents: [
-            {
-              text: 'Hello, Gemini! return OK to verify the API connection.',
-            },
-          ],
-        });
-
-        if (testResult.includes('OK')) {
-          await saveToStorage(data);
-        }
-        
-      }
-    } catch (e) {
-      setError(e instanceof Error ? e?.message : String(e));
-    } finally {
-      setIsLoading(false);
-    }
+  // Helper: Show success message temporarily
+  const showSuccessMessage = () => {
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 2000);
   };
 
-  const saveToStorage = async (data: z.infer<typeof validation>) => {
-    setError('');
-    try {
-      // Check if chrome.storage is available
-      if (!chrome?.storage?.local) {
-        form.reset(data);
-        setSaveSuccess(true);
-        setTimeout(() => {
-          setSaveSuccess(false);
-        }, 2000);
-        return;
-      }
-
-      // Save to Chrome local storage
-      const storageData = {
-        source_lang: data.source_lang,
-        target_lang: data.target_lang,
-        mode: data.mode,
-        accent: data.accent,
-        ...(data.selector && { selector: data.selector }),
-        ...(data.summarizer_type && { summarizer_type: data.summarizer_type }),
-        ...(data.summarizer_length && {
-          summarizer_length: data.summarizer_length,
-        }),
-      };
-
-      await setLocalStorageMultiple({
-        settings: storageData,
-        ext_status: true,
-      });
-
-      // Reset form dirty state after successful save
-      form.reset(data);
-
-      // Show success feedback
-      setSaveSuccess(true);
-
-      // Clear success message after 2 seconds
-      setTimeout(() => {
-        setSaveSuccess(false);
-      }, 2000);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : String(err));
-    }
-  };
-
+  // Helper: Get current status based on selected mode
   const getStatus = useCallback(() => {
     let result: SummarizerStatusItem = {
       status: 'idle',
@@ -260,6 +87,143 @@ const Configuration = () => {
     };
   }, [selectedMode, translatorStatus, summarizerStatus, promptStatus]);
 
+  // Load saved configuration into form
+  const loadSettings = useCallback(async () => {
+    try {
+      if (hasValidConfiguration(settingsData!)) {
+        const formData = buildFormData(settingsData!);
+        form.reset(formData);
+        setSelectedMode(formData.mode);
+      }
+    } catch {
+      // Silently handle storage errors
+    } finally {
+      setIsLoading(false);
+    }
+  }, [settingsData, form]);
+
+  useEffect(() => {
+    if (settingsData) {
+      loadSettings();
+    }
+  }, [settingsData, loadSettings]);
+
+  // Initialize Chrome AI APIs
+  const initializeChromeAPI = async (data: z.infer<typeof validation>) => {
+    if (data.mode === 'translation') {
+      await initLanguageTranslator(data.source_lang, data.target_lang);
+    } else if (data.mode === 'summarizer') {
+      const config: SummarizerConfig = {
+        expectedInputLanguages: [data.source_lang || 'en'],
+        expectedContextLanguages: [data.target_lang || 'en'],
+        format: 'markdown',
+        length: (data.summarizer_length || 'short') as
+          | 'short'
+          | 'medium'
+          | 'long',
+        outputLanguage: data.target_lang || 'en',
+        type: (data.summarizer_type || 'key-points') as
+          | 'headline'
+          | 'key-points'
+          | 'teaser'
+          | 'tldr',
+      };
+
+      await initSummarizer(config);
+    } else {
+      const config: LanguageModelCreateOptions = {
+        initialPrompts: [
+          {
+            role: 'system',
+            content: 'You are a helpful and friendly assistant.',
+          },
+        ],
+        temperature: 0.2,
+        topK: 1,
+        expectedInputs: [
+          {
+            type: 'text',
+            languages: [
+              data.source_lang /* system prompt */,
+              data.source_lang /* user prompt */,
+            ],
+          },
+        ],
+        expectedOutputs: [{ type: 'text', languages: [data.target_lang] }],
+      };
+
+      await initPromptSession(config);
+    }
+  };
+
+  // Test Gemini API connection
+  const testGeminiConnection = async () => {
+    if (!preferences?.apiKey) {
+      throw new Error(
+        'Gemini API key not found. Please add your API key to Chrome storage or .env file.'
+      );
+    }
+
+    const model = preferences?.model ?? '';
+    if (!model) {
+      throw new Error(
+        'No model specified in preferences. Please configure a model.'
+      );
+    }
+
+    const testResult = await generateStream({
+      model,
+      contents: [
+        {
+          text: 'Hello, Gemini! return OK to verify the API connection.',
+        },
+      ],
+    });
+
+    if (!testResult.includes('OK')) {
+      throw new Error('Failed to connect to Gemini API');
+    }
+  };
+
+  // Save configuration to storage and apply changes
+  const onSubmit = async (data: z.infer<typeof validation>) => {
+    setIsLoading(true);
+    setError('');
+
+    const agent = preferences?.agent || 'chrome';
+
+    try {
+      // Initialize or test the appropriate API
+      if (agent === 'chrome') {
+        await initializeChromeAPI(data);
+      } else {
+        await testGeminiConnection();
+      }
+
+      // Fallback for when chrome.storage is not available
+      if (!chrome?.storage?.local) {
+        form.reset(data);
+        showSuccessMessage();
+        return;
+      }
+
+      const storageData = buildStorageData(data);
+
+      await setLocalStorageMultiple({
+        settings: storageData,
+        ext_status: true,
+      });
+
+      form.reset(data);
+      showSuccessMessage();
+    } catch (e) {
+      setError(e instanceof Error ? e?.message : String(e));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Determine if notification should be shown
   const showNotification = useMemo(() => {
     return (
       error ||
@@ -275,57 +239,11 @@ const Configuration = () => {
         {t('configuration')}
       </h3>
 
-      {/* Notification Card */}
-      {showNotification && (
-        <div
-          className={`w-full flex items-center gap-3 min-h-12 px-4 py-3 mb-6 rounded-lg shadow-sm border
-            ${
-              getStatus().status === 'error'
-                ? 'border-red-200 bg-red-50 dark:bg-red-900 dark:border-red-700'
-                : getStatus().status === 'downloading'
-                ? 'border-blue-200 bg-blue-50 dark:bg-blue-900 dark:border-blue-700'
-                : getStatus().status === 'ready'
-                ? 'border-green-200 bg-green-50 dark:bg-green-900 dark:border-green-700'
-                : 'border-zinc-200 from-zinc-50 to-zinc-100 dark:from-zinc-800 dark:to-zinc-900 dark:border-zinc-700'
-            }`}
-          style={{ fontWeight: 500 }}
-        >
-          {getStatus().status === 'error' || error ? (
-            <>
-              <InfoIcon className="w-5 h-5 text-red-500 dark:text-red-400" />
-              <span className="text-red-800 dark:text-red-100">
-                {getStatus().error ? getStatus().error : error}
-              </span>
-            </>
-          ) : getStatus().status === 'downloading' ? (
-            <>
-              <InfoIcon className="w-5 h-5 text-blue-500 dark:text-blue-400 animate-spin" />
-              <span className="text-blue-800 dark:text-blue-100">
-                {t('api_downloading')}
-                {typeof getStatus().progress === 'number' && (
-                  <span className="ml-2">
-                    {Math.round(getStatus().progress)}%
-                  </span>
-                )}
-              </span>
-            </>
-          ) : (
-            getStatus().status === 'ready' && (
-              <>
-                <InfoIcon className="w-5 h-5 text-green-500 dark:text-green-400" />
-                <span className="text-green-800 dark:text-green-100">
-                  {t('api_ready')}
-                </span>
-              </>
-            )
-          )}
-        </div>
-      )}
+      {showNotification && <NotificationCard status={getStatus()} error={error} />}
 
-      <Form form={form} initialValues={initialValues} onSubmit={handleSubmit}>
-        {({ formState: { isDirty, isValid }, setValue, getValues }) => {
-          return (
-            <FieldGroup>
+      <Form form={form} initialValues={initialValues} onSubmit={onSubmit}>
+        {({ formState: { isDirty, isValid }, setValue, getValues }) => (
+          <FieldGroup>
               <ControlledField
                 label={t('mode')}
                 name="mode"
@@ -436,11 +354,10 @@ const Configuration = () => {
                 </Button>
               </div>
             </FieldGroup>
-          );
-        }}
+        )}
       </Form>
     </div>
   );
 };
 
-export default Configuration;
+export default ConfigurationForm;
