@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { getLocalStorage, getLocalStorageMultiple } from '@/utils/storage';
 
 export interface SettingsData {
   source_lang: string;
@@ -32,11 +33,11 @@ export const useStorage = () => {
         return null;
       }
 
-      const storageData = await chrome.storage.local.get(['preferences', 'ext_status']);
+      const storageData = await getLocalStorageMultiple<{ preferences: IPreferences; ext_status: boolean }>(['preferences', 'ext_status']);
 
-      if (storageData.preferences || storageData?.ext_status) {
-        const parsedPreferences = storageData.preferences ? JSON.parse(storageData.preferences) : {};
-        return { ...parsedPreferences, ext_status: storageData?.ext_status || false };
+      if (storageData.preferences || storageData?.ext_status !== undefined) {
+        const preferences = storageData.preferences || {} as IPreferences;
+        return { ...preferences, ext_status: storageData?.ext_status || false };
       }
 
       return null;
@@ -52,11 +53,10 @@ export const useStorage = () => {
         return null;
       }
 
-      const storageData = await chrome.storage.local.get(['settings']);
+      const settings = await getLocalStorage<SettingsData>('settings');
 
-      if (storageData.settings) {
-        const parsedSettings = JSON.parse(storageData.settings);
-        return parsedSettings;
+      if (settings) {
+        return settings;
       }
 
       return null;
