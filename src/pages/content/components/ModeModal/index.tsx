@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { classes } from './style';
 import {
+  Camera,
   // Camera,
   GripVertical,
   Highlighter,
@@ -14,7 +15,7 @@ import { useI18n } from '@/hooks/useI18n';
 
 const ModeModal = () => {
   const { t } = useI18n();
-  const { isLightTheme } = useStorage();
+  const { isLightTheme, preferences } = useStorage();
 
   const [hoveredButtonIndex, setHoveredButtonIndex] = useState<number | null>(
     null
@@ -23,10 +24,12 @@ const ModeModal = () => {
   const { position, isDragging, handleMouseDown } = useDraggable({});
   const {
     enableHighlightMode,
-    // enableScreenshotMode,
+    enableScreenshotMode,
     mode,
     closeModeModal,
   } = useExtensionMode();
+
+  console.log('mode', mode)
 
   // Function to get button style with theme-aware hover effect
   const getButtonStyle = (index: number) => {
@@ -45,7 +48,7 @@ const ModeModal = () => {
     };
   };
 
-  const options = [
+  const allOptions = [
     {
       icon: <Highlighter size={18} />,
       action: () => {
@@ -54,14 +57,14 @@ const ModeModal = () => {
       title: t('enable_text_translation'),
       key: 'highlight',
     },
-    // {
-    //   icon: <Camera size={18} />,
-    //   action: () => {
-    //     enableScreenshotMode();
-    //   },
-    //   title: t('capture_screenshot'),
-    //   key: 'screenshot',
-    // },
+    {
+      icon: <Camera size={18} />,
+      action: () => {
+        enableScreenshotMode();
+      },
+      title: t('capture_screenshot'),
+      key: 'screenshot',
+    },
     {
       icon: <Power size={18} />,
       action: () => {
@@ -71,6 +74,14 @@ const ModeModal = () => {
       key: 'close',
     },
   ];
+
+  // Filter out screenshot option for Chrome agent
+  const options = allOptions.filter(option => {
+    if (option.key === 'screenshot' && preferences?.agent === 'chrome') {
+      return false;
+    }
+    return true;
+  });
 
   return (
     <div
