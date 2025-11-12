@@ -11,6 +11,7 @@ import { generateStream } from '@/services/gemini';
 import { createPronunciationPrompt } from '@/prompt/gemini/pronunciation';
 import { pronunciationSchema } from '@/prompt/schema/pronunciationSchema';
 import PronunciationDisplay from './PronunciationDisplay';
+import type { ContentListUnion } from '@google/genai';
 
 // Main Component
 const Pronunciation = () => {
@@ -20,10 +21,18 @@ const Pronunciation = () => {
   const [error, setError] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  const { settingsData, sourceLanguage, targetLanguage, isLightTheme, preferences } = useStorage();
+  const {
+    settingsData,
+    sourceLanguage,
+    targetLanguage,
+    isLightTheme,
+    preferences,
+  } = useStorage();
   const { analyzeWord, pronunciationStatus, isLoading } = usePronunciation();
   const lastAnalyzedRef = useRef<string>('');
-  const { state: { selectedText } } = useExtension();
+  const {
+    state: { selectedText, mode, screenshotData },
+  } = useExtension();
 
   const accent = settingsData?.accent === 'british' ? 'uk' : 'us';
 
@@ -45,19 +54,48 @@ const Pronunciation = () => {
     setError(null);
     setIsAnalyzing(true);
 
+    const agent = preferences?.agent;
+
     try {
-      if (preferences?.agent === 'chrome') {
+      if (agent === 'chrome') {
         const result = await analyzeWord({
           word: selectedText,
           sourceLanguage,
           targetLanguage,
         });
         setData(result);
-      } else if (preferences?.agent === 'gemini' && preferences.model) {
-        const contents = [{
-          role: 'user' as const,
-          parts: [{ text: createPronunciationPrompt(selectedText, sourceLanguage, targetLanguage) }],
-        }];
+      } else if (agent === 'gemini' && preferences?.model) {
+        const prompt = createPronunciationPrompt(
+          selectedText,
+          sourceLanguage,
+          targetLanguage
+        );
+
+        let contents: ContentListUnion = [
+          {
+            role: 'user' as const,
+            parts: [
+              {
+                text: prompt,
+              },
+            ],
+          },
+        ];
+
+        if (mode === 'screenshot') {
+          // Convert base64 image to the format Gemini expects
+          const base64Data = screenshotData?.split(',')[1];
+          const mimeType = screenshotData?.split(';')[0].split(':')[1];
+          contents = [
+            {
+              inlineData: {
+                mimeType,
+                data: base64Data,
+              },
+            },
+            { text: prompt },
+          ];
+        }
 
         await generateStream(
           {
@@ -77,14 +115,20 @@ const Pronunciation = () => {
     } finally {
       setIsAnalyzing(false);
     }
-  }, [analyzeWord, preferences, selectedText, sourceLanguage, targetLanguage]);
+  }, [analyzeWord, mode, preferences, screenshotData, selectedText, sourceLanguage, targetLanguage]);
 
   useEffect(() => {
-    if (selectedText && selectedText !== lastAnalyzedRef.current && sourceLanguage && targetLanguage && preferences) {
+     const highlightMode =
+      selectedText &&
+      selectedText !== lastAnalyzedRef.current &&
+      mode === 'highlight';
+    const screenshotMode = screenshotData && mode === 'screenshot';
+
+    if ((highlightMode || screenshotMode) && sourceLanguage && targetLanguage) {
       lastAnalyzedRef.current = selectedText;
       handlePronunciation();
     }
-  }, [handlePronunciation, preferences, selectedText, sourceLanguage, targetLanguage]);
+  }, [handlePronunciation, mode, preferences, screenshotData, selectedText, sourceLanguage, targetLanguage]);
 
   // Parse streamed JSON for Gemini
   const parsedGeminiData = useMemo(() => {
@@ -100,14 +144,18 @@ const Pronunciation = () => {
   const displayData = preferences?.agent === 'gemini' ? parsedGeminiData : data;
 
   // Render loading state
-  const isLoadingState = preferences?.agent === 'gemini'
-    ? isAnalyzing && !parsedGeminiData
-    : isLoading || !data;
+  const isLoadingState =
+    preferences?.agent === 'gemini'
+      ? isAnalyzing && !parsedGeminiData
+      : isLoading || !data;
 
   // Render error state
-  const errorState = preferences?.agent === 'gemini'
-    ? error
-    : error || pronunciationStatus.error || (pronunciationStatus.status === 'error' && t('something_went_wrong'));
+  const errorState =
+    preferences?.agent === 'gemini'
+      ? error
+      : error ||
+        pronunciationStatus.error ||
+        (pronunciationStatus.status === 'error' && t('something_went_wrong'));
 
   return (
     <div

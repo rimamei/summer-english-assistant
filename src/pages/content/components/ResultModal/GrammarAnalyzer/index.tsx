@@ -10,6 +10,7 @@ import type { IGrammarData } from '@/type';
 import { generateStream } from '@/services/gemini';
 import { createGrammarPrompt } from '@/prompt/gemini/grammar';
 import { grammarSchema } from '@/prompt/schema/grammarSchema';
+import type { ContentListUnion } from '@google/genai';
 
 const GrammarAnalyzer = () => {
   const { t } = useI18n();
@@ -24,7 +25,7 @@ const GrammarAnalyzer = () => {
   const lastAnalyzedRef = useRef<string>('');
 
   const {
-    state: { selectedText },
+    state: { selectedText, mode, screenshotData },
   } = useExtension();
 
   const handleAnalyzeSentence = useCallback(async () => {
@@ -34,7 +35,7 @@ const GrammarAnalyzer = () => {
       setError('');
       setIsAnalyzing(true);
 
-      const agent = preferences?.agent || 'chrome';
+      const agent = preferences?.agent;
 
       try {
         if (agent === 'chrome') {
@@ -53,20 +54,37 @@ const GrammarAnalyzer = () => {
             responseSchema: grammarSchema,
           };
 
-          const contents = [
+          const prompt = createGrammarPrompt(
+            selectedText,
+            sourceLanguage,
+            targetLanguage
+          );
+
+          let contents: ContentListUnion = [
             {
               role: 'user',
               parts: [
                 {
-                  text: createGrammarPrompt(
-                    selectedText,
-                    sourceLanguage,
-                    targetLanguage
-                  ),
+                  text: prompt,
                 },
               ],
             },
           ];
+
+          if (mode === 'screenshot') {
+            // Convert base64 image to the format Gemini expects
+            const base64Data = screenshotData?.split(',')[1];
+            const mimeType = screenshotData?.split(';')[0].split(':')[1];
+            contents = [
+              {
+                inlineData: {
+                  mimeType,
+                  data: base64Data,
+                },
+              },
+              { text: prompt },
+            ];
+          }
 
           await generateStream(
             {
@@ -87,32 +105,20 @@ const GrammarAnalyzer = () => {
         setIsAnalyzing(false);
       }
     }
-  }, [
-    analyzeSentence,
-    preferences,
-    selectedText,
-    sourceLanguage,
-    targetLanguage,
-  ]);
+  }, [analyzeSentence, mode, preferences?.agent, preferences?.model, screenshotData, selectedText, sourceLanguage, targetLanguage]);
 
   useEffect(() => {
-    if (
+    const highlightMode =
       selectedText &&
       selectedText !== lastAnalyzedRef.current &&
-      sourceLanguage &&
-      targetLanguage &&
-      preferences
-    ) {
+      mode === 'highlight';
+    const screenshotMode = screenshotData && mode === 'screenshot';
+
+    if ((highlightMode || screenshotMode) && sourceLanguage && targetLanguage) {
       lastAnalyzedRef.current = selectedText;
       handleAnalyzeSentence();
     }
-  }, [
-    handleAnalyzeSentence,
-    preferences,
-    selectedText,
-    sourceLanguage,
-    targetLanguage,
-  ]);
+  }, [handleAnalyzeSentence, mode, preferences, screenshotData, selectedText, sourceLanguage, targetLanguage]);
 
   // Parse the JSON and extract the markdown content
   const parsedGrammarData = useMemo(() => {

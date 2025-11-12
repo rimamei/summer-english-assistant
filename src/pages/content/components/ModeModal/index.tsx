@@ -29,8 +29,6 @@ const ModeModal = () => {
     closeModeModal,
   } = useExtensionMode();
 
-  console.log('mode', mode)
-
   // Function to get button style with theme-aware hover effect
   const getButtonStyle = (index: number) => {
     const isHovered = hoveredButtonIndex === index;

@@ -73,7 +73,6 @@ export async function setLocalStorage<T = unknown>(
 ): Promise<boolean> {
   try {
     if (!chrome?.storage?.local) {
-      console.warn('Chrome storage API is not available');
       return false;
     }
 

@@ -9,6 +9,7 @@ import Pronunciation from './Pronunciation';
 import { useCallback, useRef } from 'react';
 import { useClickOutside } from '../../hooks/useClickOutside';
 import { modeOptions } from '@/pages/popup/constants';
+import { useExtension } from '../../hooks/useContext';
 
 interface ResultModalProps {
   isVisible: boolean;
@@ -22,6 +23,7 @@ const ResultModal = ({
   position = { x: 0, y: 0 },
 }: ResultModalProps) => {
   const { mode, isLightTheme } = useStorage();
+  const { state } = useExtension();
 
   const modalRef = useRef<HTMLDivElement>(null!);
   const handleClickOutside = useCallback(() => {
@@ -30,12 +32,22 @@ const ResultModal = ({
 
   useClickOutside(modalRef, handleClickOutside);
 
+  // Calculate position based on screenshot area if available
+  const calculatedPosition = state.screenshotArea
+    ? {
+        // Convert document coordinates to viewport coordinates and center horizontally
+        x: state.screenshotArea.x - window.scrollX + state.screenshotArea.width / 2 - 200, // 200 is half of modal width (400px)
+        // Position below the screenshot area with some padding
+        y: state.screenshotArea.y - window.scrollY + state.screenshotArea.height + 20,
+      }
+    : position;
+
   const {
     position: draggablePosition,
     isDragging,
     handleMouseDown,
   } = useDraggable({
-    initialPosition: position,
+    initialPosition: calculatedPosition,
   });
 
   if (!isVisible) return null;

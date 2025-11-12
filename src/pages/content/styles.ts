@@ -51,22 +51,35 @@ const loadingDotsKeyframes = `
     .loading-dots {
       font-size: 16px;
     }
-    
+
     .loading-dots span {
       display: inline-block;
       animation: loadingDots 1.4s infinite;
     }
-    
+
     .loading-dots span:nth-child(1) {
       animation-delay: 0s;
     }
-    
+
     .loading-dots span:nth-child(2) {
       animation-delay: 0.2s;
     }
-    
+
     .loading-dots span:nth-child(3) {
       animation-delay: 0.4s;
+    }
+  `;
+
+const pulseBorderKeyframes = `
+    @keyframes pulse-border {
+      0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.8;
+        transform: scale(1.005);
+      }
     }
   `;
 
@@ -124,7 +137,9 @@ export const injectStyles = (targetRoot: ShadowRoot | null) => {
     baseFontStyles +
     keyframes +
     translationKeyframes +
-    modaAppearKeyframes + loadingDotsKeyframes;
+    modaAppearKeyframes +
+    loadingDotsKeyframes +
+    pulseBorderKeyframes;
 
   targetRoot.appendChild(style);
 };

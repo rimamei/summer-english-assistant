@@ -8,6 +8,8 @@ interface ExtensionState {
   translationPosition: { x: number; y: number };
   showTranslationModal: boolean;
   selectedText: string;
+  screenshotData: string | null;
+  screenshotArea: { x: number; y: number; width: number; height: number } | null;
 }
 
 export interface ExtensionContextType {
@@ -22,6 +24,8 @@ const initialState: ExtensionState = {
   translationText: '',
   translationPosition: { x: 0, y: 0 },
   selectedText: '',
+  screenshotData: null,
+  screenshotArea: null,
 };
 
 // eslint-disable-next-line react-refresh/only-export-components

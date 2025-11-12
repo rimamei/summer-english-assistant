@@ -10,6 +10,7 @@ import type { ISummarizerData } from '@/type';
 import { generateStream } from '@/services/gemini';
 import { createSummarizerPrompt } from '@/prompt/gemini/summarizer';
 import { summarizerSchema } from '@/prompt/schema/summarizerSchema';
+import type { ContentListUnion } from '@google/genai';
 
 const Summarization = () => {
   const { t } = useI18n();
@@ -26,7 +27,7 @@ const Summarization = () => {
   const lastAnalyzedRef = useRef<string>('');
 
   const {
-    state: { selectedText },
+    state: { selectedText, mode, screenshotData },
   } = useExtension();
 
   const handleAnalyzeSentence = useCallback(async () => {
@@ -65,21 +66,38 @@ const Summarization = () => {
             responseSchema: summarizerSchema,
           };
 
-          const contents = [
+          const prompt = createSummarizerPrompt(
+            selectedText,
+            'Keypoints',
+            'medium',
+            targetLanguage
+          );
+
+          let contents: ContentListUnion = [
             {
               role: 'user',
               parts: [
                 {
-                  text: createSummarizerPrompt(
-                    selectedText,
-                    'Keypoints',
-                    'medium',
-                    targetLanguage
-                  ),
+                  text: prompt,
                 },
               ],
             },
           ];
+
+          if (mode === 'screenshot') {
+            // Convert base64 image to the format Gemini expects
+            const base64Data = screenshotData?.split(',')[1];
+            const mimeType = screenshotData?.split(';')[0].split(':')[1];
+            contents = [
+              {
+                inlineData: {
+                  mimeType,
+                  data: base64Data,
+                },
+              },
+              { text: prompt },
+            ];
+          }
 
           await generateStream(
             {
@@ -102,32 +120,20 @@ const Summarization = () => {
         setIsAnalyzing(false);
       }
     }
-  }, [
-    handleSummarizeStreaming,
-    preferences,
-    selectedText,
-    sourceLanguage,
-    targetLanguage,
-  ]);
+  }, [handleSummarizeStreaming, mode, preferences?.agent, preferences?.model, screenshotData, selectedText, sourceLanguage, targetLanguage]);
 
   useEffect(() => {
-    if (
+    const highlightMode =
       selectedText &&
       selectedText !== lastAnalyzedRef.current &&
-      targetLanguage &&
-      sourceLanguage &&
-      preferences
-    ) {
+      mode === 'highlight';
+    const screenshotMode = screenshotData && mode === 'screenshot';
+
+    if ((highlightMode || screenshotMode) && sourceLanguage && targetLanguage) {
       lastAnalyzedRef.current = selectedText;
       handleAnalyzeSentence();
     }
-  }, [
-    handleAnalyzeSentence,
-    preferences,
-    selectedText,
-    sourceLanguage,
-    targetLanguage,
-  ]);
+  }, [handleAnalyzeSentence, mode, preferences, screenshotData, selectedText, sourceLanguage, targetLanguage]);
 
   // Parse the JSON and extract the summary content for Gemini
   const parsedSummarizerData = useMemo(() => {

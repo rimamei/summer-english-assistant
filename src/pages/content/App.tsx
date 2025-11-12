@@ -6,6 +6,9 @@ import { useTextSelection } from './hooks/useTextSelection';
 import { useTranslationModal } from './hooks/useTranslationModal';
 import { injectStyles } from './styles';
 import { useStorage } from '@/hooks/useStorage';
+import { useExtensionMode } from './hooks/useExtensionMode';
+import ScreenshotOverlay from './components/ScreenshotOverlay';
+import ScreenshotSelector from './components/ScreenshotSelector';
 
 interface MainProps {
   shadowRoot: ShadowRoot | null;
@@ -14,6 +17,7 @@ interface MainProps {
 const App = ({ shadowRoot }: MainProps) => {
   const { enableExtension } = useStorage();
   const { selection, clearSelection } = useTextSelection();
+  const { isScreenshotMode } = useExtensionMode();
 
   const {
     showTranslationModal,
@@ -38,6 +42,19 @@ const App = ({ shadowRoot }: MainProps) => {
     clearSelection();
   };
 
+  const handleScreenshotCapture = (
+    dataUrl: string,
+    position: { x: number; y: number },
+    area: { x: number; y: number; width: number; height: number }
+  ) => {
+    // Open the result modal with screenshot data first
+    openTranslationModal(dataUrl, position, area);
+  };
+
+  const handleScreenshotCancel = () => {
+    closeTranslationModal();
+  };
+
   if (enableExtension) {
     return (
       <div
@@ -51,8 +68,19 @@ const App = ({ shadowRoot }: MainProps) => {
         <div style={{ pointerEvents: 'auto' }}>
           <ModeModal />
 
+          {/* Screenshot Overlay - appears when screenshot mode is active */}
+          {isScreenshotMode && (
+            <ScreenshotOverlay
+              onScreenshotCapture={handleScreenshotCapture}
+              onCancel={handleScreenshotCancel}
+            />
+          )}
+
+          {/* Screenshot Selector - shows the selected area while modal is open */}
+          <ScreenshotSelector />
+
           {/* Translation Icon - appears when text is selected */}
-          {selection && (
+          {selection && !isScreenshotMode && (
             <FloatingIcon
               position={selection.position}
               onClick={handleTranslationClick}
