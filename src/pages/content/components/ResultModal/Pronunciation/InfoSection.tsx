@@ -10,7 +10,7 @@ const InfoSection = ({ label, value, isLightTheme }: InfoSectionProps) => (
   <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '8px' }}>
     <span
       style={{
-        ...classes.smallText,
+        ...classes.contentText,
         fontWeight: 'normal',
         color: isLightTheme ? '#6b7280' : '#d1d5db',
       }}
@@ -19,7 +19,7 @@ const InfoSection = ({ label, value, isLightTheme }: InfoSectionProps) => (
     </span>
     <span
       style={{
-        ...classes.smallText,
+        ...classes.contentText,
         fontWeight: 'normal',
         color: isLightTheme ? '#6b7280' : '#d1d5db',
       }}

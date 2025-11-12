@@ -23,7 +23,7 @@ const SoundBySoundList = ({
   >
     <span
       style={{
-        ...classes.smallText,
+        ...classes.contentText,
         fontWeight: 'normal',
         color: isLightTheme ? '#6b7280' : '#d1d5db',
       }}
@@ -44,7 +44,7 @@ const SoundBySoundList = ({
         <li key={index}>
           <span
             style={{
-              ...classes.smallText,
+              ...classes.contentText,
               fontWeight: 'normal',
               color: isLightTheme ? '#6b7280' : '#d1d5db',
             }}

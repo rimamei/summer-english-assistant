@@ -22,7 +22,7 @@ const PronunciationDisplay = ({ data, accent, onSpeak, isLightTheme, t }: Pronun
       {/* Pronunciation with speaker button */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
         <SpeakerButton onClick={onSpeak} isLightTheme={isLightTheme} />
-        <span style={{ ...classes.smallText, fontWeight: 'normal' }}>
+        <span style={{ ...classes.contentText, color: isLightTheme ? '#374151' : '#e5e7eb', fontWeight: 'normal' }}>
           <b>{data.pronunciation?.[accent] || 'N/A'}</b>
         </span>
       </div>
