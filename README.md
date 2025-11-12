@@ -29,25 +29,27 @@ Summer is a Chrome extension that helps users learn and improve their English sk
 ## Requirements
 
 - Node.js (v18 or higher recommended)
-- Chrome browser with AI features enabled
-- Chrome Canary or Dev channel (for built-in AI APIs)
+- Chrome browser with v138 (stable) or higher and AI features enabled
 
 ## Installation
 
 ### Development Setup
 
 1. Clone the repository:
+
 ```bash
 git clone git@github.com:rimamei/summer-english-assistant.git
 cd summer-english-ai
 ```
 
 2. Install dependencies:
+
 ```bash
 pnpm install
 ```
 
 3. Start development server:
+
 ```bash
 pnpm run dev
 ```
@@ -92,19 +94,15 @@ src/
 ## How It Works
 
 ### Grammar Analysis
+
 The grammar analyzer uses Chrome's Prompt API to provide concise, educational feedback:
+
 - Analyzes sentence structure, tenses, and grammar patterns
 - Returns 2-3 key grammar points in bullet format
 - Uses conversational tone for better learning experience
-- Optimized with `temperature: 0.8` and `topK: 5` for natural responses
-
-### AI Configuration
-The extension leverages Chrome's built-in AI APIs with customized parameters:
-- **Temperature**: 0.8 (for more natural, varied responses)
-- **TopK**: 5 (for focused but creative output)
-- **Response Format**: Structured JSON schemas for consistent output
 
 ### User Flow
+
 1. User selects text on any webpage
 2. Translation icon appears near selection
 3. User clicks to open translation modal
@@ -126,10 +124,6 @@ The extension leverages Chrome's built-in AI APIs with customized parameters:
 - **TailwindCSS**: Utility-first styling with v4
 - **Radix UI**: Accessible component primitives
 - **TypeScript**: Full type safety
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
