@@ -72,13 +72,13 @@ const loadingDotsKeyframes = `
 
 // Google Fonts CSS import
 const googleFontsCSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 `;
 
 // Base font styles using the imported font
 const baseFontStyles = `
   * {
-    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
   }
 `;
 

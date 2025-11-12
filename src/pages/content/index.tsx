@@ -24,7 +24,7 @@ const createAppContainer = () => {
     height: 100vh !important;
     pointer-events: none !important;
     z-index: 2147483647 !important;
-    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
   `;
 
   document.body.appendChild(container);
