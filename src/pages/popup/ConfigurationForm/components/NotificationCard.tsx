@@ -16,20 +16,20 @@ const NotificationCard = ({ status, error }: NotificationCardProps) => {
   const colorClasses = isError
     ? 'border-red-200 bg-red-50 dark:bg-red-900 dark:border-red-700'
     : isDownloading
-    ? 'border-blue-200 bg-blue-50 dark:bg-blue-900 dark:border-blue-700'
-    : 'border-green-200 bg-green-50 dark:bg-green-900 dark:border-green-700';
+      ? 'border-blue-200 bg-blue-50 dark:bg-blue-900 dark:border-blue-700'
+      : 'border-green-200 bg-green-50 dark:bg-green-900 dark:border-green-700';
 
   const iconClasses = isError
     ? 'text-red-500 dark:text-red-400'
     : isDownloading
-    ? 'text-blue-500 dark:text-blue-400 animate-spin'
-    : 'text-green-500 dark:text-green-400';
+      ? 'text-blue-500 dark:text-blue-400 animate-spin'
+      : 'text-green-500 dark:text-green-400';
 
   const textClasses = isError
     ? 'text-red-800 dark:text-red-100'
     : isDownloading
-    ? 'text-blue-800 dark:text-blue-100'
-    : 'text-green-800 dark:text-green-100';
+      ? 'text-blue-800 dark:text-blue-100'
+      : 'text-green-800 dark:text-green-100';
 
   return (
     <div
@@ -41,12 +41,10 @@ const NotificationCard = ({ status, error }: NotificationCardProps) => {
         {isError
           ? status.error || error
           : isDownloading
-          ? `${t('api_downloading')}${
-              typeof status.progress === 'number'
-                ? ` ${Math.round(status.progress)}%`
-                : ''
-            }`
-          : t('api_ready')}
+            ? `${t('api_downloading')}${
+                typeof status.progress === 'number' ? ` ${Math.round(status.progress)}%` : ''
+              }`
+            : t('api_ready')}
       </span>
     </div>
   );

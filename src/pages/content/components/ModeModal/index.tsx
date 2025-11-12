@@ -17,17 +17,10 @@ const ModeModal = () => {
   const { t } = useI18n();
   const { isLightTheme, preferences } = useStorage();
 
-  const [hoveredButtonIndex, setHoveredButtonIndex] = useState<number | null>(
-    null
-  );
+  const [hoveredButtonIndex, setHoveredButtonIndex] = useState<number | null>(null);
 
   const { position, isDragging, handleMouseDown } = useDraggable({});
-  const {
-    enableHighlightMode,
-    enableScreenshotMode,
-    mode,
-    closeModeModal,
-  } = useExtensionMode();
+  const { enableHighlightMode, enableScreenshotMode, mode, closeModeModal } = useExtensionMode();
 
   // Function to get button style with theme-aware hover effect
   const getButtonStyle = (index: number) => {

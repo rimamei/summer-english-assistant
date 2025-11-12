@@ -1,4 +1,4 @@
-import { classes } from "../style";
+import { classes } from '../style';
 
 interface SoundBySoundListProps {
   sounds: Array<{ symbol: string; exampleWord: string }>;
@@ -7,12 +7,7 @@ interface SoundBySoundListProps {
   isLightTheme: boolean;
 }
 
-const SoundBySoundList = ({
-  sounds,
-  label,
-  asInLabel,
-  isLightTheme,
-}: SoundBySoundListProps) => (
+const SoundBySoundList = ({ sounds, label, asInLabel, isLightTheme }: SoundBySoundListProps) => (
   <div
     style={{
       display: 'flex',

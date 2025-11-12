@@ -1,8 +1,5 @@
 import { Label } from '@/components/ui/label';
-import {
-  RadioGroup as RadioGroupUI,
-  RadioGroupItem,
-} from '@/components/ui/radio-group';
+import { RadioGroup as RadioGroupUI, RadioGroupItem } from '@/components/ui/radio-group';
 import React from 'react';
 import type { ControllerRenderProps, FieldError, FieldValues, Path } from 'react-hook-form';
 
@@ -30,17 +27,19 @@ const RadioGroup = <T extends FieldValues = FieldValues>({
   fieldState,
 }: RadioGroupProps<T>) => {
   // Use field props if available (React Hook Form mode), otherwise use regular props
-  const radioGroupProps = field ? {
-    value: field.value as string,
-    onValueChange: (value: string) => {
-      field.onChange(value);
-      field.onBlur();
-      onValueChange?.(value);
-    },
-  } : {
-    defaultValue,
-    onValueChange: onValueChange || (() => {}),
-  };
+  const radioGroupProps = field
+    ? {
+        value: field.value as string,
+        onValueChange: (value: string) => {
+          field.onChange(value);
+          field.onBlur();
+          onValueChange?.(value);
+        },
+      }
+    : {
+        defaultValue,
+        onValueChange: onValueChange || (() => {}),
+      };
 
   const hasError = fieldState?.error;
 
@@ -49,19 +48,15 @@ const RadioGroup = <T extends FieldValues = FieldValues>({
       className={`${className} ${hasError ? 'border-red-500' : ''}`}
       {...radioGroupProps}
     >
-      {options.map((option) => {
+      {options.map(option => {
         const isDisabled = option.disabled || false;
         return (
-          <div 
-            className={`flex items-center space-x-2 ${isDisabled ? 'opacity-50 pointer-events-none' : ''}`} 
+          <div
+            className={`flex items-center space-x-2 ${isDisabled ? 'opacity-50 pointer-events-none' : ''}`}
             key={option.value}
           >
-            <RadioGroupItem
-              value={option.value}
-              id={option.value}
-              disabled={isDisabled}
-            />
-            <Label 
+            <RadioGroupItem value={option.value} id={option.value} disabled={isDisabled} />
+            <Label
               htmlFor={option.value}
               className={isDisabled ? 'text-gray-400 cursor-not-allowed' : ''}
             >
@@ -74,4 +69,6 @@ const RadioGroup = <T extends FieldValues = FieldValues>({
   );
 };
 
-export default RadioGroup as <T extends FieldValues = FieldValues>(props: RadioGroupProps<T>) => React.JSX.Element;
+export default RadioGroup as <T extends FieldValues = FieldValues>(
+  props: RadioGroupProps<T>
+) => React.JSX.Element;

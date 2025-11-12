@@ -67,17 +67,13 @@ export async function getLocalStorageMultiple<T extends Record<string, unknown>>
  * @param key - The storage key to set
  * @param value - The value to store (will be JSON stringified if it's an object)
  */
-export async function setLocalStorage<T = unknown>(
-  key: string,
-  value: T
-): Promise<boolean> {
+export async function setLocalStorage<T = unknown>(key: string, value: T): Promise<boolean> {
   try {
     if (!chrome?.storage?.local) {
       return false;
     }
 
-    const storageValue =
-      typeof value === 'object' ? JSON.stringify(value) : value;
+    const storageValue = typeof value === 'object' ? JSON.stringify(value) : value;
 
     await chrome.storage.local.set({ [key]: storageValue });
     return true;
@@ -101,8 +97,7 @@ export async function setLocalStorageMultiple<T extends Record<string, unknown>>
     const storageItems: Record<string, unknown> = {};
 
     for (const [key, value] of Object.entries(items)) {
-      storageItems[key] =
-        typeof value === 'object' ? JSON.stringify(value) : value;
+      storageItems[key] = typeof value === 'object' ? JSON.stringify(value) : value;
     }
 
     await chrome.storage.local.set(storageItems);

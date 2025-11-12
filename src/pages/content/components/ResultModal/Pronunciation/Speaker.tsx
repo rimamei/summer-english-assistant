@@ -1,5 +1,5 @@
-import { Volume2 } from "lucide-react";
-import { useState } from "react";
+import { Volume2 } from 'lucide-react';
+import { useState } from 'react';
 
 interface SpeakerButtonProps {
   onClick: () => void;
@@ -11,7 +11,7 @@ const SpeakerButton = ({ onClick, isLightTheme }: SpeakerButtonProps) => {
 
   return (
     <button
-      onClick={(e) => {
+      onClick={e => {
         e.stopPropagation();
         onClick();
       }}
@@ -22,11 +22,7 @@ const SpeakerButton = ({ onClick, isLightTheme }: SpeakerButtonProps) => {
         alignItems: 'center',
         justifyContent: 'center',
         padding: '4px',
-        backgroundColor: isHovered
-          ? isLightTheme
-            ? '#f3f4f6'
-            : '#374151'
-          : 'transparent',
+        backgroundColor: isHovered ? (isLightTheme ? '#f3f4f6' : '#374151') : 'transparent',
         border: 'none',
         borderRadius: '4px',
         cursor: 'pointer',
@@ -34,10 +30,7 @@ const SpeakerButton = ({ onClick, isLightTheme }: SpeakerButtonProps) => {
       }}
       title="Listen to pronunciation"
     >
-      <Volume2
-        size={16}
-        style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}
-      />
+      <Volume2 size={16} style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }} />
     </button>
   );
 };

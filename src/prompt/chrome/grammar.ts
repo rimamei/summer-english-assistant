@@ -4,7 +4,7 @@
  * @returns {string} The formatted prompt.
  */
 export const createGrammarPrompt = (sentence: string): string => {
-    return `Analyze this sentence for grammar and provide brief, educational feedback.
+  return `Analyze this sentence for grammar and provide brief, educational feedback.
 
 Sentence: "${sentence}"
 

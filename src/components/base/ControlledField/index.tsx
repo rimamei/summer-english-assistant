@@ -8,17 +8,13 @@ import {
   type FieldValues,
 } from 'react-hook-form';
 import { cn } from '@/lib/utils';
-import {
-  Field,
-  FieldError as FieldErrorComponent,
-  FieldLabel,
-} from '@/components/ui/field';
+import { Field, FieldError as FieldErrorComponent, FieldLabel } from '@/components/ui/field';
 
 type FieldProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  T extends React.ComponentType<any> = React.ComponentType<any>
+  T extends React.ComponentType<any> = React.ComponentType<any>,
 > = Omit<React.ComponentProps<T>, ''> & {
   component: T;
   control?: Control<TFieldValues>;
@@ -41,7 +37,7 @@ function ControlledField<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  T extends React.ComponentType<any> = React.ComponentType<any>
+  T extends React.ComponentType<any> = React.ComponentType<any>,
 >({
   component,
   name,
@@ -57,9 +53,7 @@ function ControlledField<
 }: FieldProps<TFieldValues, TName, T>) {
   // Throw error if not provided name or component, or name & component is falsy
   if (!name || !component) {
-    throw new Error(
-      'ControlledField component requires "name" and "component" props.'
-    );
+    throw new Error('ControlledField component requires "name" and "component" props.');
   }
 
   const generateError = (
@@ -88,20 +82,11 @@ function ControlledField<
       control={control}
       name={name}
       shouldUnregister={shouldUnregister}
-      render={({
-        field,
-        fieldState,
-      }) => {
+      render={({ field, fieldState }) => {
         const { invalid, error } = fieldState;
         const { onChange, onBlur } = field;
         return (
-          <Field
-            className={cn(
-              'field w-full',
-              positionError && 'relative',
-              fieldClassName
-            )}
-          >
+          <Field className={cn('field w-full', positionError && 'relative', fieldClassName)}>
             {label && <FieldLabel htmlFor={name + 'Id'}>{label}</FieldLabel>}
             {React.createElement(component, {
               isError: (error && invalid) || externalError,
@@ -119,12 +104,12 @@ function ControlledField<
                 restProps?.onBlur?.(e);
               },
             })}
-          {(externalError || (error && invalid)) &&
-            (renderError?.(error, field.value, externalError) || (
-              <FieldErrorComponent>{generateError(error)}</FieldErrorComponent>
-            ))}
-        </Field>
-      );
+            {(externalError || (error && invalid)) &&
+              (renderError?.(error, field.value, externalError) || (
+                <FieldErrorComponent>{generateError(error)}</FieldErrorComponent>
+              ))}
+          </Field>
+        );
       }}
     />
   );

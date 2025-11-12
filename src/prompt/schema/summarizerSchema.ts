@@ -1,11 +1,11 @@
 export const summarizerSchema = {
-    type: 'object',
-    properties: {
-        summary: {
-            type: 'string',
-            description: 'The generated summary in markdown format',
-        },
+  type: 'object',
+  properties: {
+    summary: {
+      type: 'string',
+      description: 'The generated summary in markdown format',
     },
-    required: ['summary'],
-    additionalProperties: false,
+  },
+  required: ['summary'],
+  additionalProperties: false,
 };

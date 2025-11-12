@@ -53,8 +53,8 @@ export const useTextToSpeech = ({
     // Select voice based on accent
     const voiceLang = accent === 'british' ? 'en-GB' : 'en-US';
     const selectedVoice =
-      voices.find((voice) => voice.lang.startsWith(voiceLang)) ||
-      voices.find((voice) => voice.lang.startsWith('en'));
+      voices.find(voice => voice.lang.startsWith(voiceLang)) ||
+      voices.find(voice => voice.lang.startsWith('en'));
 
     if (selectedVoice) {
       utterance.voice = selectedVoice;

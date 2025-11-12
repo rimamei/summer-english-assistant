@@ -39,25 +39,70 @@ type TLDRGuideline = {
  */
 const LENGTH_GUIDELINES = {
   Headline: {
-    short: { words: 8, instruction: 'Maximum 8 words. Not 9, not 10. Exactly 8 or fewer.' } as HeadlineGuideline,
-    medium: { words: 12, instruction: 'Maximum 12 words. Not 13, not 14. Exactly 12 or fewer.' } as HeadlineGuideline,
-    long: { words: 15, instruction: 'Maximum 15 words. Not 16, not 17. Exactly 15 or fewer.' } as HeadlineGuideline
+    short: {
+      words: 8,
+      instruction: 'Maximum 8 words. Not 9, not 10. Exactly 8 or fewer.',
+    } as HeadlineGuideline,
+    medium: {
+      words: 12,
+      instruction: 'Maximum 12 words. Not 13, not 14. Exactly 12 or fewer.',
+    } as HeadlineGuideline,
+    long: {
+      words: 15,
+      instruction: 'Maximum 15 words. Not 16, not 17. Exactly 15 or fewer.',
+    } as HeadlineGuideline,
   },
   Keypoints: {
-    short: { count: 3, wordsPerPoint: 15, instruction: 'Exactly 3 bullet points. Each point maximum 15 words.' } as KeypointsGuideline,
-    medium: { count: 5, wordsPerPoint: 20, instruction: 'Exactly 5 bullet points. Each point maximum 20 words.' } as KeypointsGuideline,
-    long: { count: 7, wordsPerPoint: 25, instruction: 'Exactly 7 bullet points. Each point maximum 25 words.' } as KeypointsGuideline
+    short: {
+      count: 3,
+      wordsPerPoint: 15,
+      instruction: 'Exactly 3 bullet points. Each point maximum 15 words.',
+    } as KeypointsGuideline,
+    medium: {
+      count: 5,
+      wordsPerPoint: 20,
+      instruction: 'Exactly 5 bullet points. Each point maximum 20 words.',
+    } as KeypointsGuideline,
+    long: {
+      count: 7,
+      wordsPerPoint: 25,
+      instruction: 'Exactly 7 bullet points. Each point maximum 25 words.',
+    } as KeypointsGuideline,
   },
   Teaser: {
-    short: { sentences: 2, words: 30, instruction: 'Maximum 2 sentences. Maximum 30 words total.' } as TeaserGuideline,
-    medium: { sentences: 3, words: 60, instruction: 'Maximum 3 sentences. Maximum 60 words total.' } as TeaserGuideline,
-    long: { sentences: 4, words: 100, instruction: 'Maximum 4 sentences. Maximum 100 words total.' } as TeaserGuideline
+    short: {
+      sentences: 2,
+      words: 30,
+      instruction: 'Maximum 2 sentences. Maximum 30 words total.',
+    } as TeaserGuideline,
+    medium: {
+      sentences: 3,
+      words: 60,
+      instruction: 'Maximum 3 sentences. Maximum 60 words total.',
+    } as TeaserGuideline,
+    long: {
+      sentences: 4,
+      words: 100,
+      instruction: 'Maximum 4 sentences. Maximum 100 words total.',
+    } as TeaserGuideline,
   },
   TLDR: {
-    short: { sentences: 1, words: 25, instruction: 'Exactly 1 sentence. Maximum 25 words.' } as TLDRGuideline,
-    medium: { sentences: 2, words: 50, instruction: 'Exactly 2 sentences. Maximum 50 words total.' } as TLDRGuideline,
-    long: { sentences: 3, words: 80, instruction: 'Exactly 3 sentences. Maximum 80 words total.' } as TLDRGuideline
-  }
+    short: {
+      sentences: 1,
+      words: 25,
+      instruction: 'Exactly 1 sentence. Maximum 25 words.',
+    } as TLDRGuideline,
+    medium: {
+      sentences: 2,
+      words: 50,
+      instruction: 'Exactly 2 sentences. Maximum 50 words total.',
+    } as TLDRGuideline,
+    long: {
+      sentences: 3,
+      words: 80,
+      instruction: 'Exactly 3 sentences. Maximum 80 words total.',
+    } as TLDRGuideline,
+  },
 } as const;
 
 /**

@@ -2,7 +2,11 @@ import { useEffect, useRef } from 'react';
 import { useScreenshot } from '../../hooks/useScreenshot';
 
 interface ScreenshotOverlayProps {
-  onScreenshotCapture: (dataUrl: string, position: { x: number; y: number }, area: { x: number; y: number; width: number; height: number }) => void;
+  onScreenshotCapture: (
+    dataUrl: string,
+    position: { x: number; y: number },
+    area: { x: number; y: number; width: number; height: number }
+  ) => void;
   onCancel: () => void;
 }
 
@@ -56,7 +60,11 @@ const ScreenshotOverlay = ({ onScreenshotCapture, onCancel }: ScreenshotOverlayP
       const documentX = viewportX + window.scrollX;
       const documentY = viewportY + window.scrollY;
 
-      onScreenshotCapture(dataUrl, { x: viewportX, y: viewportY }, { x: documentX, y: documentY, width, height });
+      onScreenshotCapture(
+        dataUrl,
+        { x: viewportX, y: viewportY },
+        { x: documentX, y: documentY, width, height }
+      );
     } else {
       onCancel();
     }

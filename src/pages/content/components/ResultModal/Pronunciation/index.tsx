@@ -21,13 +21,7 @@ const Pronunciation = () => {
   const [error, setError] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  const {
-    settingsData,
-    sourceLanguage,
-    targetLanguage,
-    isLightTheme,
-    preferences,
-  } = useStorage();
+  const { settingsData, sourceLanguage, targetLanguage, isLightTheme, preferences } = useStorage();
   const { analyzeWord, pronunciationStatus, isLoading } = usePronunciation();
   const lastAnalyzedRef = useRef<string>('');
   const {
@@ -65,11 +59,7 @@ const Pronunciation = () => {
         });
         setData(result);
       } else if (agent === 'gemini' && preferences?.model) {
-        const prompt = createPronunciationPrompt(
-          selectedText,
-          sourceLanguage,
-          targetLanguage
-        );
+        const prompt = createPronunciationPrompt(selectedText, sourceLanguage, targetLanguage);
 
         let contents: ContentListUnion = [
           {
@@ -107,7 +97,7 @@ const Pronunciation = () => {
               responseSchema: pronunciationSchema,
             },
           },
-          (chunk) => setStreamingContent(chunk)
+          chunk => setStreamingContent(chunk)
         );
       }
     } catch (err) {
@@ -115,20 +105,34 @@ const Pronunciation = () => {
     } finally {
       setIsAnalyzing(false);
     }
-  }, [analyzeWord, mode, preferences, screenshotData, selectedText, sourceLanguage, targetLanguage]);
+  }, [
+    analyzeWord,
+    mode,
+    preferences,
+    screenshotData,
+    selectedText,
+    sourceLanguage,
+    targetLanguage,
+  ]);
 
   useEffect(() => {
-     const highlightMode =
-      selectedText &&
-      selectedText !== lastAnalyzedRef.current &&
-      mode === 'highlight';
+    const highlightMode =
+      selectedText && selectedText !== lastAnalyzedRef.current && mode === 'highlight';
     const screenshotMode = screenshotData && mode === 'screenshot';
 
     if ((highlightMode || screenshotMode) && sourceLanguage && targetLanguage) {
       lastAnalyzedRef.current = selectedText;
       handlePronunciation();
     }
-  }, [handlePronunciation, mode, preferences, screenshotData, selectedText, sourceLanguage, targetLanguage]);
+  }, [
+    handlePronunciation,
+    mode,
+    preferences,
+    screenshotData,
+    selectedText,
+    sourceLanguage,
+    targetLanguage,
+  ]);
 
   // Parse streamed JSON for Gemini
   const parsedGeminiData = useMemo(() => {
@@ -145,9 +149,7 @@ const Pronunciation = () => {
 
   // Render loading state
   const isLoadingState =
-    preferences?.agent === 'gemini'
-      ? isAnalyzing && !parsedGeminiData
-      : isLoading || !data;
+    preferences?.agent === 'gemini' ? isAnalyzing && !parsedGeminiData : isLoading || !data;
 
   // Render error state
   const errorState =
@@ -166,7 +168,7 @@ const Pronunciation = () => {
         cursor: 'text',
         lineHeight: '1.6',
       }}
-      onClick={(e) => e.stopPropagation()}
+      onClick={e => e.stopPropagation()}
     >
       {isLoadingState ? (
         <span style={{ color: isLightTheme ? '#6b7280' : '#d1d5db' }}>

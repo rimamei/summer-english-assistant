@@ -22,17 +22,13 @@ export function Tooltip({ text, customStyles, children }: TooltipProps) {
 
   return (
     <>
-      <div
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        style={customStyles}
-      >
+      <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} style={customStyles}>
         {children}
       </div>
 
       {/* Render tooltip only when visible */}
       {isVisible && (
-        <div 
+        <div
           style={{
             ...classes.tooltipContainer,
             backgroundColor: isLightTheme ? '#1f2937' : '#f9fafb',

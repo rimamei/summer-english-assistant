@@ -34,9 +34,8 @@ class I18n {
   }
 
   t(key: TranslationKey, variables?: Record<string, string | number>): string {
-    const translation = translations[this.currentLanguage]?.[key] ||
-      translations[this.fallbackLanguage][key] ||
-      key;
+    const translation =
+      translations[this.currentLanguage]?.[key] || translations[this.fallbackLanguage][key] || key;
 
     if (!variables) {
       return translation;

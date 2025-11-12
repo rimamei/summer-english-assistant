@@ -1,7 +1,7 @@
-import type { IPreferenceForm } from "@/type";
+import type { IPreferenceForm } from '@/type';
 
-export const initialValues: IPreferenceForm= {
-    lang: 'en',
-    theme: 'light',
-    agent: 'chrome',
+export const initialValues: IPreferenceForm = {
+  lang: 'en',
+  theme: 'light',
+  agent: 'chrome',
 };

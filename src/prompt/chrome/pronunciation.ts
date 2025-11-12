@@ -4,11 +4,8 @@
  * @param {string} targetLanguage - The target language for translation (e.g., "Japanese", "Spanish").
  * @returns {string} The formatted prompt.
  */
-export const createPronunciationPrompt = (
-    word: string,
-    targetLanguage: string
-): string => {
-    return `
+export const createPronunciationPrompt = (word: string, targetLanguage: string): string => {
+  return `
 You are an expert linguistic assistant specializing in pedagogy for English language learners.
 Your task is to analyze the given English word.
 You MUST output only a valid JSON object that strictly adheres to the provided schema.

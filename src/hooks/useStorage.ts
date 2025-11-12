@@ -15,10 +15,13 @@ export const useStorage = () => {
         return null;
       }
 
-      const storageData = await getLocalStorageMultiple<{ preferences: IPreferences; ext_status: boolean }>(['preferences', 'ext_status']);
+      const storageData = await getLocalStorageMultiple<{
+        preferences: IPreferences;
+        ext_status: boolean;
+      }>(['preferences', 'ext_status']);
 
       if (storageData.preferences || storageData?.ext_status !== undefined) {
-        const preferences = storageData.preferences || {} as IPreferences;
+        const preferences = storageData.preferences || ({} as IPreferences);
         return { ...preferences, ext_status: storageData?.ext_status || false };
       }
 
@@ -83,7 +86,6 @@ export const useStorage = () => {
     if (!chrome?.storage?.onChanged) return;
 
     const handleStorageChange = (changes: { [key: string]: chrome.storage.StorageChange }) => {
-
       if (changes.settings) {
         const newSettings = JSON.parse(changes.settings.newValue || '{}');
         setSettingsData(newSettings);
@@ -91,7 +93,7 @@ export const useStorage = () => {
 
       if (changes.theme) {
         const newTheme = changes.theme.newValue || 'light';
-        setPreferencesData((prev) => {
+        setPreferencesData(prev => {
           if (!prev) return undefined;
           return {
             ...prev,
@@ -107,12 +109,12 @@ export const useStorage = () => {
 
       if (changes.preferences) {
         const newPreferences = JSON.parse(changes.preferences.newValue || '{}');
-        setPreferencesData((prev) => ({ ...prev, ...newPreferences }));
+        setPreferencesData(prev => ({ ...prev, ...newPreferences }));
       }
 
       if (changes.ext_status) {
         const newStatus = changes.ext_status.newValue || false;
-        setPreferencesData((prev) => {
+        setPreferencesData(prev => {
           if (!prev) return undefined;
           return {
             ...prev,

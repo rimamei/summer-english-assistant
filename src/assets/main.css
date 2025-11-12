@@ -9,10 +9,9 @@
   --radius: 0.625rem;
   --background: oklch(94.85% 0.011 95.17);
   --background-theme: oklch(1 0 0);
-  --shadow-theme: inset -2px -4px 5px rgba(0, 0, 0, 0.2),
-    inset 0px 5px 5px rgba(0, 0, 0, 0.1);
-  --shadow-border-theme: inset 0px -4px 5px rgba(0, 0, 0, 0.2),
-    inset 0px 5px 5px rgba(0, 0, 0, 0.1);
+  --shadow-theme: inset -2px -4px 5px rgba(0, 0, 0, 0.2), inset 0px 5px 5px rgba(0, 0, 0, 0.1);
+  --shadow-border-theme:
+    inset 0px -4px 5px rgba(0, 0, 0, 0.2), inset 0px 5px 5px rgba(0, 0, 0, 0.1);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -44,8 +43,7 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-  --shadow-menu: inset 0px 2px 4px 0px rgba(0, 0, 0, 0.25),
-    0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  --shadow-menu: inset 0px 2px 4px 0px rgba(0, 0, 0, 0.25), 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
   --shadow-btn-theme: 1px 1px 0px #bababa, -1px -1px 0px #ffffff;
   --background-btn-theme: linear-gradient(145deg, #cacaca, #f0f0f0);
 }
@@ -128,8 +126,8 @@
   --sidebar-border: oklch(1 0 0 / 15%);
   --sidebar-ring: oklch(0.556 0 0);
   --background-theme: oklch(0.2 0 0);
-  --shadow-theme: inset -2px -4px 5px rgba(255, 255, 255, 0.1),
-    inset 0px 5px 5px rgba(0, 0, 0, 0.3);
+  --shadow-theme:
+    inset -2px -4px 5px rgba(255, 255, 255, 0.1), inset 0px 5px 5px rgba(0, 0, 0, 0.3);
   --shadow-btn-theme: 1px 1px 0px #0a0a0a, -1px -1px 0px #404040;
   --background-btn-theme: linear-gradient(145deg, #2a2a2a, #1a1a1a);
 }
@@ -143,9 +141,11 @@
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
     border-radius: 16px;
-    transition: background-color 0.7s ease-in-out, color 0.7s ease-in-out;
+    transition:
+      background-color 0.7s ease-in-out,
+      color 0.7s ease-in-out;
   }
-  
+
   html {
     transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
   }

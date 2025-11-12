@@ -12,12 +12,20 @@ interface SwitchProps {
   isRightLabel?: boolean;
 }
 
-const Switch = ({ name, label, checked, onCheckedChange, className, isLeftLabel, isRightLabel }: SwitchProps) => {
+const Switch = ({
+  name,
+  label,
+  checked,
+  onCheckedChange,
+  className,
+  isLeftLabel,
+  isRightLabel,
+}: SwitchProps) => {
   return (
     <div className={cn('flex space-x-2 items-center', className)}>
-      {(label && isLeftLabel) && <Label htmlFor={name}>{label}</Label>}
+      {label && isLeftLabel && <Label htmlFor={name}>{label}</Label>}
       <SwitchUI id={name} checked={checked} onCheckedChange={onCheckedChange} />
-      {(label && isRightLabel) && <Label htmlFor={name}>{label}</Label>}
+      {label && isRightLabel && <Label htmlFor={name}>{label}</Label>}
     </div>
   );
 };

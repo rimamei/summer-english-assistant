@@ -7,11 +7,7 @@ interface FloatingIconProps {
   isVisible: boolean;
 }
 
-export function FloatingIcon({
-  position,
-  onClick,
-  isVisible,
-}: FloatingIconProps) {
+export function FloatingIcon({ position, onClick, isVisible }: FloatingIconProps) {
   if (!isVisible) return null;
 
   const handleClick = (e: React.MouseEvent) => {

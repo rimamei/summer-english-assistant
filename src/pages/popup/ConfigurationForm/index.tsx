@@ -19,12 +19,7 @@ import {
 import { usePrompt } from '@/hooks/usePrompt';
 import type { SelectorOption } from '@/type';
 import { useStorage } from '@/hooks/useStorage';
-import {
-  Form,
-  ControlledField,
-  Select,
-  RadioGroup,
-} from '@/components/base';
+import { Form, ControlledField, Select, RadioGroup } from '@/components/base';
 import { initialValues } from './constant';
 import { generateStream } from '@/services/gemini';
 import { setLocalStorageMultiple } from '@/utils/storage';
@@ -117,10 +112,7 @@ const ConfigurationForm = () => {
         expectedInputLanguages: [data.source_lang || 'en'],
         expectedContextLanguages: [data.target_lang || 'en'],
         format: 'markdown',
-        length: (data.summarizer_length || 'short') as
-          | 'short'
-          | 'medium'
-          | 'long',
+        length: (data.summarizer_length || 'short') as 'short' | 'medium' | 'long',
         outputLanguage: data.target_lang || 'en',
         type: (data.summarizer_type || 'key-points') as
           | 'headline'
@@ -143,10 +135,7 @@ const ConfigurationForm = () => {
         expectedInputs: [
           {
             type: 'text',
-            languages: [
-              data.source_lang /* system prompt */,
-              data.source_lang /* user prompt */,
-            ],
+            languages: [data.source_lang /* system prompt */, data.source_lang /* user prompt */],
           },
         ],
         expectedOutputs: [{ type: 'text', languages: [data.target_lang] }],
@@ -166,9 +155,7 @@ const ConfigurationForm = () => {
 
     const model = preferences?.model ?? '';
     if (!model) {
-      throw new Error(
-        'No model specified in preferences. Please configure a model.'
-      );
+      throw new Error('No model specified in preferences. Please configure a model.');
     }
 
     const testResult = await generateStream({
@@ -244,116 +231,111 @@ const ConfigurationForm = () => {
       <Form form={form} initialValues={initialValues} onSubmit={onSubmit}>
         {({ formState: { isDirty, isValid }, setValue, getValues }) => (
           <FieldGroup>
+            <ControlledField
+              label={t('mode')}
+              name="mode"
+              options={translatedModeOptions}
+              component={Select}
+              onValueChange={value => {
+                setSelectedMode(value as 'pronunciation' | 'grammar');
+                setValue('selector', getDefaultSelectorValue(value), {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                });
+              }}
+            />
+
+            <div className="w-full">
+              <Label>{t('language')}</Label>
+              <div className="w-full grid grid-cols-12 place-content-center items-center mt-2">
+                <div className="col-span-5">
+                  <ControlledField
+                    name="source_lang"
+                    options={translatedSourceLangOptions}
+                    component={Select}
+                  />
+                </div>
+
+                <div className="col-span-2 flex justify-center">
+                  <ArrowRight className="mx-2" />
+                </div>
+
+                <div className="col-span-5">
+                  <ControlledField
+                    name="target_lang"
+                    options={translatedTargetLangOptions}
+                    defaultValue={getValues('target_lang')}
+                    component={Select}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {selectedMode === 'summarizer' && (
+              <>
+                <ControlledField
+                  name="summarizer_type"
+                  label={t('summarizer_type')}
+                  component={Select}
+                  options={translatedSummarizerTypeOptions}
+                  defaultValue="key-points"
+                />
+                <ControlledField
+                  name="summarizer_length"
+                  label={t('summarizer_length')}
+                  component={RadioGroup}
+                  options={translatedSummarizerLengthOptions}
+                  className="grid-cols-3"
+                />
+              </>
+            )}
+
+            {selectedMode !== 'translation' && selectedMode !== 'summarizer' && (
               <ControlledField
-                label={t('mode')}
-                name="mode"
-                options={translatedModeOptions}
-                component={Select}
-                onValueChange={(value) => {
-                  setSelectedMode(value as 'pronunciation' | 'grammar');
-                  setValue('selector', getDefaultSelectorValue(value), {
+                name="selector"
+                label={t('selector')}
+                component={RadioGroup}
+                options={translatedSelectorOptions.map(option => ({
+                  ...option,
+                  disabled: !getEnabledOptions(selectedMode).includes(option.value),
+                }))}
+                onValueChange={value => {
+                  form.setValue('selector', value as SelectorOption, {
                     shouldDirty: true,
                     shouldValidate: true,
                   });
                 }}
+                className="grid-cols-3"
               />
+            )}
 
-              <div className="w-full">
-                <Label>{t('language')}</Label>
-                <div className="w-full grid grid-cols-12 place-content-center items-center mt-2">
-                  <div className="col-span-5">
-                    <ControlledField
-                      name="source_lang"
-                      options={translatedSourceLangOptions}
-                      component={Select}
-                    />
-                  </div>
-
-                  <div className="col-span-2 flex justify-center">
-                    <ArrowRight className="mx-2" />
-                  </div>
-
-                  <div className="col-span-5">
-                    <ControlledField
-                      name="target_lang"
-                      options={translatedTargetLangOptions}
-                      defaultValue={getValues('target_lang')}
-                      component={Select}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {selectedMode === 'summarizer' && (
-                <>
-                  <ControlledField
-                    name="summarizer_type"
-                    label={t('summarizer_type')}
-                    component={Select}
-                    options={translatedSummarizerTypeOptions}
-                    defaultValue="key-points"
-                  />
-                  <ControlledField
-                    name="summarizer_length"
-                    label={t('summarizer_length')}
-                    component={RadioGroup}
-                    options={translatedSummarizerLengthOptions}
-                    className="grid-cols-3"
-                  />
-                </>
-              )}
-
-              {selectedMode !== 'translation' &&
-                selectedMode !== 'summarizer' && (
-                  <ControlledField
-                    name="selector"
-                    label={t('selector')}
-                    component={RadioGroup}
-                    options={translatedSelectorOptions.map((option) => ({
-                      ...option,
-                      disabled: !getEnabledOptions(selectedMode).includes(
-                        option.value
-                      ),
-                    }))}
-                    onValueChange={(value) => {
-                      form.setValue('selector', value as SelectorOption, {
-                        shouldDirty: true,
-                        shouldValidate: true,
-                      });
-                    }}
-                    className="grid-cols-3"
-                  />
+            {selectedMode === 'pronunciation' && (
+              <ControlledField
+                name="accent"
+                label={t('accent')}
+                component={RadioGroup}
+                options={translatedAccentOptions}
+                className="grid-cols-3"
+              />
+            )}
+            <div className="flex justify-end">
+              <Button
+                type="submit"
+                isLoading={isLoading}
+                disabled={!isDirty || !isValid || isLoading}
+                className={saveSuccess ? 'bg-green-600 hover:bg-green-700' : ''}
+              >
+                {saveSuccess ? (
+                  <>
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    {t('saved')}
+                  </>
+                ) : (
+                  <>{t('save_activate')}</>
                 )}
-
-              {selectedMode === 'pronunciation' && (
-                <ControlledField
-                  name="accent"
-                  label={t('accent')}
-                  component={RadioGroup}
-                  options={translatedAccentOptions}
-                  className="grid-cols-3"
-                />
-              )}
-              <div className="flex justify-end">
-                <Button
-                  type="submit"
-                  isLoading={isLoading}
-                  disabled={!isDirty || !isValid || isLoading}
-                  className={
-                    saveSuccess ? 'bg-green-600 hover:bg-green-700' : ''
-                  }
-                >
-                  {saveSuccess ? (
-                    <>
-                      <CheckCircle className="w-4 h-4 mr-2" />
-                      {t('saved')}
-                    </>
-                  ) : (
-                    <>{t('save_activate')}</>
-                  )}
-                </Button>
-              </div>
-            </FieldGroup>
+              </Button>
+            </div>
+          </FieldGroup>
         )}
       </Form>
     </div>

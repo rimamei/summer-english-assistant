@@ -14,13 +14,7 @@ import { useStorage } from '@/hooks/useStorage';
 import { agentOptions, modelOptions } from '@/constants/agent';
 import { initialValues } from './constant';
 import { setLocalStorage } from '@/utils/storage';
-import {
-  Input,
-  Form,
-  ControlledField,
-  Select,
-  Switch,
-} from '@/components/base';
+import { Input, Form, ControlledField, Select, Switch } from '@/components/base';
 import { buildFormData, buildStorageData, hasValidPreferences } from './utils';
 
 const PreferencesForm = () => {
@@ -155,9 +149,7 @@ const PreferencesForm = () => {
                 <Button
                   type="submit"
                   disabled={!isDirty || !isValid || isLoading}
-                  className={
-                    saveSuccess ? 'bg-green-600 hover:bg-green-700' : ''
-                  }
+                  className={saveSuccess ? 'bg-green-600 hover:bg-green-700' : ''}
                 >
                   {saveSuccess ? (
                     <>

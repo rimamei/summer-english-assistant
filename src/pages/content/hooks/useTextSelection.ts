@@ -14,7 +14,6 @@ interface UseTextSelectionReturn {
 export function useTextSelection(): UseTextSelectionReturn {
   const [selection, setSelection] = useState<SelectionInfo | null>(null);
 
-
   // Only set selection on mouseup for smoother UX
   const handleMouseUp = useCallback(() => {
     const sel = window.getSelection();

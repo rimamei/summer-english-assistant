@@ -17,11 +17,7 @@ interface ResultModalProps {
   position?: { x: number; y: number };
 }
 
-const ResultModal = ({
-  isVisible,
-  onClose,
-  position = { x: 0, y: 0 },
-}: ResultModalProps) => {
+const ResultModal = ({ isVisible, onClose, position = { x: 0, y: 0 } }: ResultModalProps) => {
   const { mode, isLightTheme } = useStorage();
   const { state } = useExtension();
 
@@ -62,21 +58,16 @@ const ResultModal = ({
   return (
     <div
       ref={modalRef}
-      onMouseDown={(e) => e.stopPropagation()}
-      onTouchStart={(e) => e.stopPropagation()}
+      onMouseDown={e => e.stopPropagation()}
+      onTouchStart={e => e.stopPropagation()}
       style={{
         ...classes.modalStyle,
         backgroundColor: isLightTheme ? '#ffffff' : '#1c1c1c',
         border: isLightTheme ? '1px solid #e5e7eb' : '2px solid #1c1c1c',
-        left: `${Math.min(
-          draggablePosition.x || position.x,
-          window.innerWidth - 400
-        )}px`,
+        left: `${Math.min(draggablePosition.x || position.x, window.innerWidth - 400)}px`,
         top: `${Math.max(draggablePosition.y || position.y + 40, 20)}px`,
         cursor: isDragging ? 'grabbing' : 'default',
-        boxShadow: isLightTheme
-          ? '0 1px 2px rgba(0, 0, 0, 0.05)'
-          : '0 1px 3px rgba(0, 0, 0, 0.3)',
+        boxShadow: isLightTheme ? '0 1px 2px rgba(0, 0, 0, 0.05)' : '0 1px 3px rgba(0, 0, 0, 0.3)',
       }}
     >
       <div
@@ -93,10 +84,10 @@ const ResultModal = ({
             color: isLightTheme ? '#111827' : '#f9fafb',
           }}
         >
-          {modeOptions.find((opt) => opt.value === mode)?.label}
+          {modeOptions.find(opt => opt.value === mode)?.label}
         </span>
         <button
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation();
             onClose();
           }}

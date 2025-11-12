@@ -20,7 +20,7 @@ interface UseScreenshotReturn {
 export function useScreenshot(): UseScreenshotReturn {
   const [isSelecting, setIsSelecting] = useState(false);
   const [screenshotArea, setScreenshotArea] = useState<ScreenshotArea | null>(null);
-  const [error, setError] = useState('')
+  const [error, setError] = useState('');
 
   const startSelection = useCallback((x: number, y: number) => {
     setIsSelecting(true);
@@ -56,7 +56,7 @@ export function useScreenshot(): UseScreenshotReturn {
       }
 
       if (response.error) {
-        setError('Failed to capture screenshot: '+ response.error);
+        setError('Failed to capture screenshot: ' + response.error);
         return null;
       }
 
@@ -69,7 +69,7 @@ export function useScreenshot(): UseScreenshotReturn {
       const img = new Image();
       img.src = response.dataUrl;
 
-      return new Promise((resolve) => {
+      return new Promise(resolve => {
         img.onload = () => {
           const canvas = document.createElement('canvas');
           const ctx = canvas.getContext('2d');
@@ -93,17 +93,7 @@ export function useScreenshot(): UseScreenshotReturn {
           const dpr = window.devicePixelRatio || 1;
 
           // Draw the cropped portion
-          ctx.drawImage(
-            img,
-            x * dpr,
-            y * dpr,
-            width * dpr,
-            height * dpr,
-            0,
-            0,
-            width,
-            height
-          );
+          ctx.drawImage(img, x * dpr, y * dpr, width * dpr, height * dpr, 0, 0, width, height);
 
           // Convert to data URL
           const croppedDataUrl = canvas.toDataURL('image/png');
@@ -116,7 +106,7 @@ export function useScreenshot(): UseScreenshotReturn {
         };
       });
     } catch (error) {
-      setError('Error capturing screenshot: '+ error);
+      setError('Error capturing screenshot: ' + error);
       return null;
     }
   }, []);
@@ -142,6 +132,6 @@ export function useScreenshot(): UseScreenshotReturn {
     updateSelection,
     finishSelection,
     cancelSelection,
-    error
+    error,
   };
 }

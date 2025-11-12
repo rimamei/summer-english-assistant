@@ -17,7 +17,7 @@ interface AnalyzeSentenceParams {
 
 export const useGrammar = () => {
   const [grammarStatus, setGrammarStatus] = useState<GrammarStatusItem>({
-    status: 'idle'
+    status: 'idle',
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -25,7 +25,7 @@ export const useGrammar = () => {
 
   // Subscribe to status changes from the singleton service
   useEffect(() => {
-    const unsubscribe = grammarService.subscribeToStatus((status) => {
+    const unsubscribe = grammarService.subscribeToStatus(status => {
       setGrammarStatus(status);
     });
 
@@ -35,11 +35,21 @@ export const useGrammar = () => {
   }, []);
 
   const analyzeSentence = useCallback(
-    async ({ sentence, sourceLanguage, targetLanguage, onChunk }: AnalyzeSentenceParams): Promise<IGrammarData | null> => {
+    async ({
+      sentence,
+      sourceLanguage,
+      targetLanguage,
+      onChunk,
+    }: AnalyzeSentenceParams): Promise<IGrammarData | null> => {
       setIsLoading(true);
 
       try {
-        const result = await grammarService.analyzeSentence(sentence, sourceLanguage, targetLanguage, onChunk);
+        const result = await grammarService.analyzeSentence(
+          sentence,
+          sourceLanguage,
+          targetLanguage,
+          onChunk
+        );
         setIsLoading(false);
         return result;
       } catch (error: unknown) {
@@ -53,7 +63,7 @@ export const useGrammar = () => {
         throw new Error(`Failed to analyze grammar: ${errorMessage}`);
       }
     },
-    [],
+    []
   );
 
   const abortAnalysis = useCallback(() => {

@@ -1,4 +1,4 @@
-import { classes } from "../style";
+import { classes } from '../style';
 
 interface InfoSectionProps {
   label: string;

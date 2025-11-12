@@ -45,36 +45,37 @@ const Select = <T extends FieldValues = FieldValues>(props: SelectProps<T>) => {
   } = props;
 
   // Use field props if available (React Hook Form mode), otherwise use regular props
-  const selectProps = field ? {
-    name: field.name,
-    value: field.value as string,
-    onValueChange: (value: string) => {
-      field.onChange(value);
-      field.onBlur();
-      onValueChange?.(value);
-    },
-    disabled: disabled || field.disabled,
-  } : {
-    name,
-    defaultValue,
-    onValueChange: onValueChange || (() => {}),
-    disabled,
-  };
+  const selectProps = field
+    ? {
+        name: field.name,
+        value: field.value as string,
+        onValueChange: (value: string) => {
+          field.onChange(value);
+          field.onBlur();
+          onValueChange?.(value);
+        },
+        disabled: disabled || field.disabled,
+      }
+    : {
+        name,
+        defaultValue,
+        onValueChange: onValueChange || (() => {}),
+        disabled,
+      };
 
   const hasError = fieldState?.error;
 
   return (
     <>
       {label && <Label>{label}</Label>}
-      <SelectUI
-        required={required}
-        {...selectProps}
-      >
-        <SelectTrigger className={`${className || "w-[180px]"} ${hasError ? 'border-red-500' : ''}`}>
+      <SelectUI required={required} {...selectProps}>
+        <SelectTrigger
+          className={`${className || 'w-[180px]'} ${hasError ? 'border-red-500' : ''}`}
+        >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>
-          {options.map((option) => (
+          {options.map(option => (
             <SelectItem key={option.value} value={option.value}>
               {option.label}
             </SelectItem>
@@ -85,4 +86,6 @@ const Select = <T extends FieldValues = FieldValues>(props: SelectProps<T>) => {
   );
 };
 
-export default Select as <T extends FieldValues = FieldValues>(props: SelectProps<T>) => React.JSX.Element;
+export default Select as <T extends FieldValues = FieldValues>(
+  props: SelectProps<T>
+) => React.JSX.Element;

@@ -55,11 +55,7 @@ function Form<TValues extends FieldValues = FieldValues>({
 
   return (
     <FormProvider {...form}>
-      <form
-        style={style}
-        className={className}
-        onSubmit={form.handleSubmit(onSubmit)}
-      >
+      <form style={style} className={className} onSubmit={form.handleSubmit(onSubmit)}>
         {child}
       </form>
     </FormProvider>

@@ -19,10 +19,8 @@ const Summarization = () => {
   const [error, setError] = useState<string>('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  const { isLightTheme, sourceLanguage, targetLanguage, preferences } =
-    useStorage();
-  const { handleSummarizeStreaming, isLoading, summarizerStatus } =
-    useSummarizer();
+  const { isLightTheme, sourceLanguage, targetLanguage, preferences } = useStorage();
+  const { handleSummarizeStreaming, isLoading, summarizerStatus } = useSummarizer();
 
   const lastAnalyzedRef = useRef<string>('');
 
@@ -105,14 +103,13 @@ const Summarization = () => {
               contents,
               config,
             },
-            (chunk) => {
+            chunk => {
               setStreamingContent(chunk);
             }
           );
         }
       } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : 'Summarization failed';
+        const errorMessage = err instanceof Error ? err.message : 'Summarization failed';
         setError(errorMessage);
         setExplanation('');
         setStreamingContent('');
@@ -120,20 +117,35 @@ const Summarization = () => {
         setIsAnalyzing(false);
       }
     }
-  }, [handleSummarizeStreaming, mode, preferences?.agent, preferences?.model, screenshotData, selectedText, sourceLanguage, targetLanguage]);
+  }, [
+    handleSummarizeStreaming,
+    mode,
+    preferences?.agent,
+    preferences?.model,
+    screenshotData,
+    selectedText,
+    sourceLanguage,
+    targetLanguage,
+  ]);
 
   useEffect(() => {
     const highlightMode =
-      selectedText &&
-      selectedText !== lastAnalyzedRef.current &&
-      mode === 'highlight';
+      selectedText && selectedText !== lastAnalyzedRef.current && mode === 'highlight';
     const screenshotMode = screenshotData && mode === 'screenshot';
 
     if ((highlightMode || screenshotMode) && sourceLanguage && targetLanguage) {
       lastAnalyzedRef.current = selectedText;
       handleAnalyzeSentence();
     }
-  }, [handleAnalyzeSentence, mode, preferences, screenshotData, selectedText, sourceLanguage, targetLanguage]);
+  }, [
+    handleAnalyzeSentence,
+    mode,
+    preferences,
+    screenshotData,
+    selectedText,
+    sourceLanguage,
+    targetLanguage,
+  ]);
 
   // Parse the JSON and extract the summary content for Gemini
   const parsedSummarizerData = useMemo(() => {
@@ -166,7 +178,7 @@ const Summarization = () => {
         userSelect: 'text',
         cursor: 'text',
       }}
-      onClick={(e) => e.stopPropagation()}
+      onClick={e => e.stopPropagation()}
     >
       {preferences?.agent === 'gemini' ? (
         // Gemini agent rendering

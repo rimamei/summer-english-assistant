@@ -48,9 +48,7 @@ const FullTranslation = () => {
     if (translatorStatus.status === 'checking') return 'Checking availability';
     if (translatorStatus.status === 'downloading') {
       return `Downloading model${
-        translatorStatus.progress
-          ? ` ${Math.round(translatorStatus.progress)}%`
-          : ''
+        translatorStatus.progress ? ` ${Math.round(translatorStatus.progress)}%` : ''
       }`;
     }
     return t('loading');
@@ -76,15 +74,9 @@ const FullTranslation = () => {
 
       // Check if using Gemini agent
       if (agent === 'gemini') {
-        const prompt = createTranslationPrompt(
-          selectedText,
-          sourceLanguage!,
-          targetLanguage!
-        );
+        const prompt = createTranslationPrompt(selectedText, sourceLanguage!, targetLanguage!);
 
-        let contents: ContentListUnion = [
-          { role: 'user', parts: [{ text: prompt }] },
-        ];
+        let contents: ContentListUnion = [{ role: 'user', parts: [{ text: prompt }] }];
 
         if (mode === 'screenshot') {
           // Convert base64 image to the format Gemini expects
@@ -107,7 +99,7 @@ const FullTranslation = () => {
             model: preferences?.model || 'gemini-2.0-flash-exp',
             contents,
           },
-          (text) => {
+          text => {
             setTranslationText(text);
           }
         );
@@ -128,8 +120,7 @@ const FullTranslation = () => {
         setIsLoading(false);
       }
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Translation failed';
+      const errorMessage = err instanceof Error ? err.message : 'Translation failed';
       setError(errorMessage);
       setTranslationText('');
       setIsLoading(false);
@@ -146,9 +137,7 @@ const FullTranslation = () => {
 
   useEffect(() => {
     const highlightMode =
-      selectedText &&
-      selectedText !== lastAnalyzedRef.current &&
-      mode === 'highlight';
+      selectedText && selectedText !== lastAnalyzedRef.current && mode === 'highlight';
     const screenshotMode = screenshotData && mode === 'screenshot';
 
     if ((highlightMode || screenshotMode) && sourceLanguage && targetLanguage) {
@@ -167,7 +156,7 @@ const FullTranslation = () => {
         userSelect: 'text',
         cursor: 'text',
       }}
-      onClick={(e) => e.stopPropagation()}
+      onClick={e => e.stopPropagation()}
     >
       {isTranslating ? (
         <span style={{ color: isLightTheme ? '#6b7280' : '#d1d5db' }}>

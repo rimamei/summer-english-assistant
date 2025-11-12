@@ -29,9 +29,7 @@ const initialState: ExtensionState = {
 };
 
 // eslint-disable-next-line react-refresh/only-export-components
-export const ExtensionContext = createContext<ExtensionContextType | undefined>(
-  undefined
-);
+export const ExtensionContext = createContext<ExtensionContextType | undefined>(undefined);
 
 interface ExtensionProviderProps {
   children: ReactNode;
@@ -41,8 +39,6 @@ export function ExtensionProvider({ children }: ExtensionProviderProps) {
   const [state, setState] = useState<ExtensionState>(initialState);
 
   return (
-    <ExtensionContext.Provider value={{ state, setState }}>
-      {children}
-    </ExtensionContext.Provider>
+    <ExtensionContext.Provider value={{ state, setState }}>{children}</ExtensionContext.Provider>
   );
 }

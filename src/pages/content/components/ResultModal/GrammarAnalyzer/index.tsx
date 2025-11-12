@@ -18,8 +18,7 @@ const GrammarAnalyzer = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string>('');
 
-  const { sourceLanguage, targetLanguage, isLightTheme, preferences } =
-    useStorage();
+  const { sourceLanguage, targetLanguage, isLightTheme, preferences } = useStorage();
   const { analyzeSentence } = useGrammar();
 
   const lastAnalyzedRef = useRef<string>('');
@@ -43,7 +42,7 @@ const GrammarAnalyzer = () => {
             sentence: selectedText,
             sourceLanguage,
             targetLanguage,
-            onChunk: (chunk) => {
+            onChunk: chunk => {
               setStreamingContent(chunk);
             },
           });
@@ -54,11 +53,7 @@ const GrammarAnalyzer = () => {
             responseSchema: grammarSchema,
           };
 
-          const prompt = createGrammarPrompt(
-            selectedText,
-            sourceLanguage,
-            targetLanguage
-          );
+          const prompt = createGrammarPrompt(selectedText, sourceLanguage, targetLanguage);
 
           let contents: ContentListUnion = [
             {
@@ -92,33 +87,46 @@ const GrammarAnalyzer = () => {
               contents,
               config,
             },
-            (chunk) => {
+            chunk => {
               setStreamingContent(chunk);
             }
           );
         }
       } catch (error) {
-        setError(
-          error instanceof Error ? error.message : 'Failed to analyze grammar'
-        );
+        setError(error instanceof Error ? error.message : 'Failed to analyze grammar');
       } finally {
         setIsAnalyzing(false);
       }
     }
-  }, [analyzeSentence, mode, preferences?.agent, preferences?.model, screenshotData, selectedText, sourceLanguage, targetLanguage]);
+  }, [
+    analyzeSentence,
+    mode,
+    preferences?.agent,
+    preferences?.model,
+    screenshotData,
+    selectedText,
+    sourceLanguage,
+    targetLanguage,
+  ]);
 
   useEffect(() => {
     const highlightMode =
-      selectedText &&
-      selectedText !== lastAnalyzedRef.current &&
-      mode === 'highlight';
+      selectedText && selectedText !== lastAnalyzedRef.current && mode === 'highlight';
     const screenshotMode = screenshotData && mode === 'screenshot';
 
     if ((highlightMode || screenshotMode) && sourceLanguage && targetLanguage) {
       lastAnalyzedRef.current = selectedText;
       handleAnalyzeSentence();
     }
-  }, [handleAnalyzeSentence, mode, preferences, screenshotData, selectedText, sourceLanguage, targetLanguage]);
+  }, [
+    handleAnalyzeSentence,
+    mode,
+    preferences,
+    screenshotData,
+    selectedText,
+    sourceLanguage,
+    targetLanguage,
+  ]);
 
   // Parse the JSON and extract the markdown content
   const parsedGrammarData = useMemo(() => {
@@ -149,9 +157,7 @@ const GrammarAnalyzer = () => {
 
     if (parsedGrammarData.details) {
       const explanation = t('explanation');
-      content += `**${
-        explanation.charAt(0).toUpperCase() + explanation.slice(1)
-      }:**\n`;
+      content += `**${explanation.charAt(0).toUpperCase() + explanation.slice(1)}:**\n`;
       const details = parsedGrammarData.details
         .replace(/\\n/g, '\n') // Replace literal \n with actual newlines
         .replace(/\n\n+/g, '\n\n'); // Normalize multiple newlines
@@ -172,7 +178,7 @@ const GrammarAnalyzer = () => {
         cursor: 'text',
         lineHeight: '1.6',
       }}
-      onClick={(e) => e.stopPropagation()}
+      onClick={e => e.stopPropagation()}
     >
       {error ? (
         <span style={{ color: '#ef4444' }}>{error}</span>

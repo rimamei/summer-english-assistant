@@ -4,18 +4,11 @@ import type { validation } from './validation';
 
 // Helper: Check if configuration data is valid
 export const hasValidConfiguration = (config: IConfiguration | null) => {
-  return (
-    config?.source_lang &&
-    config?.target_lang &&
-    config?.mode &&
-    config?.selector
-  );
+  return config?.source_lang && config?.target_lang && config?.mode && config?.selector;
 };
 
 // Helper: Build form data from saved configuration
-export const buildFormData = (
-  config: IConfiguration
-): z.infer<typeof validation> => {
+export const buildFormData = (config: IConfiguration): z.infer<typeof validation> => {
   return {
     source_lang: config.source_lang || 'en',
     target_lang: config.target_lang || 'id',
@@ -28,9 +21,7 @@ export const buildFormData = (
 };
 
 // Helper: Build storage data from form values
-export const buildStorageData = (
-  data: z.infer<typeof validation>
-): IConfiguration => {
+export const buildStorageData = (data: z.infer<typeof validation>): IConfiguration => {
   return {
     source_lang: data.source_lang,
     target_lang: data.target_lang,

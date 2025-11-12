@@ -5,8 +5,12 @@
  * @param {string} targetLanguage - The target language.
  * @returns {string} The formatted prompt.
  */
-export const createTranslationPrompt = (text: string, sourceLanguage: string, targetLanguage: string): string => {
-    return `You are an expert translator with deep knowledge of multiple languages and cultural nuances. Translate the following text accurately and naturally.
+export const createTranslationPrompt = (
+  text: string,
+  sourceLanguage: string,
+  targetLanguage: string
+): string => {
+  return `You are an expert translator with deep knowledge of multiple languages and cultural nuances. Translate the following text accurately and naturally.
 
 Text to translate: "${text}"
 Source language: ${sourceLanguage}

@@ -19,12 +19,8 @@ const App = ({ shadowRoot }: MainProps) => {
   const { selection, clearSelection } = useTextSelection();
   const { isScreenshotMode } = useExtensionMode();
 
-  const {
-    showTranslationModal,
-    translationPosition,
-    openTranslationModal,
-    closeTranslationModal,
-  } = useTranslationModal();
+  const { showTranslationModal, translationPosition, openTranslationModal, closeTranslationModal } =
+    useTranslationModal();
 
   // Inject styles (keyframe) when component mounts
   useEffect(() => {

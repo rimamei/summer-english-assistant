@@ -3,8 +3,12 @@
  * @param {string} sentence - The sentence to analyze.
  * @returns {string} The formatted prompt.
  */
-export const createGrammarPrompt = (sentence: string, sourceLanguage: string, targetLanguage: string): string => {
-    return `You are an English grammar teacher. Analyze this sentence clearly and concisely.
+export const createGrammarPrompt = (
+  sentence: string,
+  sourceLanguage: string,
+  targetLanguage: string
+): string => {
+  return `You are an English grammar teacher. Analyze this sentence clearly and concisely.
 
 Sentence: "${sentence}"
 Source language: ${sourceLanguage}

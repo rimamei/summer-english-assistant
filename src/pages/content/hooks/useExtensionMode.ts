@@ -24,9 +24,8 @@ export function useExtensionMode(): useExtensionModeProps {
     if (preferences?.agent === 'chrome' && state.mode === 'screenshot') {
       setState(prev => ({ ...prev, mode: 'highlight' }));
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [preferences])
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preferences]);
 
   const enableHighlightMode = useCallback(() => {
     setState(prev => ({

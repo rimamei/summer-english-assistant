@@ -46,9 +46,7 @@ function Popup() {
               src="/icons/icon128.png"
             />
             <div>
-              <h1 className="text-xl font-bold transition-all duration-500 text-logo">
-                Summer
-              </h1>
+              <h1 className="text-xl font-bold transition-all duration-500 text-logo">Summer</h1>
               <p className="text-sm text-gray-600 dark:text-gray-300 font-medium transition-colors duration-500">
                 AI-Powered English Learning Assistant
               </p>
@@ -62,7 +60,7 @@ function Popup() {
       <div className="w-16 relative flex items-center justify-center">
         {/* <ToggleTheme /> */}
         <div className="min-h-[20vh] min-w-8 bg-white dark:bg-card rounded-4xl fixed right-3 shadow-lg flex flex-col items-center justify-center">
-          {menuOption.map((option) => {
+          {menuOption.map(option => {
             const Icon = option.icon;
             return (
               <div
