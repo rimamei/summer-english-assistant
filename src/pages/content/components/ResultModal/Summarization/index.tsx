@@ -18,7 +18,8 @@ const Summarization = () => {
   const [error, setError] = useState<string>('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  const { isLightTheme, sourceLanguage, targetLanguage, preferences } = useStorage();
+  const { isLightTheme, sourceLanguage, targetLanguage, preferences } =
+    useStorage();
   const { handleSummarizeStreaming, isLoading, summarizerStatus } =
     useSummarizer();
 
@@ -120,7 +121,13 @@ const Summarization = () => {
       lastAnalyzedRef.current = selectedText;
       handleAnalyzeSentence();
     }
-  }, [handleAnalyzeSentence, preferences, selectedText, sourceLanguage, targetLanguage]);
+  }, [
+    handleAnalyzeSentence,
+    preferences,
+    selectedText,
+    sourceLanguage,
+    targetLanguage,
+  ]);
 
   // Parse the JSON and extract the summary content for Gemini
   const parsedSummarizerData = useMemo(() => {
@@ -146,103 +153,79 @@ const Summarization = () => {
   const sanitizedHtml = useSafeMarkdown(displayContent);
 
   return (
-    <div
+    <span
       style={{
-        padding: '8px',
+        ...classes.contentText,
+        color: isLightTheme ? '#374151' : '#e5e7eb',
+        userSelect: 'text',
+        cursor: 'text',
       }}
+      onClick={(e) => e.stopPropagation()}
     >
-      <div
-        style={{
-          marginBottom: '12px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '4px',
-        }}
-      >
-        <div
-          style={{
-            ...classes.translationContainer,
-            backgroundColor: isLightTheme ? '#f3f4f6' : '#374151',
-          }}
-        >
-          <span
-            style={{
-              ...classes.contentText,
-              color: isLightTheme ? '#374151' : '#9ca3af',
-              userSelect: 'text',
-              cursor: 'text',
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {preferences?.agent === 'gemini' ? (
-              // Gemini agent rendering
-              isAnalyzing && !parsedSummarizerData ? (
-                <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
-                  {t('loading')}
-                  <LoadingDots />
-                </span>
-              ) : error ? (
-                <span style={{ color: '#ef4444' }}>{error}</span>
-              ) : parsedSummarizerData && displayContent ? (
-                <span
-                  dangerouslySetInnerHTML={{
-                    __html: sanitizedHtml,
-                  }}
-                />
-              ) : (
-                <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
-                  {t('no_explanation_available')}
-                </span>
-              )
-            ) : (
-              // Chrome agent rendering
-              isLoading ? (
-                summarizerStatus.status === 'downloading' ? (
-                  <div style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
-                    <div style={{ marginBottom: '8px' }}>
-                      {t('downloading')} {summarizerStatus.progress || 0}%
-                    </div>
-                    <div
-                      style={{
-                        width: '100%',
-                        height: '4px',
-                        backgroundColor: isLightTheme ? '#e5e7eb' : '#4b5563',
-                        borderRadius: '2px',
-                        overflow: 'hidden',
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: `${summarizerStatus.progress || 0}%`,
-                          height: '100%',
-                          backgroundColor: '#3b82f6',
-                          transition: 'width 0.3s ease',
-                        }}
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
-                    {t('loading')}
-                    <LoadingDots />
-                  </span>
-                )
-              ) : error || summarizerStatus.status === 'error' ? (
-                <span style={{ color: '#ef4444' }}>
-                  {error || summarizerStatus.error || 'Summarization failed'}
-                </span>
-              ) : (
-                <span
-                  dangerouslySetInnerHTML={{
-                    __html: sanitizedHtml || '',
-                  }}
-                />
-              )
-            )}
+      {preferences?.agent === 'gemini' ? (
+        // Gemini agent rendering
+        isAnalyzing && !parsedSummarizerData ? (
+          <span style={{ color: isLightTheme ? '#6b7280' : '#d1d5db' }}>
+            {t('loading')}
+            <LoadingDots />
           </span>
-        </div>
-      </div>
-    </div>
+        ) : error ? (
+          <span style={{ color: '#ef4444' }}>{error}</span>
+        ) : parsedSummarizerData && displayContent ? (
+          <span
+            dangerouslySetInnerHTML={{
+              __html: sanitizedHtml,
+            }}
+          />
+        ) : (
+          <span style={{ color: isLightTheme ? '#6b7280' : '#d1d5db' }}>
+            {t('no_explanation_available')}
+          </span>
+        )
+      ) : // Chrome agent rendering
+      isLoading ? (
+        summarizerStatus.status === 'downloading' ? (
+          <div style={{ color: isLightTheme ? '#6b7280' : '#d1d5db' }}>
+            <div style={{ marginBottom: '8px' }}>
+              {t('downloading')} {summarizerStatus.progress || 0}%
+            </div>
+            <div
+              style={{
+                width: '100%',
+                height: '4px',
+                backgroundColor: isLightTheme ? '#e5e7eb' : '#4b5563',
+                borderRadius: '2px',
+                overflow: 'hidden',
+              }}
+            >
+              <div
+                style={{
+                  width: `${summarizerStatus.progress || 0}%`,
+                  height: '100%',
+                  backgroundColor: '#3b82f6',
+                  transition: 'width 0.3s ease',
+                }}
+              />
+            </div>
+          </div>
+        ) : (
+          <span style={{ color: isLightTheme ? '#6b7280' : '#d1d5db' }}>
+            {t('loading')}
+            <LoadingDots />
+          </span>
+        )
+      ) : error || summarizerStatus.status === 'error' ? (
+        <span style={{ color: '#ef4444' }}>
+          {error || summarizerStatus.error || 'Summarization failed'}
+        </span>
+      ) : (
+        <span
+          dangerouslySetInnerHTML={{
+            __html: sanitizedHtml || '',
+          }}
+        />
+      )}
+    </span>
   );
 };
 

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import ModeModal from './components/ModeModal';
-import { TranslationIcon } from './components/TranslationIcon';
+import { FloatingIcon } from './components/FloatingIcon';
 import { ResultModal } from './components/ResultModal';
 import { useTextSelection } from './hooks/useTextSelection';
 import { useTranslationModal } from './hooks/useTranslationModal';
@@ -53,7 +53,7 @@ const App = ({ shadowRoot }: MainProps) => {
 
           {/* Translation Icon - appears when text is selected */}
           {selection && (
-            <TranslationIcon
+            <FloatingIcon
               position={selection.position}
               onClick={handleTranslationClick}
               isVisible={!showTranslationModal}

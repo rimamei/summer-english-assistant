@@ -18,8 +18,11 @@ const FullTranslation = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const { isLightTheme } = useStorage();
-  const { handleTranslateStreaming, isLoading: isLoadingTranslatorService, translatorStatus } =
-    useTranslator();
+  const {
+    handleTranslateStreaming,
+    isLoading: isLoadingTranslatorService,
+    translatorStatus,
+  } = useTranslator();
   const {
     state: { selectedText },
   } = useExtension();
@@ -128,52 +131,30 @@ const FullTranslation = () => {
   const sanitizedHtml = useSafeMarkdown(translationText);
 
   return (
-    <div
+    <span
       style={{
-        padding: '8px',
+        ...classes.contentText,
+        color: isLightTheme ? '#374151' : '#e5e7eb',
+        userSelect: 'text',
+        cursor: 'text',
       }}
+      onClick={(e) => e.stopPropagation()}
     >
-      <div
-        style={{
-          marginBottom: '12px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '4px',
-        }}
-      >
-        <div
-          style={{
-            ...classes.translationContainer,
-            backgroundColor: isLightTheme ? '#f3f4f6' : '#374151',
+      {isTranslating ? (
+        <span style={{ color: isLightTheme ? '#6b7280' : '#d1d5db' }}>
+          {loadingMessage}
+          <LoadingDots />
+        </span>
+      ) : hasError ? (
+        <span style={{ color: '#ef4444' }}>{errorMessage}</span>
+      ) : (
+        <span
+          dangerouslySetInnerHTML={{
+            __html: sanitizedHtml ?? '',
           }}
-        >
-          <span
-            style={{
-              ...classes.contentText,
-              color: isLightTheme ? '#374151' : '#9ca3af',
-              userSelect: 'text',
-              cursor: 'text',
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {isTranslating ? (
-              <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
-                {loadingMessage}
-                <LoadingDots />
-              </span>
-            ) : hasError ? (
-              <span style={{ color: '#ef4444' }}>{errorMessage}</span>
-            ) : (
-              <span
-                dangerouslySetInnerHTML={{
-                  __html: sanitizedHtml ?? '',
-                }}
-              />
-            )}
-          </span>
-        </div>
-      </div>
-    </div>
+        />
+      )}
+    </span>
   );
 };
 

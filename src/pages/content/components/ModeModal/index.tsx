@@ -37,7 +37,7 @@ const ModeModal = () => {
       color: isLightTheme ? '#6b7280' : '#9ca3af',
       ...(isHovered
         ? {
-            backgroundColor: isLightTheme ? '#f3f4f6' : '#374151',
+            backgroundColor: isLightTheme ? '#f3f4f6' : '#4c4c4c',
             padding: '8px',
             borderRadius: '8px',
           }
@@ -76,8 +76,8 @@ const ModeModal = () => {
     <div
       style={{
         ...classes.modalContainer,
-        backgroundColor: isLightTheme ? '#ffffff' : '#1f2937',
-        borderColor: isLightTheme ? '#e5e7eb' : '#374151',
+        backgroundColor: isLightTheme ? '#ffffff' : '#1c1c1c',
+        border: isLightTheme ? '1px solid #e5e7eb' : '2px solid #4c4c4c',
         color: isLightTheme ? '#1f2937' : '#f9fafb',
         transform: `translate(${position.x}px, ${position.y}px)`,
         cursor: isDragging ? 'grabbing' : 'default',
@@ -104,7 +104,7 @@ const ModeModal = () => {
               position: 'relative',
               ...getButtonStyle(index),
               ...(option.key === mode && {
-                backgroundColor: isLightTheme ? '#f3f4f6' : '#374151',
+                backgroundColor: isLightTheme ? '#f3f4f6' : '#4c4c4c',
               }),
             }}
             onClick={option.action}

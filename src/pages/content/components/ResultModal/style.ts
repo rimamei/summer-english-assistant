@@ -8,7 +8,7 @@ export const classes = {
         borderRadius: '12px',
         boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
         padding: '4px',
-        minWidth: '100px',
+        minWidth: '500px',
         maxWidth: '400px',
         minHeight: '100px',
         zIndex: 2147483648,
@@ -70,21 +70,12 @@ export const classes = {
         fontSize: '12px',
         color: '#374151',
         lineHeight: '1.43 !important',
-        fontWeight: '600',
+        fontWeight: '500',
         padding: '0 !important',
         margin: '0 !important',
     },
 
-    translationContainer: {
-        backgroundColor: '#f3f4f6',
-        borderRadius: '4px',
-        display: 'flex',
-        flexDirection: 'column',
-        padding: '6px 8px',
-    } as CSSProperties,
-
     modalHead: {
-        borderBottom: '1px solid #e5e7eb',
         padding: '4px 6px',
         display: 'flex',
         justifyContent: 'space-between',
@@ -108,11 +99,5 @@ export const classes = {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-    } as CSSProperties,
-
-    grammarContainer: {
-        display: 'flex',
-        flexDirection: 'column',
-        padding: '8px',
     } as CSSProperties,
 }

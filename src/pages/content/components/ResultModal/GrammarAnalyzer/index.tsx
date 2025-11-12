@@ -136,12 +136,16 @@ const GrammarAnalyzer = () => {
     // Show corrections if the sentence is incorrect
     if (!parsedGrammarData.isCorrect && parsedGrammarData.corrections) {
       const correction = t('correction');
-      content += `**${correction.charAt(0).toUpperCase() + correction.slice(1)}:**\n ${parsedGrammarData.corrections}\n\n`;
+      content += `**${
+        correction.charAt(0).toUpperCase() + correction.slice(1)
+      }:**\n ${parsedGrammarData.corrections}\n\n`;
     }
 
     if (parsedGrammarData.details) {
       const explanation = t('explanation');
-      content += `**${explanation.charAt(0).toUpperCase() + explanation.slice(1)}:**\n`;
+      content += `**${
+        explanation.charAt(0).toUpperCase() + explanation.slice(1)
+      }:**\n`;
       const details = parsedGrammarData.details
         .replace(/\\n/g, '\n') // Replace literal \n with actual newlines
         .replace(/\n\n+/g, '\n\n'); // Normalize multiple newlines
@@ -154,57 +158,37 @@ const GrammarAnalyzer = () => {
   const sanitizedStreamingHtml = useSafeMarkdown(displayContent);
 
   return (
-    <div>
-      <div
-        style={{
-          margin: '8px',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        <div
+    <div
+      style={{
+        ...classes.contentText,
+        color: isLightTheme ? '#374151' : '#f3f4f6',
+        userSelect: 'text',
+        cursor: 'text',
+        lineHeight: '1.6',
+      }}
+      onClick={(e) => e.stopPropagation()}
+    >
+      {error ? (
+        <span style={{ color: '#ef4444' }}>{error}</span>
+      ) : isAnalyzing && !parsedGrammarData ? (
+        <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
+          {t('loading')}
+          <LoadingDots />
+        </span>
+      ) : parsedGrammarData && displayContent ? (
+        <span
           style={{
-            ...classes.grammarContainer,
-            backgroundColor: isLightTheme ? '#f3f4f6' : '',
-            borderRadius: '4px',
+            listStylePosition: 'outside',
           }}
-        >
-          <div
-            style={{
-              ...classes.contentText,
-              color: isLightTheme ? '#374151' : '#f3f4f6',
-              userSelect: 'text',
-              cursor: 'text',
-              lineHeight: '1.6',
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {error ? (
-              <span style={{ color: '#ef4444' }}>
-                {error}
-              </span>
-            ) : isAnalyzing && !parsedGrammarData ? (
-              <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
-                {t('loading')}
-                <LoadingDots />
-              </span>
-            ) : parsedGrammarData && displayContent ? (
-              <span
-                style={{
-                  listStylePosition: 'outside',
-                }}
-                dangerouslySetInnerHTML={{
-                  __html: sanitizedStreamingHtml,
-                }}
-              />
-            ) : (
-              <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
-                {t('no_explanation_available')}
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
+          dangerouslySetInnerHTML={{
+            __html: sanitizedStreamingHtml,
+          }}
+        />
+      ) : (
+        <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
+          {t('no_explanation_available')}
+        </span>
+      )}
     </div>
   );
 };
