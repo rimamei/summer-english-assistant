@@ -60,6 +60,7 @@ const Summarization = () => {
         } else if (agent === 'gemini') {
           const config = {
             temperature: 0.3,
+            maxOutputTokens: 1536,
             responseMimeType: 'application/json',
             responseSchema: summarizerSchema,
           };

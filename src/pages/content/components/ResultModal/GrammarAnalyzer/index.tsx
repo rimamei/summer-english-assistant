@@ -49,6 +49,7 @@ const GrammarAnalyzer = () => {
         } else if (agent === 'gemini' && preferences?.model) {
           const config = {
             temperature: 0.2,
+            maxOutputTokens: 1536,
             responseMimeType: 'application/json',
             responseSchema: grammarSchema,
           };
@@ -92,8 +93,9 @@ const GrammarAnalyzer = () => {
             }
           );
         }
-      } catch (error) {
-        setError(error instanceof Error ? error.message : 'Failed to analyze grammar');
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Summarization failed';
+        setError(errorMessage);
       } finally {
         setIsAnalyzing(false);
       }

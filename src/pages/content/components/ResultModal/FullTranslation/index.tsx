@@ -98,6 +98,9 @@ const FullTranslation = () => {
           {
             model: preferences?.model || 'gemini-2.0-flash-exp',
             contents,
+            config: {
+              maxOutputTokens: 2048,
+            },
           },
           text => {
             setTranslationText(text);
@@ -120,7 +123,7 @@ const FullTranslation = () => {
         setIsLoading(false);
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Translation failed';
+      const errorMessage = err instanceof Error ? err.message : 'Summarization failed';
       setError(errorMessage);
       setTranslationText('');
       setIsLoading(false);
