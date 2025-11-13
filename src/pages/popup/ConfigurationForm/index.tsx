@@ -46,12 +46,13 @@ const ConfigurationForm = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [error, setError] = useState('');
-  const [selectedMode, setSelectedMode] = useState(initialValues.mode);
 
   const form = useForm<z.infer<typeof validation>>({
     resolver: zodResolver(validation),
     defaultValues: initialValues,
   });
+
+  const selectedMode = form.watch('mode');
 
   // Helper: Show success message temporarily
   const showSuccessMessage = () => {
@@ -88,7 +89,6 @@ const ConfigurationForm = () => {
       if (hasValidConfiguration(settingsData!)) {
         const formData = buildFormData(settingsData!);
         form.reset(formData);
-        setSelectedMode(formData.mode);
       }
     } catch {
       // Silently handle storage errors
@@ -237,7 +237,6 @@ const ConfigurationForm = () => {
               options={translatedModeOptions}
               component={Select}
               onValueChange={value => {
-                setSelectedMode(value as 'pronunciation' | 'grammar');
                 setValue('selector', getDefaultSelectorValue(value), {
                   shouldDirty: true,
                   shouldValidate: true,
