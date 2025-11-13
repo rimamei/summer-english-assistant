@@ -31,7 +31,7 @@ export function useTranslationModal(): UseTranslationModalReturn {
         screenshotArea: area || null,
         showTranslationModal: true,
         translationPosition: position,
-        mode: prev.mode === 'screenshot' ? prev.mode : 'highlight',
+        mode: isScreenshot ? 'screenshot' : 'highlight',
       }));
     },
     [setState]
