@@ -46,8 +46,10 @@ function Popup() {
               src="/icons/icon128.png"
             />
             <div>
-              <h1 className="text-xl font-bold transition-all duration-500 text-logo">Summer</h1>
-              <p className="text-sm text-gray-600 dark:text-gray-300 font-medium transition-colors duration-500">
+              <h1 className="text-xl font-bold transition-all duration-500 text-black uppercase">
+                Summer
+              </h1>
+              <p className="text-sm text-gray-600 dark:text-gray-300 transition-colors duration-500">
                 AI-Powered English Learning Assistant
               </p>
             </div>
