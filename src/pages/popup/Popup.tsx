@@ -56,20 +56,22 @@ function Popup() {
           </div>
         </div>
 
-        {view[menu as keyof typeof view]}
+        <div key={menu} className="animate-fadeIn">
+          {view[menu as keyof typeof view]}
+        </div>
       </div>
 
       <div className="w-16 relative flex items-center justify-center">
         {/* <ToggleTheme /> */}
-        <div className="min-h-[20vh] min-w-8 bg-white dark:bg-card rounded-4xl fixed right-3 shadow-lg flex flex-col items-center justify-center">
+        <div className="min-h-[20vh] min-w-8 bg-white dark:bg-card rounded-4xl fixed right-3 top-1/2 -translate-y-1/2 shadow-lg flex flex-col items-center justify-center">
           {menuOption.map(option => {
             const Icon = option.icon;
             return (
               <div
                 key={option.name}
-                className={`p-3 my-2 rounded-3xl cursor-pointer transition-all duration-300 flex items-center justify-center ${
+                className={`p-3 my-2 rounded-3xl cursor-pointer transition-all duration-300 ease-in-out flex items-center justify-center ${
                   menu === option.name
-                    ? 'bg-logo text-white shadow-lg'
+                    ? 'bg-logo text-white shadow-lg scale-110'
                     : 'text-gray-500 hover:text-logo hover:scale-110'
                 }`}
                 onClick={() => setMenu(option.name)}
