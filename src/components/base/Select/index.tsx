@@ -6,6 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 import React from 'react';
 import type { ControllerRenderProps, FieldError, FieldValues, Path } from 'react-hook-form';
 
@@ -69,9 +70,7 @@ const Select = <T extends FieldValues = FieldValues>(props: SelectProps<T>) => {
     <>
       {label && <Label>{label}</Label>}
       <SelectUI required={required} {...selectProps}>
-        <SelectTrigger
-          className={`${className || 'w-[180px]'} ${hasError ? 'border-red-500' : ''}`}
-        >
+        <SelectTrigger className={cn(className || 'w-[180px]', hasError ? 'border-red-500' : '')}>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>
