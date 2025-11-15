@@ -103,7 +103,7 @@ const ResultModal = ({ isVisible, onClose, position = { x: 0, y: 0 } }: ResultMo
       </div>
       <div
         style={{
-          backgroundColor: isLightTheme ? '#f0eee6' : '#2d2d2d',
+          backgroundColor: isLightTheme ? '#f8f1e7' : '#2d2d2d',
           marginTop: '4px',
           borderRadius: '12px',
           minHeight: '50px',
