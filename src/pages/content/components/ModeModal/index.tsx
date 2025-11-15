@@ -1,12 +1,6 @@
 import { useState } from 'react';
 import { classes } from './style';
-import {
-  Camera,
-  // Camera,
-  GripVertical,
-  Highlighter,
-  Power,
-} from 'lucide-react';
+import { Camera, GripVertical, Highlighter, Power } from 'lucide-react';
 import { Tooltip } from '../Tooltip';
 import { useDraggable } from '../../hooks/useDraggable';
 import { useExtensionMode } from '../../hooks/useExtensionMode';
