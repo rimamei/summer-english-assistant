@@ -12,24 +12,32 @@ export const generateStream = async (
   { model, contents, config }: GenerateContentParameters,
   onChunk?: (text: string) => void
 ) => {
-  const apiKey: string = await getApiKey();
-  const ai = new GoogleGenAI({ apiKey });
+  try {
+    const apiKey: string = await getApiKey();
+    const ai = new GoogleGenAI({ apiKey });
 
-  const response = await ai.models.generateContentStream({
-    model,
-    contents,
-    config,
-  });
+    const response = await ai.models.generateContentStream({
+      model,
+      contents,
+      config,
+    });
 
-  let resultText = '';
-  for await (const chunk of response) {
-    const chunkText = chunk.text || '';
-    resultText += chunkText;
+    let resultText = '';
+    for await (const chunk of response) {
+      const chunkText = chunk.text || '';
+      resultText += chunkText;
 
-    if (onChunk) {
-      onChunk(resultText);
+      if (onChunk) {
+        onChunk(resultText);
+      }
     }
-  }
 
-  return resultText;
+    return resultText;
+  } catch (err) {
+    const errorMessage =
+      err instanceof Error && err?.message
+        ? JSON.parse(err.message)?.error?.message?.error
+        : 'Failed to generate';
+    throw new Error(errorMessage);
+  }
 };

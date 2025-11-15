@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { classes } from '../style';
-import LoadingDots from '../../LoadingDots';
 import { useExtension } from '@/pages/content/hooks/useContext';
 import { useI18n } from '@/hooks/useI18n';
 import { useSummarizer, type SummarizerConfig } from '@/hooks/useSummarizer';
@@ -18,10 +17,14 @@ const Summarization = () => {
   const [explanation, setExplanation] = useState('');
   const [streamingContent, setStreamingContent] = useState<string>('');
   const [error, setError] = useState<string>('');
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { isLightTheme, sourceLanguage, targetLanguage, preferences } = useStorage();
-  const { handleSummarizeStreaming, isLoading, summarizerStatus } = useSummarizer();
+  const {
+    handleSummarizeStreaming,
+    isLoading: isLoadingSummarizer,
+    summarizerStatus,
+  } = useSummarizer();
 
   const lastAnalyzedRef = useRef<string>('');
 
@@ -35,7 +38,7 @@ const Summarization = () => {
       setStreamingContent('');
       setExplanation('');
       setError('');
-      setIsAnalyzing(true);
+      setIsLoading(true);
 
       const agent = preferences?.agent || 'chrome';
 
@@ -116,7 +119,7 @@ const Summarization = () => {
         setExplanation('');
         setStreamingContent('');
       } finally {
-        setIsAnalyzing(false);
+        setIsLoading(false);
       }
     }
   }, [
@@ -190,8 +193,7 @@ const Summarization = () => {
       onClick={e => e.stopPropagation()}
     >
       {preferences?.agent === 'gemini' ? (
-        // Gemini agent rendering
-        isAnalyzing && !parsedSummarizerData ? (
+        isLoading && !parsedSummarizerData ? (
           <>
             {Array(3)
               .fill(0)
@@ -213,7 +215,7 @@ const Summarization = () => {
           </span>
         )
       ) : // Chrome agent rendering
-      isLoading ? (
+      isLoadingSummarizer ? (
         summarizerStatus.status === 'downloading' ? (
           <div style={{ color: isLightTheme ? '#6b7280' : '#d1d5db' }}>
             <div style={{ marginBottom: '8px' }}>
@@ -239,10 +241,13 @@ const Summarization = () => {
             </div>
           </div>
         ) : (
-          <span style={{ color: isLightTheme ? '#6b7280' : '#d1d5db' }}>
-            {t('loading')}
-            <LoadingDots />
-          </span>
+          <>
+            {Array(3)
+              .fill(0)
+              .map((_, index) => (
+                <Skeleton key={index} width="100%" height="1em" isLightTheme={isLightTheme} />
+              ))}
+          </>
         )
       ) : error || summarizerStatus.status === 'error' ? (
         <span style={{ color: '#ef4444' }}>
