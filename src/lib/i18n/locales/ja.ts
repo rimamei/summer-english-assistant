@@ -1,0 +1,92 @@
+export const ja = {
+  vocabulary: '語彙',
+  level: 'レベル',
+  type: 'タイプ',
+  something_went_wrong: '問題が発生しました。',
+  // Popup - Extension Status
+  extension_status: '拡張機能の状態',
+  enabled: '有効',
+
+  // Popup - Preferences
+  preferences: '設定',
+  theme: 'テーマ',
+  light: 'ライト',
+  dark: 'ダーク',
+  language: '言語',
+  apply: '適用',
+  saved: '保存されました！',
+
+  // Popup - Configuration
+  configuration: '構成',
+  mode: 'モード',
+  pronunciation: '発音',
+  grammar: '文法',
+  translation: '翻訳',
+  summarizer: '要約',
+  selector: 'セレクター',
+  word: '単語',
+  sentence: '文',
+  context: '文脈',
+  accent: 'アクセント',
+  american: 'アメリカ',
+  british: 'イギリス',
+  summarizer_type: 'タイプ',
+  summarizer_length: '長さ',
+  headline: '見出し',
+  key_points: '要点',
+  teaser: 'ティーザー',
+  tldr: '要約',
+  short: '短い',
+  medium: '中',
+  long: '長い',
+  save_activate: '保存して有効化',
+  api_downloading: 'モデルをダウンロード中...',
+  api_error_default: '翻訳機能でエラーが発生しました。',
+  api_ready: 'モデルの使用準備ができました。',
+
+  // Content Script - Translation Modal
+  loading: '読み込み中',
+  downloading: 'ダウンロード中',
+  translation_label: '翻訳：',
+  no_translation_available: '翻訳が利用できません',
+  no_explanation_available: '説明が利用できません',
+  no_summary_available: '要約が利用できません',
+  explanation: '説明',
+  correction: '訂正',
+
+  // Content Script - Pronunciation
+  definition: '定義：',
+  synonyms: '同義語：',
+  sound_by_sound: '音ごと：',
+  as_in: 'のように',
+
+  // Content Script - Mode Modal
+  enable_text_translation: 'テキスト翻訳を有効にする',
+  capture_screenshot: 'スクリーンショットを撮る',
+  extension_off: '拡張機能を無効化',
+
+  // Language Names
+  english: '英語',
+  indonesia: 'インドネシア語',
+  spanish: 'スペイン語',
+  japanese: '日本語',
+  french: 'フランス語',
+  german: 'ドイツ語',
+  chinese: '中国語',
+  korean: '韓国語',
+  portuguese: 'ポルトガル語',
+  italian: 'イタリア語',
+  arabic: 'アラビア語',
+  russian: 'ロシア語',
+  dutch: 'オランダ語',
+  turkish: 'トルコ語',
+  hindi: 'ヒンディー語',
+  vietnamese: 'ベトナム語',
+
+  // Common
+  close: '閉じる',
+  cancel: 'キャンセル',
+  ok: 'OK',
+  yes: 'はい',
+  no: 'いいえ',
+};
