@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { classes } from '../style';
-import LoadingDots from '../../LoadingDots';
 import { useStorage } from '@/hooks/useStorage';
 import { useExtension } from '@/pages/content/hooks/useContext';
 import { useI18n } from '@/hooks/useI18n';
@@ -11,11 +10,12 @@ import { generateStream } from '@/services/gemini';
 import { createGrammarPrompt } from '@/prompt/gemini/grammar';
 import { grammarSchema } from '@/prompt/schema/grammarSchema';
 import type { ContentListUnion } from '@google/genai';
+import Skeleton from '../../Skeleton';
 
 const GrammarAnalyzer = () => {
   const { t } = useI18n();
   const [streamingContent, setStreamingContent] = useState<string>('');
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
 
   const { sourceLanguage, targetLanguage, isLightTheme, preferences } = useStorage();
@@ -32,7 +32,7 @@ const GrammarAnalyzer = () => {
       // Reset streaming content and error at the start
       setStreamingContent('');
       setError('');
-      setIsAnalyzing(true);
+      setIsLoading(true);
 
       const agent = preferences?.agent;
 
@@ -97,7 +97,7 @@ const GrammarAnalyzer = () => {
         const errorMessage = err instanceof Error ? err.message : 'Summarization failed';
         setError(errorMessage);
       } finally {
-        setIsAnalyzing(false);
+        setIsLoading(false);
       }
     }
   }, [
@@ -115,8 +115,15 @@ const GrammarAnalyzer = () => {
     const highlightMode =
       selectedText && selectedText !== lastAnalyzedRef.current && mode === 'highlight';
     const screenshotMode = screenshotData && mode === 'screenshot';
+    const model = preferences?.agent === 'gemini' ? !!preferences?.model : true;
 
-    if ((highlightMode || screenshotMode) && sourceLanguage && targetLanguage) {
+    if (
+      (highlightMode || screenshotMode) &&
+      sourceLanguage &&
+      targetLanguage &&
+      preferences?.agent &&
+      model
+    ) {
       lastAnalyzedRef.current = selectedText;
       handleAnalyzeSentence();
     }
@@ -184,11 +191,14 @@ const GrammarAnalyzer = () => {
     >
       {error ? (
         <span style={{ color: '#ef4444' }}>{error}</span>
-      ) : isAnalyzing && !parsedGrammarData ? (
-        <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
-          {t('loading')}
-          <LoadingDots />
-        </span>
+      ) : isLoading && !parsedGrammarData ? (
+        <>
+          {Array(3)
+            .fill(0)
+            .map((_, index) => (
+              <Skeleton key={index} width="100%" height="1em" isLightTheme={isLightTheme} />
+            ))}
+        </>
       ) : parsedGrammarData && displayContent ? (
         <span
           style={{

@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { classes } from '../style';
-import LoadingDots from '../../LoadingDots';
 import { useStorage } from '@/hooks/useStorage';
 import { useExtension } from '@/pages/content/hooks/useContext';
 import type { TPronunciationState } from '@/type/pronunciation';
@@ -12,6 +11,7 @@ import { createPronunciationPrompt } from '@/prompt/gemini/pronunciation';
 import { pronunciationSchema } from '@/prompt/schema/pronunciationSchema';
 import PronunciationDisplay from './PronunciationDisplay';
 import type { ContentListUnion } from '@google/genai';
+import Skeleton from '../../Skeleton';
 
 // Main Component
 const Pronunciation = () => {
@@ -119,8 +119,15 @@ const Pronunciation = () => {
     const highlightMode =
       selectedText && selectedText !== lastAnalyzedRef.current && mode === 'highlight';
     const screenshotMode = screenshotData && mode === 'screenshot';
+    const model = preferences?.agent === 'gemini' ? !!preferences?.model : true;
 
-    if ((highlightMode || screenshotMode) && sourceLanguage && targetLanguage) {
+    if (
+      (highlightMode || screenshotMode) &&
+      sourceLanguage &&
+      targetLanguage &&
+      preferences?.agent &&
+      model
+    ) {
       lastAnalyzedRef.current = selectedText;
       handlePronunciation();
     }
@@ -171,10 +178,13 @@ const Pronunciation = () => {
       onClick={e => e.stopPropagation()}
     >
       {isLoadingState ? (
-        <span style={{ color: isLightTheme ? '#6b7280' : '#d1d5db' }}>
-          {t('loading')}
-          <LoadingDots />
-        </span>
+        <>
+          {Array(3)
+            .fill(0)
+            .map((_, index) => (
+              <Skeleton key={index} width="100%" height="1em" isLightTheme={isLightTheme} />
+            ))}
+        </>
       ) : errorState ? (
         <span style={{ color: '#ef4444' }}>{errorState}</span>
       ) : displayData ? (

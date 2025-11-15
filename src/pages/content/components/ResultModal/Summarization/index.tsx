@@ -11,6 +11,7 @@ import { generateStream } from '@/services/gemini';
 import { createSummarizerPrompt } from '@/prompt/gemini/summarizer';
 import { summarizerSchema } from '@/prompt/schema/summarizerSchema';
 import type { ContentListUnion } from '@google/genai';
+import Skeleton from '../../Skeleton';
 
 const Summarization = () => {
   const { t } = useI18n();
@@ -133,8 +134,15 @@ const Summarization = () => {
     const highlightMode =
       selectedText && selectedText !== lastAnalyzedRef.current && mode === 'highlight';
     const screenshotMode = screenshotData && mode === 'screenshot';
+    const model = preferences?.agent === 'gemini' ? !!preferences?.model : true;
 
-    if ((highlightMode || screenshotMode) && sourceLanguage && targetLanguage) {
+    if (
+      (highlightMode || screenshotMode) &&
+      sourceLanguage &&
+      targetLanguage &&
+      preferences?.agent &&
+      model
+    ) {
       lastAnalyzedRef.current = selectedText;
       handleAnalyzeSentence();
     }
@@ -184,10 +192,13 @@ const Summarization = () => {
       {preferences?.agent === 'gemini' ? (
         // Gemini agent rendering
         isAnalyzing && !parsedSummarizerData ? (
-          <span style={{ color: isLightTheme ? '#6b7280' : '#d1d5db' }}>
-            {t('loading')}
-            <LoadingDots />
-          </span>
+          <>
+            {Array(3)
+              .fill(0)
+              .map((_, index) => (
+                <Skeleton key={index} width="100%" height="1em" isLightTheme={isLightTheme} />
+              ))}
+          </>
         ) : error ? (
           <span style={{ color: '#ef4444' }}>{error}</span>
         ) : parsedSummarizerData && displayContent ? (

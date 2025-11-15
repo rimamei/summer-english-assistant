@@ -1,17 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { classes } from '../style';
-import LoadingDots from '../../LoadingDots';
 import { useStorage } from '@/hooks/useStorage';
 import { useExtension } from '@/pages/content/hooks/useContext';
-import { useI18n } from '@/hooks/useI18n';
 import { useTranslator } from '@/hooks/useTranslator';
 import { useSafeMarkdown } from '@/hooks/useSafeMarkdown';
 import { generateStream } from '@/services/gemini';
 import { createTranslationPrompt } from '@/prompt/gemini/translation';
 import type { ContentListUnion } from '@google/genai';
+import Skeleton from '../../Skeleton';
 
 const FullTranslation = () => {
-  const { t } = useI18n();
   const [translationText, setTranslationText] = useState('');
   const { sourceLanguage, targetLanguage, preferences } = useStorage();
   const {
@@ -42,17 +40,6 @@ const FullTranslation = () => {
       translatorStatus.status === 'downloading'
     );
   }, [isLoading, isLoadingTranslatorService, translatorStatus.status]);
-
-  // Compute loading message
-  const loadingMessage = useMemo(() => {
-    if (translatorStatus.status === 'checking') return 'Checking availability';
-    if (translatorStatus.status === 'downloading') {
-      return `Downloading model${
-        translatorStatus.progress ? ` ${Math.round(translatorStatus.progress)}%` : ''
-      }`;
-    }
-    return t('loading');
-  }, [translatorStatus.status, translatorStatus.progress, t]);
 
   // Compute error state and message
   const hasError = useMemo(() => {
@@ -142,12 +129,28 @@ const FullTranslation = () => {
     const highlightMode =
       selectedText && selectedText !== lastAnalyzedRef.current && mode === 'highlight';
     const screenshotMode = screenshotData && mode === 'screenshot';
+    const model = preferences?.agent === 'gemini' ? !!preferences?.model : true;
 
-    if ((highlightMode || screenshotMode) && sourceLanguage && targetLanguage) {
+    if (
+      (highlightMode || screenshotMode) &&
+      sourceLanguage &&
+      targetLanguage &&
+      preferences?.agent &&
+      model
+    ) {
       lastAnalyzedRef.current = selectedText;
       handleFullTranslation();
     }
-  }, [handleFullTranslation, selectedText, sourceLanguage, targetLanguage, screenshotData, mode]);
+  }, [
+    handleFullTranslation,
+    selectedText,
+    sourceLanguage,
+    targetLanguage,
+    screenshotData,
+    mode,
+    preferences?.agent,
+    preferences?.model,
+  ]);
 
   const sanitizedHtml = useSafeMarkdown(translationText);
 
@@ -162,10 +165,13 @@ const FullTranslation = () => {
       onClick={e => e.stopPropagation()}
     >
       {isTranslating ? (
-        <span style={{ color: isLightTheme ? '#6b7280' : '#d1d5db' }}>
-          {loadingMessage}
-          <LoadingDots />
-        </span>
+        <>
+          {Array(3)
+            .fill(0)
+            .map((_, index) => (
+              <Skeleton key={index} width="100%" height="1em" isLightTheme={isLightTheme} />
+            ))}
+        </>
       ) : hasError ? (
         <span style={{ color: '#ef4444' }}>{errorMessage}</span>
       ) : (
