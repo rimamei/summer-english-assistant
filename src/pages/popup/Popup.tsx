@@ -9,6 +9,7 @@ import Configuration from './ConfigurationForm';
 import PreferencesForm from './PreferencesForm';
 import { applyTheme } from './utils';
 import { useStorage } from '@/hooks/useStorage';
+import { Separator } from '@/components/ui/separator';
 
 function Popup() {
   const [menu, setMenu] = useState('home');
@@ -39,23 +40,17 @@ function Popup() {
     <div className="flex shadow-lg dark:shadow-2xl dark:shadow-black/50 min-w-[500px] max-w-[500px] max-auto min-h-[500px] h-full bg-background text-foreground font-display transition-all duration-700 ease-in-out transform hover:shadow-2xl dark:hover:shadow-black/70 relative overflow-hidden dark:border dark:border-white/10">
       <div className="relative z-10 w-full p-4 overflow-y-auto">
         <div className="flex justify-between items-center">
-          <div className="flex items-start space-x-2">
-            <img
-              alt="icon"
-              className="w-8 h-auto -mb-4 transition-all duration-500 hover:scale-110 drop-shadow-lg"
-              src="/icons/icon128.png"
-            />
-            <div>
-              <h1 className="text-xl font-bold transition-all duration-500 text-black dark:text-white uppercase">
-                Summer
-              </h1>
-              <p className="text-sm text-gray-600 dark:text-gray-300 transition-colors duration-500">
-                AI-Powered English Learning Assistant
-              </p>
-            </div>
+          <div>
+            <h1 className="text-4xl font-bold transition-all duration-500 text-accent font-sans">
+              Summer.
+            </h1>
+            <p className="text-sm text-gray-600 dark:text-gray-300 transition-colors duration-500">
+              AI-Powered English Learning Assistant
+            </p>
           </div>
         </div>
 
+        <Separator className="my-4" />
         <div key={menu} className="animate-fadeIn">
           {view[menu as keyof typeof view]}
         </div>
@@ -71,8 +66,8 @@ function Popup() {
                 key={option.name}
                 className={`p-3 my-2 rounded-3xl cursor-pointer transition-all duration-300 ease-in-out flex items-center justify-center ${
                   menu === option.name
-                    ? 'bg-logo text-white shadow-lg scale-110'
-                    : 'text-gray-500 hover:text-logo hover:scale-110'
+                    ? 'bg-accent text-white shadow-lg scale-110'
+                    : 'text-gray-500 hover:text-accent hover:scale-110'
                 }`}
                 onClick={() => setMenu(option.name)}
                 title={option.label}
