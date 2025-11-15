@@ -4,7 +4,7 @@ import type { PronunciationAnalysis } from '@/services/chrome/pronunciationServi
 
 export type { PronunciationAnalysis };
 
-interface PronunciationStatusItem {
+export interface PronunciationStatusItem {
   status: 'idle' | 'checking' | 'downloading' | 'ready' | 'error';
   progress?: number;
   error?: string;

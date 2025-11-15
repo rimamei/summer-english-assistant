@@ -3,21 +3,20 @@ import { classes } from '../style';
 import { useStorage } from '@/hooks/useStorage';
 import { useExtension } from '@/pages/content/hooks/useContext';
 import type { TPronunciationState } from '@/type/pronunciation';
-import { useI18n } from '@/hooks/useI18n';
 import { usePronunciation } from '@/hooks/usePronunciation';
 import { useTextToSpeech } from '@/hooks/useTextToSpeech';
 import { generateStream } from '@/services/gemini';
 import { createPronunciationPrompt } from '@/prompt/gemini/pronunciation';
 import { pronunciationSchema } from '@/prompt/schema/pronunciationSchema';
-import PronunciationDisplay from './PronunciationDisplay';
-import type { ContentListUnion } from '@google/genai';
-import Skeleton from '../../../components/Skeleton';
+import { createScreenshotContent, createTextContent } from '../../../utils/promptConfig';
+import ChromeContent from './ChromeContent';
+import GeminiContent from './GeminiContent';
+import { PRONUNCIATION_CONFIG } from './constants';
 
 const Pronunciation = () => {
-  const { t } = useI18n();
   const [data, setData] = useState<TPronunciationState | null>(null);
   const [streamingContent, setStreamingContent] = useState<string>('');
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string>('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const { settingsData, sourceLanguage, targetLanguage, isLightTheme, preferences } = useStorage();
@@ -33,112 +32,113 @@ const Pronunciation = () => {
   const { speak } = useTextToSpeech({
     text: selectedText,
     accent: settingsData?.accent,
-    rate: 0.9,
-    pitch: 1,
-    volume: 1,
+    rate: PRONUNCIATION_CONFIG.rate,
+    pitch: PRONUNCIATION_CONFIG.pitch,
+    volume: PRONUNCIATION_CONFIG.volume,
   });
 
-  // Fetch pronunciation data
+  // Agent-specific handlers
+  const handleChromePronunciation = useCallback(async () => {
+    const result = await analyzeWord({
+      word: selectedText,
+      sourceLanguage: sourceLanguage || 'en',
+      targetLanguage: targetLanguage || 'en',
+    });
+    setData(result);
+  }, [analyzeWord, selectedText, sourceLanguage, targetLanguage]);
+
+  const handleGeminiPronunciation = useCallback(async () => {
+    const config = {
+      temperature: PRONUNCIATION_CONFIG.temperature,
+      responseMimeType: 'application/json',
+      responseSchema: pronunciationSchema,
+    };
+
+    const prompt = createPronunciationPrompt(
+      selectedText,
+      sourceLanguage || 'en',
+      targetLanguage || 'en'
+    );
+
+    const contents =
+      mode === 'screenshot'
+        ? createScreenshotContent(screenshotData, prompt)
+        : createTextContent(prompt);
+
+    await generateStream(
+      {
+        model: preferences?.model ?? '',
+        contents,
+        config,
+      },
+      chunk => {
+        setStreamingContent(chunk);
+      }
+    );
+  }, [selectedText, sourceLanguage, targetLanguage, mode, screenshotData, preferences?.model]);
+
+  // Main analyze handler
   const handlePronunciation = useCallback(async () => {
     if (!sourceLanguage || !targetLanguage) return;
 
+    // Reset state
     setStreamingContent('');
     setData(null);
-    setError(null);
+    setError('');
     setIsAnalyzing(true);
 
-    const agent = preferences?.agent;
+    const agent = preferences?.agent || 'chrome';
 
     try {
       if (agent === 'chrome') {
-        const result = await analyzeWord({
-          word: selectedText,
-          sourceLanguage,
-          targetLanguage,
-        });
-        setData(result);
-      } else if (agent === 'gemini' && preferences?.model) {
-        const prompt = createPronunciationPrompt(selectedText, sourceLanguage, targetLanguage);
-
-        let contents: ContentListUnion = [
-          {
-            role: 'user' as const,
-            parts: [
-              {
-                text: prompt,
-              },
-            ],
-          },
-        ];
-
-        if (mode === 'screenshot') {
-          // Convert base64 image to the format Gemini expects
-          const base64Data = screenshotData?.split(',')[1];
-          const mimeType = screenshotData?.split(';')[0].split(':')[1];
-          contents = [
-            {
-              inlineData: {
-                mimeType,
-                data: base64Data,
-              },
-            },
-            { text: prompt },
-          ];
-        }
-
-        await generateStream(
-          {
-            model: preferences.model,
-            contents,
-            config: {
-              temperature: 0.2,
-              responseMimeType: 'application/json',
-              responseSchema: pronunciationSchema,
-            },
-          },
-          chunk => setStreamingContent(chunk)
-        );
+        await handleChromePronunciation();
+      } else if (agent === 'gemini') {
+        await handleGeminiPronunciation();
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error occurred');
+      const errorMessage = err instanceof Error ? err.message : 'Pronunciation analysis failed';
+      setError(errorMessage);
+      setData(null);
+      setStreamingContent('');
     } finally {
       setIsAnalyzing(false);
     }
   }, [
-    analyzeWord,
-    mode,
-    preferences,
-    screenshotData,
-    selectedText,
     sourceLanguage,
     targetLanguage,
+    preferences?.agent,
+    handleChromePronunciation,
+    handleGeminiPronunciation,
   ]);
 
-  useEffect(() => {
+  // Helper: Check if analysis should trigger
+  const shouldAnalyze = useMemo(() => {
     const highlightMode =
       selectedText && selectedText !== lastAnalyzedRef.current && mode === 'highlight';
     const screenshotMode = screenshotData && mode === 'screenshot';
-    const model = preferences?.agent === 'gemini' ? !!preferences?.model : true;
+    const hasValidModel = preferences?.agent === 'gemini' ? !!preferences?.model : true;
+    const hasRequiredLanguages = sourceLanguage && targetLanguage;
+    const hasAgent = !!preferences?.agent;
 
-    if (
-      (highlightMode || screenshotMode) &&
-      sourceLanguage &&
-      targetLanguage &&
-      preferences?.agent &&
-      model
-    ) {
-      lastAnalyzedRef.current = selectedText;
-      handlePronunciation();
-    }
+    return (highlightMode || screenshotMode) && hasRequiredLanguages && hasAgent && hasValidModel;
   }, [
-    handlePronunciation,
-    mode,
-    preferences,
-    screenshotData,
     selectedText,
+    mode,
+    screenshotData,
+    preferences?.agent,
+    preferences?.model,
     sourceLanguage,
     targetLanguage,
   ]);
+
+  // Trigger analysis when conditions are met
+  useEffect(() => {
+    if (shouldAnalyze) {
+      lastAnalyzedRef.current = selectedText;
+      handlePronunciation();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shouldAnalyze]);
 
   // Parse streamed JSON for Gemini
   const parsedGeminiData = useMemo(() => {
@@ -149,21 +149,6 @@ const Pronunciation = () => {
       return null;
     }
   }, [streamingContent]);
-
-  // Determine display data
-  const displayData = preferences?.agent === 'gemini' ? parsedGeminiData : data;
-
-  // Render loading state
-  const isLoadingState =
-    preferences?.agent === 'gemini' ? isAnalyzing && !parsedGeminiData : isLoading || !data;
-
-  // Render error state
-  const errorState =
-    preferences?.agent === 'gemini'
-      ? error
-      : error ||
-        pronunciationStatus.error ||
-        (pronunciationStatus.status === 'error' && t('something_went_wrong'));
 
   return (
     <div
@@ -176,28 +161,25 @@ const Pronunciation = () => {
       }}
       onClick={e => e.stopPropagation()}
     >
-      {isLoadingState ? (
-        <>
-          {Array(3)
-            .fill(0)
-            .map((_, index) => (
-              <Skeleton key={index} width="100%" height="1em" isLightTheme={isLightTheme} />
-            ))}
-        </>
-      ) : errorState ? (
-        <span style={{ color: '#ef4444' }}>{errorState}</span>
-      ) : displayData ? (
-        <PronunciationDisplay
-          data={displayData}
+      {preferences?.agent === 'gemini' ? (
+        <GeminiContent
+          isAnalyzing={isAnalyzing}
+          error={error}
+          parsedGeminiData={parsedGeminiData}
           accent={accent}
           onSpeak={speak}
           isLightTheme={isLightTheme}
-          t={t}
         />
       ) : (
-        <span style={{ color: isLightTheme ? '#6b7280' : '#d1d5db' }}>
-          {t('no_explanation_available')}
-        </span>
+        <ChromeContent
+          isLoading={isLoading}
+          pronunciationStatus={pronunciationStatus}
+          error={error}
+          data={data}
+          accent={accent}
+          onSpeak={speak}
+          isLightTheme={isLightTheme}
+        />
       )}
     </div>
   );
