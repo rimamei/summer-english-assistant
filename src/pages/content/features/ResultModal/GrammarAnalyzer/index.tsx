@@ -10,7 +10,7 @@ import { generateStream } from '@/services/gemini';
 import { createGrammarPrompt } from '@/prompt/gemini/grammar';
 import { grammarSchema } from '@/prompt/schema/grammarSchema';
 import type { ContentListUnion } from '@google/genai';
-import Skeleton from '../../Skeleton';
+import Skeleton from '../../../components/Skeleton';
 
 const GrammarAnalyzer = () => {
   const { t } = useI18n();

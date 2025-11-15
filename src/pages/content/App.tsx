@@ -8,7 +8,7 @@ import { useStorage } from '@/hooks/useStorage';
 import { useExtensionMode } from './hooks/useExtensionMode';
 import ScreenshotOverlay from './components/ScreenshotOverlay';
 import ScreenshotSelector from './components/ScreenshotSelector';
-import { ResultModal } from './components/ResultModal';
+import { ResultModal } from './features';
 
 interface MainProps {
   shadowRoot: ShadowRoot | null;

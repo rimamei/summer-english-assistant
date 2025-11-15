@@ -7,7 +7,7 @@ import { useSafeMarkdown } from '@/hooks/useSafeMarkdown';
 import { generateStream } from '@/services/gemini';
 import { createTranslationPrompt } from '@/prompt/gemini/translation';
 import type { ContentListUnion } from '@google/genai';
-import Skeleton from '../../Skeleton';
+import Skeleton from '../../../components/Skeleton';
 
 const FullTranslation = () => {
   const [translationText, setTranslationText] = useState('');

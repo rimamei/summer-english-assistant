@@ -11,9 +11,8 @@ import { createPronunciationPrompt } from '@/prompt/gemini/pronunciation';
 import { pronunciationSchema } from '@/prompt/schema/pronunciationSchema';
 import PronunciationDisplay from './PronunciationDisplay';
 import type { ContentListUnion } from '@google/genai';
-import Skeleton from '../../Skeleton';
+import Skeleton from '../../../components/Skeleton';
 
-// Main Component
 const Pronunciation = () => {
   const { t } = useI18n();
   const [data, setData] = useState<TPronunciationState | null>(null);
