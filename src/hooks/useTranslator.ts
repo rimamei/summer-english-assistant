@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, useMemo } from 'react';
 import { translatorService } from '@/services/chrome/translatorService';
 
-interface TranslatorStatusItem {
+export interface TranslatorStatusItem {
   status: 'idle' | 'checking' | 'downloading' | 'ready' | 'error';
   progress?: number;
   error?: string;
