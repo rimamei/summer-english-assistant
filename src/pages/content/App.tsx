@@ -1,6 +1,4 @@
 import { useEffect } from 'react';
-import ModeModal from './components/ModeModal';
-import { FloatingIcon } from './components/FloatingIcon';
 import { useTextSelection } from './hooks/useTextSelection';
 import { useTranslationModal } from './hooks/useTranslationModal';
 import { injectStyles } from './styles';
@@ -8,7 +6,7 @@ import { useStorage } from '@/hooks/useStorage';
 import { useExtensionMode } from './hooks/useExtensionMode';
 import ScreenshotOverlay from './components/ScreenshotOverlay';
 import ScreenshotSelector from './components/ScreenshotSelector';
-import { ResultModal } from './features';
+import { FloatingIcon, ModeModal, ResultModal } from './features';
 
 interface MainProps {
   shadowRoot: ShadowRoot | null;
