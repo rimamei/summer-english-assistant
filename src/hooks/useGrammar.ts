@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useMemo } from 'react';
 import { grammarService } from '@/services/chrome/grammarService';
 import type { IGrammarData } from '@/type';
 
-interface GrammarStatusItem {
+export interface GrammarStatusItem {
   status: 'idle' | 'checking' | 'downloading' | 'ready' | 'error';
   progress?: number;
   error?: string;

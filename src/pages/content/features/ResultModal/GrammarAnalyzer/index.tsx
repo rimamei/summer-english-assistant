@@ -9,8 +9,11 @@ import type { IGrammarData } from '@/type';
 import { generateStream } from '@/services/gemini';
 import { createGrammarPrompt } from '@/prompt/gemini/grammar';
 import { grammarSchema } from '@/prompt/schema/grammarSchema';
-import type { ContentListUnion } from '@google/genai';
-import Skeleton from '../../../components/Skeleton';
+import GeminiContent from './GeminiContent';
+import ChromeContent from './ChromeContent';
+import { createScreenshotContent, createTextContent } from '../../../utils/promptConfig';
+import { GRAMMAR_CONFIG } from './constants';
+import { buildGrammarDisplayContent } from './utils';
 
 const GrammarAnalyzer = () => {
   const { t } = useI18n();
@@ -19,7 +22,7 @@ const GrammarAnalyzer = () => {
   const [error, setError] = useState<string>('');
 
   const { sourceLanguage, targetLanguage, isLightTheme, preferences } = useStorage();
-  const { analyzeSentence } = useGrammar();
+  const { analyzeSentence, isLoading: isLoadingGrammar, grammarStatus } = useGrammar();
 
   const lastAnalyzedRef = useRef<string>('');
 
@@ -27,117 +30,107 @@ const GrammarAnalyzer = () => {
     state: { selectedText, mode, screenshotData },
   } = useExtension();
 
-  const handleAnalyzeSentence = useCallback(async () => {
-    if (sourceLanguage && targetLanguage) {
-      // Reset streaming content and error at the start
-      setStreamingContent('');
-      setError('');
-      setIsLoading(true);
+  // Agent-specific handlers
+  const handleChromeGrammarAnalysis = useCallback(async () => {
+    await analyzeSentence({
+      sentence: selectedText,
+      sourceLanguage: sourceLanguage || '',
+      targetLanguage: targetLanguage || '',
+      onChunk: chunk => {
+        setStreamingContent(chunk);
+      },
+    });
+  }, [analyzeSentence, selectedText, sourceLanguage, targetLanguage]);
 
-      const agent = preferences?.agent;
+  const handleGeminiGrammarAnalysis = useCallback(async () => {
+    const config = {
+      temperature: GRAMMAR_CONFIG.temperature,
+      maxOutputTokens: GRAMMAR_CONFIG.maxOutputTokens,
+      responseMimeType: 'application/json',
+      responseSchema: grammarSchema,
+    };
 
-      try {
-        if (agent === 'chrome') {
-          await analyzeSentence({
-            sentence: selectedText,
-            sourceLanguage,
-            targetLanguage,
-            onChunk: chunk => {
-              setStreamingContent(chunk);
-            },
-          });
-        } else if (agent === 'gemini' && preferences?.model) {
-          const config = {
-            temperature: 0.2,
-            maxOutputTokens: 1536,
-            responseMimeType: 'application/json',
-            responseSchema: grammarSchema,
-          };
+    const prompt = createGrammarPrompt(selectedText, sourceLanguage || '', targetLanguage || '');
 
-          const prompt = createGrammarPrompt(selectedText, sourceLanguage, targetLanguage);
+    const contents =
+      mode === 'screenshot'
+        ? createScreenshotContent(screenshotData, prompt)
+        : createTextContent(prompt);
 
-          let contents: ContentListUnion = [
-            {
-              role: 'user',
-              parts: [
-                {
-                  text: prompt,
-                },
-              ],
-            },
-          ];
-
-          if (mode === 'screenshot') {
-            // Convert base64 image to the format Gemini expects
-            const base64Data = screenshotData?.split(',')[1];
-            const mimeType = screenshotData?.split(';')[0].split(':')[1];
-            contents = [
-              {
-                inlineData: {
-                  mimeType,
-                  data: base64Data,
-                },
-              },
-              { text: prompt },
-            ];
-          }
-
-          await generateStream(
-            {
-              model: preferences.model,
-              contents,
-              config,
-            },
-            chunk => {
-              setStreamingContent(chunk);
-            }
-          );
-        }
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Summarization failed';
-        setError(errorMessage);
-      } finally {
-        setIsLoading(false);
+    await generateStream(
+      {
+        model: preferences?.model ?? '',
+        contents,
+        config,
+      },
+      chunk => {
+        setStreamingContent(chunk);
       }
+    );
+  }, [selectedText, sourceLanguage, targetLanguage, mode, screenshotData, preferences?.model]);
+
+  // Main analyze handler
+  const handleAnalyzeSentence = useCallback(async () => {
+    if (!sourceLanguage || !targetLanguage) return;
+
+    // Reset state
+    setStreamingContent('');
+    setError('');
+    setIsLoading(true);
+
+    const agent = preferences?.agent || 'chrome';
+
+    try {
+      if (agent === 'chrome') {
+        await handleChromeGrammarAnalysis();
+      } else if (agent === 'gemini') {
+        await handleGeminiGrammarAnalysis();
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Grammar analysis failed';
+      setError(errorMessage);
+      setStreamingContent('');
+    } finally {
+      setIsLoading(false);
     }
   }, [
-    analyzeSentence,
-    mode,
-    preferences?.agent,
-    preferences?.model,
-    screenshotData,
-    selectedText,
     sourceLanguage,
     targetLanguage,
+    preferences?.agent,
+    handleChromeGrammarAnalysis,
+    handleGeminiGrammarAnalysis,
   ]);
 
-  useEffect(() => {
+  // Helper: Check if analysis should trigger
+  const shouldAnalyze = useMemo(() => {
     const highlightMode =
       selectedText && selectedText !== lastAnalyzedRef.current && mode === 'highlight';
     const screenshotMode = screenshotData && mode === 'screenshot';
-    const model = preferences?.agent === 'gemini' ? !!preferences?.model : true;
+    const hasValidModel = preferences?.agent === 'gemini' ? !!preferences?.model : true;
+    const hasRequiredLanguages = sourceLanguage && targetLanguage;
+    const hasAgent = !!preferences?.agent;
 
-    if (
-      (highlightMode || screenshotMode) &&
-      sourceLanguage &&
-      targetLanguage &&
-      preferences?.agent &&
-      model
-    ) {
-      lastAnalyzedRef.current = selectedText;
-      handleAnalyzeSentence();
-    }
+    return (highlightMode || screenshotMode) && hasRequiredLanguages && hasAgent && hasValidModel;
   }, [
-    handleAnalyzeSentence,
-    mode,
-    preferences,
-    screenshotData,
     selectedText,
+    mode,
+    screenshotData,
+    preferences?.agent,
+    preferences?.model,
     sourceLanguage,
     targetLanguage,
   ]);
 
-  // Parse the JSON and extract the markdown content
+  // Trigger analysis when conditions are met
+  useEffect(() => {
+    if (shouldAnalyze) {
+      lastAnalyzedRef.current = selectedText;
+      handleAnalyzeSentence();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shouldAnalyze]);
+
+  // Parse Gemini JSON response
   const parsedGrammarData = useMemo(() => {
     if (!streamingContent) return null;
 
@@ -145,38 +138,19 @@ const GrammarAnalyzer = () => {
       const data: IGrammarData = JSON.parse(streamingContent);
       return data;
     } catch {
-      // JSON is incomplete during streaming, return null
-      return null;
+      return null; // JSON incomplete during streaming
     }
   }, [streamingContent]);
 
-  // Create the display content from parsed data
+  // Determine display content based on agent
   const displayContent = useMemo(() => {
-    if (!parsedGrammarData) return '';
-
-    let content = '';
-
-    // Show corrections if the sentence is incorrect
-    if (!parsedGrammarData.isCorrect && parsedGrammarData.corrections) {
-      const correction = t('correction');
-      content += `**${
-        correction.charAt(0).toUpperCase() + correction.slice(1)
-      }:**\n ${parsedGrammarData.corrections}\n\n`;
+    if (preferences?.agent === 'gemini') {
+      return buildGrammarDisplayContent(parsedGrammarData, t);
     }
+    return streamingContent;
+  }, [preferences?.agent, parsedGrammarData, streamingContent, t]);
 
-    if (parsedGrammarData.details) {
-      const explanation = t('explanation');
-      content += `**${explanation.charAt(0).toUpperCase() + explanation.slice(1)}:**\n`;
-      const details = parsedGrammarData.details
-        .replace(/\\n/g, '\n') // Replace literal \n with actual newlines
-        .replace(/\n\n+/g, '\n\n'); // Normalize multiple newlines
-      content += details;
-    }
-
-    return content;
-  }, [parsedGrammarData, t]);
-
-  const sanitizedStreamingHtml = useSafeMarkdown(displayContent);
+  const sanitizedHtml = useSafeMarkdown(displayContent);
 
   return (
     <div
@@ -189,29 +163,23 @@ const GrammarAnalyzer = () => {
       }}
       onClick={e => e.stopPropagation()}
     >
-      {error ? (
-        <span style={{ color: '#ef4444' }}>{error}</span>
-      ) : isLoading && !parsedGrammarData ? (
-        <>
-          {Array(3)
-            .fill(0)
-            .map((_, index) => (
-              <Skeleton key={index} width="100%" height="1em" isLightTheme={isLightTheme} />
-            ))}
-        </>
-      ) : parsedGrammarData && displayContent ? (
-        <span
-          style={{
-            listStylePosition: 'outside',
-          }}
-          dangerouslySetInnerHTML={{
-            __html: sanitizedStreamingHtml,
-          }}
+      {preferences?.agent === 'gemini' ? (
+        <GeminiContent
+          isLoading={isLoading}
+          error={error}
+          parsedGrammarData={parsedGrammarData}
+          displayContent={displayContent}
+          sanitizedHtml={sanitizedHtml}
+          isLightTheme={isLightTheme}
         />
       ) : (
-        <span style={{ color: isLightTheme ? '#6b7280' : '#9ca3af' }}>
-          {t('no_explanation_available')}
-        </span>
+        <ChromeContent
+          isLoadingGrammar={isLoadingGrammar}
+          grammarStatus={grammarStatus}
+          error={error}
+          sanitizedHtml={sanitizedHtml}
+          isLightTheme={isLightTheme}
+        />
       )}
     </div>
   );
