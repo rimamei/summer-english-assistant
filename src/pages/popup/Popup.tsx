@@ -1,15 +1,12 @@
-import {
-  // HelpCircle,
-  Home,
-  // Mic,
-  Settings,
-} from 'lucide-react';
+import { HelpCircle, Home, Mic, Settings } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import Configuration from './ConfigurationForm';
 import PreferencesForm from './PreferencesForm';
 import { applyTheme } from './utils';
 import { useStorage } from '@/hooks/useStorage';
 import { Separator } from '@/components/ui/separator';
+import Sound from './Sound';
+import { cn } from '@/lib/utils';
 
 function Popup() {
   const [menu, setMenu] = useState('home');
@@ -17,8 +14,8 @@ function Popup() {
 
   const menuOption = [
     { name: 'home', label: 'Home', icon: Home },
-    // { name: 'mic', label: 'Mic & Audio Test', icon: Mic },
-    // { name: 'help', label: 'Help', icon: HelpCircle },
+    { name: 'mic', label: 'Mic & Audio Test', icon: Mic },
+    { name: 'help', label: 'Help', icon: HelpCircle },
     { name: 'settings', label: 'Settings', icon: Settings },
   ];
 
@@ -31,8 +28,8 @@ function Popup() {
 
   const view = {
     home: <Configuration />,
-    // mic: <div>Mic & Audio Test - Coming Soon!</div>,
-    // help: <div>Help Section - Coming Soon!</div>,
+    mic: <Sound />,
+    help: <div>Help Section - Coming Soon!</div>,
     settings: <PreferencesForm />,
   };
 
@@ -64,11 +61,12 @@ function Popup() {
             return (
               <div
                 key={option.name}
-                className={`p-3 my-2 rounded-3xl cursor-pointer transition-all duration-300 ease-in-out flex items-center justify-center ${
+                className={cn(
+                  'p-3 my-2 rounded-3xl cursor-pointer transition-all duration-300 ease-in-out flex items-center justify-center',
                   menu === option.name
                     ? 'bg-accent text-white shadow-lg scale-110'
                     : 'text-gray-500 hover:text-accent hover:scale-110'
-                }`}
+                )}
                 onClick={() => setMenu(option.name)}
                 title={option.label}
               >
