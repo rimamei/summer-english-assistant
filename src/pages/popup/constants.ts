@@ -65,10 +65,10 @@ export const languageExtensionOptionsBase = [
 
 // Static options (for backward compatibility)
 export const modeOptions = [
-  { value: 'grammar', label: 'Grammar Analyzer' },
+  { value: 'grammar', label: 'Grammar' },
   { value: 'pronunciation', label: 'Pronunciation & Definition' },
-  { value: 'summarizer', label: 'Summarizer' },
-  { value: 'translation', label: 'Full Translation' },
+  { value: 'summarizer', label: 'Summarization' },
+  { value: 'translation', label: 'Translation' },
 ];
 
 export const targetLangOptions = [

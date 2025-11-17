@@ -1,4 +1,4 @@
-import { XIcon } from 'lucide-react';
+import { GripVertical } from 'lucide-react';
 import { classes } from './style';
 import { useDraggable } from '../../hooks/useDraggable';
 import FullTranslation from './FullTranslation';
@@ -71,43 +71,46 @@ const ResultModal = ({ isVisible, onClose, position = { x: 0, y: 0 } }: ResultMo
       }}
     >
       <div
-        onMouseDown={handleMouseDown}
         style={{
-          ...classes.modalHead,
-          borderBottom: isLightTheme ? '1px solid #e5e7eb' : '1px solid #374151',
-          cursor: isDragging ? 'grabbing' : 'grab',
+          display: 'flex',
+          justifyContent: 'flex-start',
+          alignItems: 'center',
         }}
       >
-        <span
+        <div
           style={{
-            ...classes.modalHeadTitle,
-            color: isLightTheme ? '#111827' : '#f9fafb',
+            display: 'flex',
+            alignItems: 'center',
+            cursor: isDragging ? 'grabbing' : 'grab',
+            color: isLightTheme ? '#000' : '#fff',
+            marginRight: '8px',
           }}
+          onMouseDown={handleMouseDown}
         >
-          {modeOptions.find(opt => opt.value === mode)?.label}
-        </span>
-        <button
-          onClick={e => {
-            e.stopPropagation();
-            onClose();
-          }}
-          style={classes.closeButton}
-        >
-          <XIcon
+          <GripVertical size={20} />
+        </div>
+
+        <div>
+          <span
             style={{
-              color: isLightTheme ? '#6b7280' : '#9ca3af',
+              fontSize: '12px',
+              color: isLightTheme ? '#374151' : '#f3f4f6',
+              borderRadius: '40px',
+              fontWeight: 'bold',
             }}
-            size={16}
-          />
-        </button>
+          >
+            {modeOptions.find(opt => opt.value === mode)?.label}
+          </span>
+        </div>
       </div>
       <div
         style={{
-          backgroundColor: isLightTheme ? '#f8f1e7' : '#2d2d2d',
+          backgroundColor: isLightTheme ? '#fbf7ee' : '#2d2d2d',
           marginTop: '4px',
           borderRadius: '12px',
           minHeight: '50px',
           padding: '8px',
+          color: isLightTheme ? '#000' : '#fff',
         }}
       >
         {modeView[mode as keyof typeof modeView]}
