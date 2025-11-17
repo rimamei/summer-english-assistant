@@ -21,9 +21,7 @@ const NotificationCard = ({ status, error }: NotificationCardProps) => {
 
   const iconClasses = isError
     ? 'text-red-500 dark:text-red-400'
-    : isDownloading
-      ? 'text-blue-500 dark:text-blue-400 animate-spin'
-      : 'text-green-500 dark:text-green-400';
+    : 'text-green-500 dark:text-green-400';
 
   const textClasses = isError
     ? 'text-red-800 dark:text-red-100'
@@ -36,7 +34,11 @@ const NotificationCard = ({ status, error }: NotificationCardProps) => {
       className={`w-full flex items-center gap-3 min-h-12 px-4 py-3 mb-6 rounded-lg shadow-sm border ${colorClasses}`}
       style={{ fontWeight: 500 }}
     >
-      <InfoIcon className={`w-5 h-5 ${iconClasses}`} />
+      {isDownloading ? (
+        <div className="h-5 w-5 border-3 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      ) : (
+        <InfoIcon className={`w-5 h-5 ${iconClasses}`} />
+      )}
       <span className={textClasses}>
         {isError
           ? status.error || error

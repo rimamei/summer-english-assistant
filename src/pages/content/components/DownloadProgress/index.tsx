@@ -1,3 +1,5 @@
+import { classes } from './style';
+
 const DownloadProgress = ({
   progress,
   isLightTheme,
@@ -7,27 +9,17 @@ const DownloadProgress = ({
   isLightTheme: boolean;
   downloadingText: string;
 }) => (
-  <div style={{ color: isLightTheme ? '#6b7280' : '#d1d5db' }}>
-    <div style={{ marginBottom: '8px' }}>
+  <div
+    style={{
+      color: isLightTheme ? '#6b7280' : '#d1d5db',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+    }}
+  >
+    <div style={classes.spinner}></div>
+    <div>
       {downloadingText} {progress}%
-    </div>
-    <div
-      style={{
-        width: '100%',
-        height: '4px',
-        backgroundColor: isLightTheme ? '#e5e7eb' : '#4b5563',
-        borderRadius: '2px',
-        overflow: 'hidden',
-      }}
-    >
-      <div
-        style={{
-          width: `${progress}%`,
-          height: '100%',
-          backgroundColor: '#3b82f6',
-          transition: 'width 0.3s ease',
-        }}
-      />
     </div>
   </div>
 );

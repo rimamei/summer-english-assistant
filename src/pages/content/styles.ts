@@ -83,6 +83,17 @@ const pulseBorderKeyframes = `
     }
   `;
 
+const spinKeyframes = `
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  `;
+
 // Google Fonts CSS import
 const googleFontsCSS = `
   @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
@@ -139,7 +150,8 @@ export const injectStyles = (targetRoot: ShadowRoot | null) => {
     translationKeyframes +
     modaAppearKeyframes +
     loadingDotsKeyframes +
-    pulseBorderKeyframes;
+    pulseBorderKeyframes +
+    spinKeyframes;
 
   targetRoot.appendChild(style);
 };
