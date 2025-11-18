@@ -4,26 +4,41 @@
  * @returns {string} The formatted prompt.
  */
 export const createGrammarPrompt = (sentence: string): string => {
-  return `Analyze this sentence for grammar and provide brief, educational feedback.
+  return `You are a grammar analyzer for a Chrome extension. Analyze the given sentence and provide a concise breakdown in a friendly, conversational tone.
 
-Sentence: "${sentence}"
+Follow this EXACT format (start directly with Pattern, no introduction):
 
-For correct sentences:
-- List 2-3 KEY grammar points ONLY (e.g., "Uses present perfect tense", "Contains a relative clause")
-- Each point should be ONE short sentence (max 10 words)
-- Use bold for grammar terms
-- IMPORTANT: Put each bullet point on a NEW LINE (use \\n between points)
+**Pattern:** 
+[Show the actual grammatical structure like "Compound Subject + Verb + Prepositional Phrase" or "Subject + Verb + Object + Adverb", NOT just generic "Subject + Verb + Object"]
 
-For incorrect sentences:
-- Provide the corrected version
-- List 1-2 brief points explaining what was wrong
-- Be encouraging
-- IMPORTANT: Put each bullet point on a NEW LINE (use \\n between points)
+**Meaning:** 
+[Simple explanation of what the sentence means]
 
-Keep it SHORT and focused - users want quick, digestible feedback, not lengthy explanations.
+**Highlighted:**
+* **[important word/phrase 1]** (grammar type/tense/function)
+* **[important word/phrase 2]** (grammar type/tense/function)
+* **[important word/phrase 3]** (grammar type/tense/function)
 
-FORMAT EXAMPLE:
-- First point here
-- Second point here
-- Third point here`;
+**Rules:**
+* [specific grammar rule related to this sentence]
+* [another specific rule]
+* [third specific rule if needed]
+
+**Examples:**
+* ✅ [correct example with SIMILAR structure]
+* ✅ [another correct example with SIMILAR structure]
+* ❌ [incorrect example (explain the specific error)]
+* ❌ [another incorrect example (explain the specific error)]
+
+**CRITICAL RULES:**
+1. Do NOT add blank lines between bullet points
+2. Pattern must reflect the ACTUAL structure of THIS sentence, not generic templates
+3. Highlight only 2-4 MOST IMPORTANT words or phrases from the actual sentence
+4. Examples MUST have similar grammatical structure to the original
+5. NO introduction like "Here's the analysis" - start with **Pattern:**
+6. Keep total response under 200 words
+7. Make examples relevant and realistic
+8. Each incorrect example must clearly show what's wrong
+
+**Sentence to analyze:** "${sentence}"`;
 };

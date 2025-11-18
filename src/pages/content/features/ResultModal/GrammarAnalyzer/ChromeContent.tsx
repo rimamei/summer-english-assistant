@@ -6,16 +6,16 @@ interface ChromeContentProps {
   isLoadingGrammar: boolean;
   grammarStatus: GrammarStatusItem;
   error: string;
-  sanitizedHtml: string;
+  sanitizeHtml: string;
   isLightTheme: boolean;
 }
 
 const ChromeContent = (props: ChromeContentProps) => {
-  const { isLoadingGrammar, grammarStatus, error, sanitizedHtml, isLightTheme } = props;
+  const { isLoadingGrammar, grammarStatus, error, sanitizeHtml, isLightTheme } = props;
 
   const { t } = useI18n();
 
-  if (isLoadingGrammar) {
+  if (isLoadingGrammar && !sanitizeHtml) {
     if (grammarStatus.status === 'downloading') {
       return (
         <DownloadProgress
@@ -38,7 +38,8 @@ const ChromeContent = (props: ChromeContentProps) => {
       style={{
         listStylePosition: 'outside',
       }}
-      dangerouslySetInnerHTML={{ __html: sanitizedHtml || '' }}
+      className="result-sanitized"
+      dangerouslySetInnerHTML={{ __html: sanitizeHtml || '' }}
     />
   );
 };

@@ -4,9 +4,7 @@
  */
 
 import { createGrammarPrompt } from '@/prompt/chrome/grammar';
-import { grammarSchema } from '@/prompt/schema/grammarSchema';
 import { normalizeLanguage } from '@/utils/normalizeLanguage';
-import type { IGrammarData } from '@/type';
 
 interface GrammarStatusItem {
   status: 'idle' | 'checking' | 'downloading' | 'ready' | 'error';
@@ -152,7 +150,7 @@ class GrammarService {
     sourceLanguage: string,
     targetLanguage: string,
     onChunk?: (chunk: string) => void
-  ): Promise<IGrammarData | null> {
+  ): Promise<string | null> {
     // Abort previous analysis
     this.analyzeController?.abort();
     this.analyzeController = new AbortController();
@@ -201,7 +199,6 @@ class GrammarService {
 
       // Define prompt operation options
       const operationOptions: PromptOperationOptions = {
-        responseConstraint: grammarSchema,
         signal,
       };
 
@@ -238,9 +235,9 @@ class GrammarService {
       }
 
       // Parse and return the successful result
-      const parsedResult: IGrammarData = JSON.parse(resultString);
+      // const parsedResult: IGrammarData = JSON.parse(resultString);
 
-      return parsedResult;
+      return resultString;
     } catch (error) {
       if (signal.aborted || (error instanceof Error && error.name === 'AbortError')) {
         return null;

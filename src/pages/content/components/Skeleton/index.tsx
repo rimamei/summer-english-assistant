@@ -44,7 +44,7 @@ const Skeleton = ({
 
   const baseStyles: CSSProperties = {
     display: 'inline-block',
-    backgroundColor: isLightTheme ? '#e0ddd0' : '#374151',
+    backgroundColor: isLightTheme ? '#e0ddd0' : '#4b5563',
     position: 'relative',
     overflow: 'hidden',
     ...getVariantStyles(),

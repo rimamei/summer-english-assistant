@@ -106,6 +106,19 @@ const baseFontStyles = `
   }
 `;
 
+const resultModalStyles = `
+  .result-sanitized ul {
+     margin: 0 !important;
+     padding-left: 0 !important;
+  }
+
+  .result-sanitized li {
+    margin: 0.2em 0 !important;
+    padding: 0 !important;
+    line-height: 1.3 !important;
+  }
+`;
+
 // Function to inject Google Fonts preconnect links
 export const injectFontPreconnects = () => {
   // Check if preconnects already exist
@@ -151,7 +164,8 @@ export const injectStyles = (targetRoot: ShadowRoot | null) => {
     modaAppearKeyframes +
     loadingDotsKeyframes +
     pulseBorderKeyframes +
-    spinKeyframes;
+    spinKeyframes +
+    resultModalStyles;
 
   targetRoot.appendChild(style);
 };

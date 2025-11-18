@@ -2,21 +2,16 @@ import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { classes } from '../style';
 import { useStorage } from '@/hooks/useStorage';
 import { useExtension } from '@/pages/content/hooks/useContext';
-import { useI18n } from '@/hooks/useI18n';
 import { useGrammar } from '@/hooks/useGrammar';
-import { useSafeMarkdown } from '@/hooks/useSafeMarkdown';
-import type { IGrammarData } from '@/type';
 import { generateStream } from '@/services/gemini';
-import { createGrammarPrompt } from '@/prompt/gemini/grammar';
-import { grammarSchema } from '@/prompt/schema/grammarSchema';
-import GeminiContent from './GeminiContent';
-import ChromeContent from './ChromeContent';
 import { createScreenshotContent, createTextContent } from '../../../utils/promptConfig';
 import { GRAMMAR_CONFIG } from './constants';
-import { buildGrammarDisplayContent } from './utils';
+import { useSafeMarkdown } from '@/hooks/useSafeMarkdown';
+import { createGrammarPrompt } from '@/prompt/gemini/grammar';
+import GeminiContent from './GeminiContent';
+import ChromeContent from './ChromeContent';
 
 const GrammarAnalyzer = () => {
-  const { t } = useI18n();
   const [streamingContent, setStreamingContent] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
@@ -37,6 +32,8 @@ const GrammarAnalyzer = () => {
       sourceLanguage: sourceLanguage || '',
       targetLanguage: targetLanguage || '',
       onChunk: chunk => {
+        if (!chunk) return;
+
         setStreamingContent(chunk);
       },
     });
@@ -46,8 +43,6 @@ const GrammarAnalyzer = () => {
     const config = {
       temperature: GRAMMAR_CONFIG.temperature,
       maxOutputTokens: GRAMMAR_CONFIG.maxOutputTokens,
-      responseMimeType: 'application/json',
-      responseSchema: grammarSchema,
     };
 
     const prompt = createGrammarPrompt(selectedText, sourceLanguage || '', targetLanguage || '');
@@ -64,6 +59,8 @@ const GrammarAnalyzer = () => {
         config,
       },
       chunk => {
+        if (!chunk) return;
+
         setStreamingContent(chunk);
       }
     );
@@ -74,7 +71,6 @@ const GrammarAnalyzer = () => {
     if (!sourceLanguage || !targetLanguage) return;
 
     // Reset state
-    setStreamingContent('');
     setError('');
     setIsLoading(true);
 
@@ -89,7 +85,6 @@ const GrammarAnalyzer = () => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Grammar analysis failed';
       setError(errorMessage);
-      setStreamingContent('');
     } finally {
       setIsLoading(false);
     }
@@ -130,27 +125,7 @@ const GrammarAnalyzer = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shouldAnalyze]);
 
-  // Parse Gemini JSON response
-  const parsedGrammarData = useMemo(() => {
-    if (!streamingContent) return null;
-
-    try {
-      const data: IGrammarData = JSON.parse(streamingContent);
-      return data;
-    } catch {
-      return null; // JSON incomplete during streaming
-    }
-  }, [streamingContent]);
-
-  // Determine display content based on agent
-  const displayContent = useMemo(() => {
-    if (preferences?.agent === 'gemini') {
-      return buildGrammarDisplayContent(parsedGrammarData, t);
-    }
-    return streamingContent;
-  }, [preferences?.agent, parsedGrammarData, streamingContent, t]);
-
-  const sanitizedHtml = useSafeMarkdown(displayContent);
+  const sanitizeHtml = useSafeMarkdown(streamingContent);
 
   return (
     <div
@@ -165,11 +140,9 @@ const GrammarAnalyzer = () => {
     >
       {preferences?.agent === 'gemini' ? (
         <GeminiContent
-          isLoading={isLoading}
+          isLoading={isLoading && !sanitizeHtml}
           error={error}
-          parsedGrammarData={parsedGrammarData}
-          displayContent={displayContent}
-          sanitizedHtml={sanitizedHtml}
+          sanitizeHtml={sanitizeHtml}
           isLightTheme={isLightTheme}
         />
       ) : (
@@ -177,7 +150,7 @@ const GrammarAnalyzer = () => {
           isLoadingGrammar={isLoadingGrammar}
           grammarStatus={grammarStatus}
           error={error}
-          sanitizedHtml={sanitizedHtml}
+          sanitizeHtml={sanitizeHtml}
           isLightTheme={isLightTheme}
         />
       )}
