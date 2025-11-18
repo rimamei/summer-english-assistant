@@ -1,6 +1,5 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { grammarService } from '@/services/chrome/grammarService';
-import type { IGrammarData } from '@/type';
 
 export interface GrammarStatusItem {
   status: 'idle' | 'checking' | 'downloading' | 'ready' | 'error';
@@ -40,7 +39,7 @@ export const useGrammar = () => {
       sourceLanguage,
       targetLanguage,
       onChunk,
-    }: AnalyzeSentenceParams): Promise<IGrammarData | null> => {
+    }: AnalyzeSentenceParams): Promise<string | null> => {
       setIsLoading(true);
 
       try {
