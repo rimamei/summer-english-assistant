@@ -265,8 +265,8 @@ const ConfigurationForm = () => {
                   <ControlledField
                     name="source_lang"
                     options={languageOptions.sourceLangOptions}
-                    component={Select}
                     defaultValue={getValues('source_lang')}
+                    component={Select}
                   />
                 </div>
 
