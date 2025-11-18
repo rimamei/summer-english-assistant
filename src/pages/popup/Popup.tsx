@@ -38,7 +38,7 @@ function Popup() {
       <div className="relative z-10 w-full p-4 overflow-y-auto">
         <div className="flex justify-between items-center">
           <div className="flex space-x-2 items-center">
-            <img src="/public/icons/icon48.png" alt="icon" />
+            <img src="/icons/icon48.png" alt="icon" />
             <div>
               <h1 className="text-4xl font-bold transition-all duration-500 text-black dark:text-white font-sans">
                 Summer.
