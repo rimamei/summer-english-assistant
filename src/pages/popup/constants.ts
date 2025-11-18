@@ -27,6 +27,16 @@ export const targetLangOptionsBase = [
 
 export const sourceLangOptionsBase = [{ value: 'en', labelKey: 'english' as const }];
 
+/**
+ * For source language, provide English for Chrome Built-in API (PROMPT API and Summarizer API
+ */
+export const sourceLangPromptAPIOptionsBase = [{ value: 'en', labelKey: 'english' as const }];
+export const targetLangPromptAPIOptionsBase = [
+  { value: 'en', labelKey: 'english' as const },
+  { value: 'es', labelKey: 'spanish' as const },
+  { value: 'ja', labelKey: 'japanese' as const },
+];
+
 export const selectorOptionsBase = [
   { value: 'word', labelKey: 'word' as const },
   { value: 'sentence', labelKey: 'sentence' as const },
@@ -56,6 +66,9 @@ export const themeOptionsBase = [
   { value: 'dark', labelKey: 'dark' as const },
 ];
 
+/**
+ * Language options for extension settings
+ */
 export const languageExtensionOptionsBase = [
   { value: 'en', labelKey: 'english' as const },
   { value: 'id', labelKey: 'indonesia' as const },

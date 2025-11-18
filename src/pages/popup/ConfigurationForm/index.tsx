@@ -7,6 +7,7 @@ import { validation } from './validation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type z from 'zod';
 import { getDefaultSelectorValue, getEnabledOptions } from '../utils';
+import { getLanguageOptions } from './utils';
 import { Label } from '@/components/ui/label';
 import { useI18n } from '@/hooks/useI18n';
 import { useTranslatedOptions } from '@/hooks/useTranslatedOptions';
@@ -30,8 +31,6 @@ const ConfigurationForm = () => {
   const { t } = useI18n();
   const {
     modeOptions: translatedModeOptions,
-    targetLangOptions: translatedTargetLangOptions,
-    sourceLangOptions: translatedSourceLangOptions,
     selectorOptions: translatedSelectorOptions,
     accentOptions: translatedAccentOptions,
     summarizerTypeOptions: translatedSummarizerTypeOptions,
@@ -53,6 +52,25 @@ const ConfigurationForm = () => {
   });
 
   const selectedMode = form.watch('mode');
+
+  // Get language options based on agent and mode
+  const languageOptions = useMemo(() => {
+    const agent = preferences?.agent || 'chrome';
+    const options = getLanguageOptions(agent, selectedMode);
+
+    return {
+      sourceLangOptions: options.sourceLangOptions.map(option => ({
+        ...option,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        label: t(option.labelKey as any) || option?.labelKey,
+      })),
+      targetLangOptions: options.targetLangOptions.map(option => ({
+        ...option,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        label: t(option.labelKey as any) || option?.labelKey,
+      })),
+    };
+  }, [preferences?.agent, selectedMode, t]);
 
   // Helper: Show success message temporarily
   const showSuccessMessage = () => {
@@ -91,7 +109,7 @@ const ConfigurationForm = () => {
         form.reset(formData);
       }
     } catch {
-      // Silently handle storage errors
+      setError('Failed to load saved configuration.');
     } finally {
       setIsLoading(false);
     }
@@ -112,13 +130,9 @@ const ConfigurationForm = () => {
         expectedInputLanguages: [data.source_lang || 'en'],
         expectedContextLanguages: [data.target_lang || 'en'],
         format: 'markdown',
-        length: (data.summarizer_length || 'short') as 'short' | 'medium' | 'long',
+        length: (data.summarizer_length || 'short') as SummarizerAvailabilityOptions['length'],
         outputLanguage: data.target_lang || 'en',
-        type: (data.summarizer_type || 'key-points') as
-          | 'headline'
-          | 'key-points'
-          | 'teaser'
-          | 'tldr',
+        type: (data.summarizer_type || 'key-points') as SummarizerAvailabilityOptions['type'],
       };
 
       await initSummarizer(config);
@@ -250,8 +264,9 @@ const ConfigurationForm = () => {
                 <div className="col-span-5">
                   <ControlledField
                     name="source_lang"
-                    options={translatedSourceLangOptions}
+                    options={languageOptions.sourceLangOptions}
                     component={Select}
+                    defaultValue={getValues('source_lang')}
                   />
                 </div>
 
@@ -262,7 +277,7 @@ const ConfigurationForm = () => {
                 <div className="col-span-5">
                   <ControlledField
                     name="target_lang"
-                    options={translatedTargetLangOptions}
+                    options={languageOptions.targetLangOptions}
                     defaultValue={getValues('target_lang')}
                     component={Select}
                   />
