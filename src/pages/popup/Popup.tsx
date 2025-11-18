@@ -37,13 +37,16 @@ function Popup() {
     <div className="flex shadow-lg dark:shadow-2xl dark:shadow-black/50 min-w-[500px] max-w-[500px] max-auto min-h-[500px] h-full bg-background text-foreground font-display transition-all duration-700 ease-in-out transform hover:shadow-2xl dark:hover:shadow-black/70 relative overflow-hidden dark:border dark:border-white/10">
       <div className="relative z-10 w-full p-4 overflow-y-auto">
         <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-4xl font-bold transition-all duration-500 text-accent font-sans">
-              Summer.
-            </h1>
-            <p className="text-sm text-gray-600 dark:text-gray-300 transition-colors duration-500">
-              AI-Powered English Learning Assistant
-            </p>
+          <div className="flex space-x-2 items-center">
+            <img src="/public/icons/icon48.png" alt="icon" />
+            <div>
+              <h1 className="text-4xl font-bold transition-all duration-500 text-black dark:text-white font-sans">
+                Summer.
+              </h1>
+              <p className="text-sm text-gray-600 dark:text-gray-300 transition-colors duration-500">
+                AI-Powered English Learning Assistant
+              </p>
+            </div>
           </div>
         </div>
 
