@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Button } from '@/components/ui/button';
 import { CircleStop, Mic, Volume2 } from 'lucide-react';
 import { useState, useEffect, useRef, type JSX } from 'react';
 import * as Tone from 'tone';
@@ -235,14 +236,13 @@ export default function MicAudioTest(): JSX.Element {
     <div className="w-full max-w-md space-y-4">
       {/* --- 1. Audio Output Test --- */}
       <div className="space-y-4">
-        <h3 className="text-sm font-semibold text-gray-700">1. Audio Output Test</h3>
-        <p className="text-sm text-gray-600">Click the button to play a test sound.</p>
+        <h3 className="text-sm font-semibold text-foreground">1. Audio Output Test</h3>
+        <p className="text-sm text-foreground">Click the button to play a test sound.</p>
         <canvas
           ref={audioVisualizerRef}
           className="w-full h-10 bg-gray-100 rounded-lg border border-gray-200"
         ></canvas>
-        <button
-          id="play-sound-btn"
+        <Button
           onClick={handlePlaySound}
           disabled={isSoundPlaying}
           className="w-full flex items-center justify-center space-x-2 bg-black text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 transition duration-300 ease-in-out disabled:bg-gray-400"
@@ -253,36 +253,34 @@ export default function MicAudioTest(): JSX.Element {
 
           <Volume2 className={`h-5 w-5 ${isSoundPlaying ? 'animate-wiggle' : ''}`} />
           <span>{isSoundPlaying ? 'Playing...' : 'Play Test Sound'}</span>
-        </button>
+        </Button>
       </div>
 
       {/* --- 2. Microphone Input Test --- */}
       <div className="space-y-4">
-        <h3 className="text-sm font-semibold text-gray-700">2. Microphone Input Test</h3>
-        <p className="text-sm text-gray-600">Click "Start" and speak into your microphone.</p>
+        <h3 className="text-sm font-semibold text-foreground">2. Microphone Input Test</h3>
+        <p className="text-sm text-foreground">Click "Start" and speak into your microphone.</p>
         <canvas
           ref={micVisualizerRef}
           className="w-full h-10 bg-gray-100 rounded-lg border border-gray-200"
         ></canvas>
         <div className="flex space-x-4">
-          <button
-            id="start-mic-btn"
+          <Button
             onClick={handleStartMicTest}
             disabled={isMicActive}
             className="flex-1 flex items-center justify-center space-x-2 bg-black text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 transition duration-300 ease-in-out disabled:bg-gray-300 disabled:text-gray-500 disabled:shadow-none"
           >
             <Mic className="h-5 w-5" />
             <span>Start Mic Test</span>
-          </button>
-          <button
-            id="stop-mic-btn"
+          </Button>
+          <Button
             onClick={handleStopMicTest}
             disabled={!isMicActive}
             className="flex-1 flex items-center justify-center space-x-2 bg-white text-black border border-gray-400 font-bold py-3 px-4 rounded-lg shadow-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 transition duration-300 ease-in-out disabled:bg-gray-100 disabled:text-gray-400 disabled:border-gray-200 disabled:shadow-none"
           >
             <CircleStop className="h-5 w-5" />
             <span>Stop Mic Test</span>
-          </button>
+          </Button>
         </div>
       </div>
 
