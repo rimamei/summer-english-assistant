@@ -34,7 +34,7 @@ function RadioGroupItem({
         data-slot="radio-group-indicator"
         className="relative flex items-center justify-center"
       >
-        <CircleIcon className="fill-amber-600 dark:fill-accent absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2 transition-colors duration-300" />
+        <CircleIcon className="fill-accent dark:fill-accent absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2 transition-colors duration-300" />
       </RadioGroupPrimitive.Indicator>
     </RadioGroupPrimitive.Item>
   );
