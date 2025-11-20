@@ -24,6 +24,23 @@ export default defineConfig(({ command }) => ({
     outDir: 'dist',
     emptyOutDir: true,
     minify: 'esbuild',
+    reportCompressedSize: false, // Skip gzip size calculation (faster)
+    target: 'esnext', // Modern target = less transpilation
+    rollupOptions: {
+      output: {
+        manualChunks: (id) => {
+          // Split large vendor chunks for better caching
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom')) {
+              return 'react-vendor';
+            }
+            if (id.includes('@radix-ui')) {
+              return 'radix-ui';
+            }
+          }
+        },
+      },
+    },
   },
   esbuild: {
     drop: command === 'build' ? ['console', 'debugger'] : [], // Remove console in builds, keep in dev
