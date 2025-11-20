@@ -123,12 +123,13 @@ const FullTranslation = () => {
   const sanitizedHtml = useSafeMarkdown(translationText);
 
   return (
-    <span
+    <div
       style={{
         ...classes.contentText,
         color: isLightTheme ? '#374151' : '#e5e7eb',
         userSelect: 'text',
         cursor: 'text',
+        minHeight: '50px',
       }}
       onClick={e => e.stopPropagation()}
     >
@@ -142,14 +143,14 @@ const FullTranslation = () => {
         />
       ) : (
         <ChromeContent
-          isLoadingTranslator={isLoadingTranslator}
+          isLoadingTranslator={isLoadingTranslator && !sanitizedHtml}
           translatorStatus={translatorStatus}
           error={error}
           sanitizedHtml={sanitizedHtml}
           isLightTheme={isLightTheme}
         />
       )}
-    </span>
+    </div>
   );
 };
 

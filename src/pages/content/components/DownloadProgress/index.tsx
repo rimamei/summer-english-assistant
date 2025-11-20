@@ -14,10 +14,9 @@ const DownloadProgress = ({
       color: isLightTheme ? '#6b7280' : '#d1d5db',
       display: 'flex',
       alignItems: 'center',
-      gap: '8px',
     }}
   >
-    <div style={classes.spinner}></div>
+    <div style={{ ...classes.spinner, marginRight: '8px' }}></div>
     <div>
       {downloadingText} {progress}%
     </div>

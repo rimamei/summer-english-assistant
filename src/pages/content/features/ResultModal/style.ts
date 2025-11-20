@@ -10,7 +10,6 @@ export const classes = {
     padding: '4px',
     minWidth: '250px',
     maxWidth: '500px',
-    minHeight: '100px',
     zIndex: 2147483648,
     fontFamily: 'system-ui, -apple-system, sans-serif',
     overflow: 'hidden',

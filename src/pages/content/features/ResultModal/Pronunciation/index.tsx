@@ -158,6 +158,7 @@ const Pronunciation = () => {
         userSelect: 'text',
         cursor: 'text',
         lineHeight: '1.6',
+        minHeight: '50px'
       }}
       onClick={e => e.stopPropagation()}
     >

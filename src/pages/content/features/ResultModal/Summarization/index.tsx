@@ -177,6 +177,7 @@ const Summarization = () => {
         color: isLightTheme ? '#374151' : '#e5e7eb',
         userSelect: 'text',
         cursor: 'text',
+        minHeight: '50px'
       }}
       onClick={e => e.stopPropagation()}
     >
