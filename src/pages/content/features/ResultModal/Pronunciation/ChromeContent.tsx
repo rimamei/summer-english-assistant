@@ -1,7 +1,12 @@
 import { useI18n } from '@/hooks/useI18n';
 import type { PronunciationStatusItem } from '@/hooks/usePronunciation';
 import type { TPronunciationState } from '@/type/pronunciation';
-import { DownloadProgress, ErrorMessage, LoadingSkeleton } from '@/pages/content/components';
+import {
+  DownloadProgress,
+  ErrorMessage,
+  LoadingSkeleton,
+  NoContentMessage,
+} from '@/pages/content/components';
 import PronunciationDisplay from './PronunciationDisplay';
 
 interface ChromeContentProps {
@@ -37,15 +42,19 @@ const ChromeContent = (props: ChromeContentProps) => {
     return <ErrorMessage message={errorMsg} />;
   }
 
-  return (
-    <PronunciationDisplay
-      data={data}
-      accent={accent}
-      onSpeak={onSpeak}
-      isLightTheme={isLightTheme}
-      t={t}
-    />
-  );
+  if (data) {
+    return (
+      <PronunciationDisplay
+        data={data}
+        accent={accent}
+        onSpeak={onSpeak}
+        isLightTheme={isLightTheme}
+        t={t}
+      />
+    );
+  }
+
+  return <NoContentMessage message={t('no_explanation_available')} isLightTheme={isLightTheme} />;
 };
 
 export default ChromeContent;

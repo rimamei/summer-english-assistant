@@ -1,6 +1,11 @@
 import { useI18n } from '@/hooks/useI18n';
 import type { TranslatorStatusItem } from '@/hooks/useTranslator';
-import { DownloadProgress, ErrorMessage, LoadingSkeleton } from '@/pages/content/components';
+import {
+  DownloadProgress,
+  ErrorMessage,
+  LoadingSkeleton,
+  NoContentMessage,
+} from '@/pages/content/components';
 
 interface ChromeContentProps {
   isLoadingTranslator: boolean;
@@ -33,7 +38,19 @@ const ChromeContent = (props: ChromeContentProps) => {
     return <ErrorMessage message={errorMsg} />;
   }
 
-  return <span dangerouslySetInnerHTML={{ __html: sanitizedHtml || '' }} />;
+  if (sanitizedHtml) {
+    return (
+      <span
+        style={{
+          listStylePosition: 'outside',
+        }}
+        className="result-sanitized"
+        dangerouslySetInnerHTML={{ __html: sanitizedHtml || '' }}
+      />
+    );
+  }
+
+  return <NoContentMessage message={t('no_explanation_available')} isLightTheme={isLightTheme} />;
 };
 
 export default ChromeContent;

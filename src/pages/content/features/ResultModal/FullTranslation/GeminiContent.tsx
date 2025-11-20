@@ -1,4 +1,5 @@
-import { ErrorMessage, LoadingSkeleton } from '@/pages/content/components';
+import { useI18n } from '@/hooks/useI18n';
+import { ErrorMessage, LoadingSkeleton, NoContentMessage } from '@/pages/content/components';
 
 interface GeminiContentProps {
   isLoading: boolean;
@@ -10,7 +11,9 @@ interface GeminiContentProps {
 
 const GeminiContent = (props: GeminiContentProps) => {
   const { isLoading, error, translationText, sanitizedHtml, isLightTheme } = props;
-
+  
+  const { t } = useI18n();
+  
   if (isLoading && !translationText) {
     return <LoadingSkeleton isLightTheme={isLightTheme} />;
   }
@@ -20,10 +23,18 @@ const GeminiContent = (props: GeminiContentProps) => {
   }
 
   if (translationText) {
-    return <span dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />;
+    return (
+      <span
+        style={{
+          listStylePosition: 'outside',
+        }}
+        className="result-sanitized"
+        dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
+      />
+    );
   }
 
-  return null;
+  return <NoContentMessage message={t('no_explanation_available')} isLightTheme={isLightTheme} />;
 };
 
 export default GeminiContent;
