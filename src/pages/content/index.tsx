@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import Main from './main';
+import ErrorBoundary from '@/components/base/ErrorBoundary';
 import { initializeOriginTrial } from './utils/originTrial';
 import { injectFontPreconnects } from './styles';
 
@@ -60,7 +61,9 @@ const initializeApp = () => {
 
   root.render(
     <React.StrictMode>
-      <Main shadowRoot={shadowRoot} />
+      <ErrorBoundary>
+        <Main shadowRoot={shadowRoot} />
+      </ErrorBoundary>
     </React.StrictMode>
   );
 };
