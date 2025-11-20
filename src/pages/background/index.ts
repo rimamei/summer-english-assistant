@@ -24,7 +24,7 @@ chrome.runtime.onInstalled.addListener(details => {
 
     chrome.storage.local.set({
       preferences: JSON.stringify(preferenceData),
-      ext_status: false,
+      ext_status: true,
       settings: JSON.stringify(configurationData),
     });
   }
