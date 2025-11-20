@@ -86,8 +86,8 @@ export const usePrompt = () => {
           sessionRef.current = await window.LanguageModel.create({
             ...createOptions,
             signal,
-            monitor(m) {
-              m.addEventListener('downloadprogress', e => {
+            monitor(m: LanguageModelMonitor) {
+              m.addEventListener('downloadprogress', (e: any) => {
                 if (!signal.aborted) {
                   setPromptStatus({
                     status: 'downloading',

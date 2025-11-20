@@ -112,8 +112,8 @@ class PronunciationService {
         this.session = await window.LanguageModel.create({
           ...createOptions,
           signal,
-          monitor(m) {
-            m.addEventListener('downloadprogress', e => {
+          monitor(m: LanguageModelMonitor) {
+            m.addEventListener('downloadprogress', (e) => {
               if (!signal.aborted) {
                 PronunciationService.getInstance().notifyStatusChange({
                   status: 'downloading',

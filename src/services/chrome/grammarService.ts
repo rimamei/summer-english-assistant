@@ -98,8 +98,8 @@ class GrammarService {
         this.session = await window.LanguageModel.create({
           ...createOptions,
           signal,
-          monitor(m) {
-            m.addEventListener('downloadprogress', e => {
+          monitor(m: LanguageModelMonitor) {
+            m.addEventListener('downloadprogress', (e) => {
               if (!signal.aborted) {
                 GrammarService.getInstance().notifyStatusChange({
                   status: 'downloading',
