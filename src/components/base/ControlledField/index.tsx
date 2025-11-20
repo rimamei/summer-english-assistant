@@ -7,7 +7,7 @@ import {
   type FieldPathValue,
   type FieldValues,
 } from 'react-hook-form';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils/style';
 import { Field, FieldError as FieldErrorComponent, FieldLabel } from '@/components/ui/field';
 
 type FieldProps<

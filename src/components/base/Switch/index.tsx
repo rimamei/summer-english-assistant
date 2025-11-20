@@ -1,6 +1,6 @@
 import { Label } from '@/components/ui/label';
 import { Switch as SwitchUI } from '@/components/ui/switch';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils/style';
 
 interface SwitchProps {
   name?: string;

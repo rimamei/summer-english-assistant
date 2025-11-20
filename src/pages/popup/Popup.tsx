@@ -6,7 +6,7 @@ import { applyTheme } from './utils';
 import { useStorage } from '@/hooks/useStorage';
 import { Separator } from '@/components/ui/separator';
 import Sound from './Sound';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils/style';
 
 function Popup() {
   const [menu, setMenu] = useState('home');
