@@ -1,45 +1,116 @@
-
-import * as React from "react"
-import { Controller } from "react-hook-form"
-import type { FieldValues, UseFormReturn, ControllerRenderProps, ControllerFieldState, Path } from "react-hook-form"
+import React from 'react';
 import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldLabel,
-} from "@/components/ui/field"
+  Controller,
+  type Control,
+  type FieldError,
+  type FieldPath,
+  type FieldPathValue,
+  type FieldValues,
+} from 'react-hook-form';
+import { cn } from '@/utils/style';
+import { Field, FieldError as FieldErrorComponent, FieldLabel } from '@/components/ui/field';
 
-interface ControlledFieldProps<T extends FieldValues> {
-  form: UseFormReturn<T>;
-  name: Path<T>;
+type FieldProps<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  T extends React.ComponentType<any> = React.ComponentType<any>,
+> = Omit<React.ComponentProps<T>, ''> & {
+  component: T;
+  control?: Control<TFieldValues>;
+  componentRef?: React.ComponentProps<T>['ref'];
+  externalError?: string;
+  fieldClassName?: string;
+  disableDefaultOnChange?: boolean;
+  positionError?: 'absolute';
+  name: TName;
+  renderError?: (
+    error?: FieldError | { [key: string]: FieldError },
+    value?: FieldPathValue<TFieldValues, TName>,
+    externalError?: string
+  ) => React.JSX.Element;
+  shouldUnregister?: boolean;
   label?: string;
-  htmlId: string;
-  description?: string;
-  component: (field: ControllerRenderProps<T, Path<T>>, fieldState: ControllerFieldState) => React.ReactNode;
-  className?: string;
-}
+};
 
-function ControlledField<T extends FieldValues>({
-  form,
-  name,
-  label,
-  htmlId,
-  description,
+function ControlledField<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  T extends React.ComponentType<any> = React.ComponentType<any>,
+>({
   component,
-  className,
-}: ControlledFieldProps<T>) {
+  name,
+  shouldUnregister = false,
+  positionError,
+  control,
+  renderError,
+  externalError,
+  fieldClassName,
+  disableDefaultOnChange = false,
+  label,
+  ...restProps
+}: FieldProps<TFieldValues, TName, T>) {
+  // Throw error if not provided name or component, or name & component is falsy
+  if (!name || !component) {
+    throw new Error('ControlledField component requires "name" and "component" props.');
+  }
+
+  const generateError = (
+    error?: FieldError | { [key: string]: FieldError }
+  ): string | undefined => {
+    if (!error) return externalError;
+
+    // Handle standard FieldError with message
+    if ('message' in error && typeof error.message === 'string') {
+      return error.message;
+    }
+
+    // Handle nested errors (e.g., for select fields with {value: {message}, label: {message}})
+    const nestedError = error as { [key: string]: FieldError };
+    if (nestedError.value?.message) {
+      return nestedError.value.message as string;
+    }
+    if (nestedError.label?.message) {
+      return nestedError.label.message as string;
+    }
+
+    return externalError;
+  };
   return (
     <Controller
+      control={control}
       name={name}
-      control={form.control}
-      render={({ field, fieldState }) => (
-        <Field className={className} data-invalid={fieldState.invalid}>
-          {label && <FieldLabel htmlFor={htmlId}>{label}</FieldLabel>}
-          {component(field, fieldState)}
-          {description && <FieldDescription>{description}</FieldDescription>}
-          {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-        </Field>
-      )}
+      shouldUnregister={shouldUnregister}
+      render={({ field, fieldState }) => {
+        const { invalid, error } = fieldState;
+        const { onChange, onBlur } = field;
+        return (
+          <Field className={cn('field w-full', positionError && 'relative', fieldClassName)}>
+            {label && <FieldLabel htmlFor={name + 'Id'}>{label}</FieldLabel>}
+            {React.createElement(component, {
+              isError: (error && invalid) || externalError,
+              ...restProps,
+              field,
+              fieldState,
+              onChange: (e: React.ChangeEvent | FieldPathValue<TFieldValues, TName>) => {
+                if (!disableDefaultOnChange) {
+                  onChange(e);
+                }
+                restProps?.onChange?.(e);
+              },
+              onBlur: (e: React.FocusEvent) => {
+                onBlur();
+                restProps?.onBlur?.(e);
+              },
+            })}
+            {(externalError || (error && invalid)) &&
+              (renderError?.(error, field.value, externalError) || (
+                <FieldErrorComponent>{generateError(error)}</FieldErrorComponent>
+              ))}
+          </Field>
+        );
+      }}
     />
   );
 }

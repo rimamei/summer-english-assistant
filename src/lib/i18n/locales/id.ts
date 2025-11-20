@@ -1,0 +1,92 @@
+export const id = {
+  vocabulary: 'Kosakata',
+  level: 'Tingkat',
+  type: 'Tipe',
+  something_went_wrong: 'Terjadi kesalahan.',
+  // Popup - Extension Status
+  extension_status: 'Status Ekstensi',
+  enabled: 'Aktif',
+
+  // Popup - Preferences
+  preferences: 'Preferensi',
+  theme: 'Tema',
+  light: 'Terang',
+  dark: 'Gelap',
+  language: 'Bahasa',
+  apply: 'Terapkan',
+  saved: 'Tersimpan!',
+
+  // Popup - Configuration
+  configuration: 'Konfigurasi',
+  mode: 'Mode',
+  pronunciation: 'Pelafalan',
+  grammar: 'Tata Bahasa',
+  translation: 'Terjemahan',
+  summarizer: 'Ringkasan',
+  selector: 'Seleksi',
+  word: 'Kata',
+  sentence: 'Kalimat',
+  context: 'Konteks',
+  accent: 'Aksen',
+  american: 'Amerika',
+  british: 'Inggris',
+  summarizer_type: 'Tipe',
+  summarizer_length: 'Panjang',
+  headline: 'Judul',
+  key_points: 'Poin Penting',
+  teaser: 'Cuplikan',
+  tldr: 'Singkatnya',
+  short: 'Pendek',
+  medium: 'Sedang',
+  long: 'Panjang',
+  save_activate: 'Simpan & Aktifkan',
+  api_downloading: 'Model sedang diunduh...',
+  api_error_default: 'Terjadi kesalahan pada penerjemah.',
+  api_ready: 'Model siap digunakan.',
+
+  // Content Script - Translation Modal
+  loading: 'Memuat',
+  downloading: 'Mengunduh',
+  translation_label: 'Terjemahan:',
+  no_translation_available: 'Terjemahan tidak tersedia',
+  no_explanation_available: 'Penjelasan tidak tersedia',
+  no_summary_available: 'Ringkasan tidak tersedia',
+  explanation: 'Penjelasan',
+  correction: 'Koreksi',
+
+  // Content Script - Pronunciation
+  definition: 'Definisi:',
+  synonyms: 'Sinonim:',
+  sound_by_sound: 'Bunyi per Bunyi:',
+  as_in: 'seperti dalam',
+
+  // Content Script - Mode Modal
+  enable_text_translation: 'Highlight Teks',
+  capture_screenshot: 'Ambil Screenshot',
+  extension_off: 'Nonaktifkan Ekstensi',
+
+  // Language Names
+  english: 'Bahasa Inggris',
+  indonesia: 'Bahasa Indonesia',
+  spanish: 'Bahasa Spanyol',
+  japanese: 'Bahasa Jepang',
+  french: 'Bahasa Prancis',
+  german: 'Bahasa Jerman',
+  chinese: 'Bahasa Mandarin',
+  korean: 'Bahasa Korea',
+  portuguese: 'Bahasa Portugis',
+  italian: 'Bahasa Italia',
+  arabic: 'Bahasa Arab',
+  russian: 'Bahasa Rusia',
+  dutch: 'Bahasa Belanda',
+  turkish: 'Bahasa Turki',
+  hindi: 'Bahasa Hindi',
+  vietnamese: 'Bahasa Vietnam',
+
+  // Common
+  close: 'Tutup',
+  cancel: 'Batal',
+  ok: 'OK',
+  yes: 'Ya',
+  no: 'Tidak',
+};

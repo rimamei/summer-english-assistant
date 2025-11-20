@@ -3,4 +3,4 @@ export const splitIntoSentences = (text: string): string => {
   // It's a basic splitter and can be improved, but it's a good start.
   const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
   return sentences.map(s => s.trim())[0]; // Trim whitespace
-}
+};

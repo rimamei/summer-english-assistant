@@ -1,10 +1,10 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import { pronunciationService } from '@/services/pronunciationService';
-import type { PronunciationAnalysis } from '@/services/pronunciationService';
+import { pronunciationService } from '@/services/chrome/pronunciationService';
+import type { PronunciationAnalysis } from '@/services/chrome/pronunciationService';
 
 export type { PronunciationAnalysis };
 
-interface PronunciationStatusItem {
+export interface PronunciationStatusItem {
   status: 'idle' | 'checking' | 'downloading' | 'ready' | 'error';
   progress?: number;
   error?: string;
@@ -18,15 +18,18 @@ interface AnalyzeWordParams {
 
 export const usePronunciation = () => {
   const [pronunciationStatus, setPronunciationStatus] = useState<PronunciationStatusItem>({
-    status: 'idle'
+    status: 'idle',
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  const isPronunciationSupported = useMemo(() => pronunciationService.isPronunciationSupported(), []);
+  const isPronunciationSupported = useMemo(
+    () => pronunciationService.isPronunciationSupported(),
+    []
+  );
 
   // Subscribe to status changes from the singleton service
   useEffect(() => {
-    const unsubscribe = pronunciationService.subscribeToStatus((status) => {
+    const unsubscribe = pronunciationService.subscribeToStatus(status => {
       setPronunciationStatus(status);
     });
 
@@ -36,8 +39,11 @@ export const usePronunciation = () => {
   }, []);
 
   const analyzeWord = useCallback(
-    async ({ word, sourceLanguage, targetLanguage }: AnalyzeWordParams
-    ): Promise<PronunciationAnalysis> => {
+    async ({
+      word,
+      sourceLanguage,
+      targetLanguage,
+    }: AnalyzeWordParams): Promise<PronunciationAnalysis> => {
       setIsLoading(true);
 
       try {
@@ -51,7 +57,7 @@ export const usePronunciation = () => {
         throw new Error(`Failed to analyze pronunciation: ${errorMessage}`);
       }
     },
-    [],
+    []
   );
 
   const abortAnalysis = useCallback(() => {

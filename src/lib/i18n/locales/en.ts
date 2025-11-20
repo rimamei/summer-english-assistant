@@ -1,0 +1,92 @@
+export const en = {
+  vocabulary: 'Vocabulary',
+  level: 'Level',
+  type: 'Type',
+  something_went_wrong: 'Something went wrong.',
+  // Popup - Extension Status
+  extension_status: 'Extension Status',
+  enabled: 'Enabled',
+
+  // Popup - Preferences
+  preferences: 'Preferences',
+  theme: 'Theme',
+  light: 'Light',
+  dark: 'Dark',
+  language: 'Language',
+  apply: 'Apply',
+  saved: 'Saved!',
+
+  // Popup - Configuration
+  configuration: 'Configuration',
+  mode: 'Mode',
+  pronunciation: 'Pronunciation',
+  grammar: 'Grammar',
+  translation: 'Translation',
+  summarizer: 'Summarizer',
+  selector: 'Selector',
+  word: 'Word',
+  sentence: 'Sentence',
+  context: 'Context',
+  accent: 'Accent',
+  american: 'American',
+  british: 'British',
+  summarizer_type: 'Type',
+  summarizer_length: 'Length',
+  headline: 'Headline',
+  key_points: 'Key Points',
+  teaser: 'Teaser',
+  tldr: 'TL;DR',
+  short: 'Short',
+  medium: 'Medium',
+  long: 'Long',
+  save_activate: 'Save & Activate',
+  api_downloading: 'Model is being downloaded...',
+  api_error_default: 'An error occurred with the translator.',
+  api_ready: 'Model is ready to use.',
+
+  // Content Script - Translation Modal
+  loading: 'Loading',
+  downloading: 'Downloading',
+  translation_label: 'Translation:',
+  no_translation_available: 'No translation available',
+  no_explanation_available: 'No explanation available',
+  no_summary_available: 'No summary available',
+  explanation: 'Explanation',
+  correction: 'Correction',
+
+  // Content Script - Pronunciation
+  definition: 'Definition:',
+  synonyms: 'Synonyms:',
+  sound_by_sound: 'Sound by Sound:',
+  as_in: 'as in',
+
+  // Content Script - Mode Modal
+  enable_text_translation: 'Highlight',
+  capture_screenshot: 'Screenshot',
+  extension_off: 'Disable Extension',
+
+  // Language Names
+  english: 'English',
+  indonesia: 'Indonesia',
+  spanish: 'Spanish',
+  japanese: 'Japanese',
+  french: 'French',
+  german: 'German',
+  chinese: 'Chinese',
+  korean: 'Korean',
+  portuguese: 'Portuguese',
+  italian: 'Italian',
+  arabic: 'Arabic',
+  russian: 'Russian',
+  dutch: 'Dutch',
+  turkish: 'Turkish',
+  hindi: 'Hindi',
+  vietnamese: 'Vietnamese',
+
+  // Common
+  close: 'Close',
+  cancel: 'Cancel',
+  ok: 'OK',
+  yes: 'Yes',
+  no: 'No',
+};

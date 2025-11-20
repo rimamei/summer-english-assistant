@@ -1,6 +1,7 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useExtension } from './useContext';
 import { useNotifications } from './useNotifications';
+import { useStorage } from '@/hooks/useStorage';
 
 interface useExtensionModeProps {
   mode: 'highlight' | 'screenshot' | 'disabled';
@@ -14,8 +15,17 @@ interface useExtensionModeProps {
 }
 
 export function useExtensionMode(): useExtensionModeProps {
+  const { preferences } = useStorage();
+
   const { state, setState } = useExtension();
   const { showNotification } = useNotifications();
+
+  useEffect(() => {
+    if (preferences?.agent === 'chrome' && state.mode === 'screenshot') {
+      setState(prev => ({ ...prev, mode: 'highlight' }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preferences]);
 
   const enableHighlightMode = useCallback(() => {
     setState(prev => ({

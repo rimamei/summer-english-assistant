@@ -51,34 +51,71 @@ const loadingDotsKeyframes = `
     .loading-dots {
       font-size: 16px;
     }
-    
+
     .loading-dots span {
       display: inline-block;
       animation: loadingDots 1.4s infinite;
     }
-    
+
     .loading-dots span:nth-child(1) {
       animation-delay: 0s;
     }
-    
+
     .loading-dots span:nth-child(2) {
       animation-delay: 0.2s;
     }
-    
+
     .loading-dots span:nth-child(3) {
       animation-delay: 0.4s;
     }
   `;
 
+const pulseBorderKeyframes = `
+    @keyframes pulse-border {
+      0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.8;
+        transform: scale(1.005);
+      }
+    }
+  `;
+
+const spinKeyframes = `
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  `;
+
 // Google Fonts CSS import
 const googleFontsCSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 `;
 
 // Base font styles using the imported font
 const baseFontStyles = `
   * {
-    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+  }
+`;
+
+const resultModalStyles = `
+  .result-sanitized ul {
+     margin: 0 !important;
+     padding-left: 0 !important;
+  }
+
+  .result-sanitized li {
+    margin: 0.2em 0 !important;
+    padding: 0 !important;
+    line-height: 1.3 !important;
   }
 `;
 
@@ -124,7 +161,11 @@ export const injectStyles = (targetRoot: ShadowRoot | null) => {
     baseFontStyles +
     keyframes +
     translationKeyframes +
-    modaAppearKeyframes + loadingDotsKeyframes;
+    modaAppearKeyframes +
+    loadingDotsKeyframes +
+    pulseBorderKeyframes +
+    spinKeyframes +
+    resultModalStyles;
 
   targetRoot.appendChild(style);
 };

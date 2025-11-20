@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import Main from './main';
+import ErrorBoundary from '@/components/base/ErrorBoundary';
 import { initializeOriginTrial } from './utils/originTrial';
 import { injectFontPreconnects } from './styles';
 
@@ -24,7 +25,7 @@ const createAppContainer = () => {
     height: 100vh !important;
     pointer-events: none !important;
     z-index: 2147483647 !important;
-    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
   `;
 
   document.body.appendChild(container);
@@ -60,7 +61,9 @@ const initializeApp = () => {
 
   root.render(
     <React.StrictMode>
-      <Main shadowRoot={shadowRoot} />
+      <ErrorBoundary>
+        <Main shadowRoot={shadowRoot} />
+      </ErrorBoundary>
     </React.StrictMode>
   );
 };

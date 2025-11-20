@@ -26,5 +26,6 @@
     }
   ],
 
-  "permissions": ["storage", "activeTab"]
+  "permissions": ["storage", "activeTab", "tabs"],
+  "host_permissions": ["<all_urls>"]
 }

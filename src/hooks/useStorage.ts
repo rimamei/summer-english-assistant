@@ -1,28 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
-
-export interface SettingsData {
-  source_lang: string;
-  target_lang: string;
-  mode: string;
-  selector: string;
-  accent: string;
-}
-
-export interface IPreferences {
-  theme: 'light' | 'dark';
-  ext_status: boolean;
-  lang: string;
-}
-
-const defaultPreferences: IPreferences = {
-  lang: 'en',
-  theme: 'light',
-  ext_status: false,
-};
+import { getLocalStorage, getLocalStorageMultiple } from '@/utils/storage';
+import type { IConfiguration, IPreferences } from '@/type';
 
 export const useStorage = () => {
-  const [settingsData, setSettingsData] = useState<SettingsData | undefined>();
-  const [preferencesData, setPreferencesData] = useState<IPreferences>(defaultPreferences);
+  const [settingsData, setSettingsData] = useState<IConfiguration | undefined>();
+  const [preferencesData, setPreferencesData] = useState<IPreferences>();
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,11 +15,14 @@ export const useStorage = () => {
         return null;
       }
 
-      const storageData = await chrome.storage.local.get(['preferences', 'ext_status']);
+      const storageData = await getLocalStorageMultiple<{
+        preferences: IPreferences;
+        ext_status: boolean;
+      }>(['preferences', 'ext_status']);
 
-      if (storageData.preferences || storageData?.ext_status) {
-        const parsedPreferences = storageData.preferences ? JSON.parse(storageData.preferences) : {};
-        return { ...parsedPreferences, ext_status: storageData?.ext_status || false };
+      if (storageData.preferences || storageData?.ext_status !== undefined) {
+        const preferences = storageData.preferences || ({} as IPreferences);
+        return { ...preferences, ext_status: storageData?.ext_status || false };
       }
 
       return null;
@@ -47,17 +32,16 @@ export const useStorage = () => {
     }
   }, []);
 
-  const getSettingStorage = useCallback(async (): Promise<SettingsData | null> => {
+  const getSettingStorage = useCallback(async (): Promise<IConfiguration | null> => {
     try {
       if (!chrome?.storage?.local) {
         return null;
       }
 
-      const storageData = await chrome.storage.local.get(['settings']);
+      const settings = await getLocalStorage<IConfiguration>('settings');
 
-      if (storageData.settings) {
-        const parsedSettings = JSON.parse(storageData.settings);
-        return parsedSettings;
+      if (settings) {
+        return settings;
       }
 
       return null;
@@ -102,7 +86,6 @@ export const useStorage = () => {
     if (!chrome?.storage?.onChanged) return;
 
     const handleStorageChange = (changes: { [key: string]: chrome.storage.StorageChange }) => {
-
       if (changes.settings) {
         const newSettings = JSON.parse(changes.settings.newValue || '{}');
         setSettingsData(newSettings);
@@ -110,17 +93,39 @@ export const useStorage = () => {
 
       if (changes.theme) {
         const newTheme = changes.theme.newValue || 'light';
-        setPreferencesData((prev) => ({ ...prev, theme: newTheme }));
+        setPreferencesData(prev => {
+          if (!prev) return undefined;
+          return {
+            ...prev,
+            theme: newTheme,
+            ext_status: prev.ext_status,
+            lang: prev.lang,
+            agent: prev.agent,
+            model: prev.model,
+            apiKey: prev.apiKey,
+          };
+        });
       }
 
       if (changes.preferences) {
         const newPreferences = JSON.parse(changes.preferences.newValue || '{}');
-        setPreferencesData((prev) => ({ ...prev, ...newPreferences }));
+        setPreferencesData(prev => ({ ...prev, ...newPreferences }));
       }
 
       if (changes.ext_status) {
         const newStatus = changes.ext_status.newValue || false;
-        setPreferencesData((prev) => ({ ...prev, ext_status: newStatus }));
+        setPreferencesData(prev => {
+          if (!prev) return undefined;
+          return {
+            ...prev,
+            ext_status: newStatus,
+            theme: prev.theme,
+            lang: prev.lang,
+            agent: prev.agent,
+            model: prev.model,
+            apiKey: prev.apiKey,
+          };
+        });
       }
     };
 

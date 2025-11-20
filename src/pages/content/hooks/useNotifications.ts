@@ -7,7 +7,6 @@ interface UseNotificationsReturn {
 
 export function useNotifications(): UseNotificationsReturn {
   const showNotification = useCallback((message: string, color: string) => {
-    
     const existing = document.querySelector('[data-summer-notification]');
     if (existing) {
       existing.remove();

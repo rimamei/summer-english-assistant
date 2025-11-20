@@ -1,5 +1,3 @@
-import ControlledField from '@/components/base/ControlledField';
-import Select from '@/components/base/Select';
 import { Button } from '@/components/ui/button';
 import { FieldGroup } from '@/components/ui/field';
 import { CheckCircle } from 'lucide-react';
@@ -8,46 +6,45 @@ import { useForm } from 'react-hook-form';
 import { validation } from './validation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type z from 'zod';
-import Switch from '@/components/base/Switch';
 import { useI18n } from '@/hooks/useI18n';
 import { useTranslatedOptions } from '@/hooks/useTranslatedOptions';
 import type { TTheme } from '@/type/theme';
 import { applyTheme } from '../utils';
 import { useStorage } from '@/hooks/useStorage';
+import { agentOptions, modelOptions } from '@/constants/agent';
+import { initialValues } from './constant';
+import { setLocalStorage } from '@/utils/storage';
+import { Input, Form, ControlledField, Select, Switch } from '@/components/base';
+import { buildFormData, buildStorageData, hasValidPreferences } from './utils';
 
 const PreferencesForm = () => {
   const { t, changeLanguage } = useI18n();
   const { preferences, enableExtension } = useStorage();
-
   const {
     themeOptions: translatedThemeOptions,
     languageExtensionOptions: translatedLanguageOptions,
   } = useTranslatedOptions();
+
   const [isLoading, setIsLoading] = useState(true);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   const form = useForm<z.infer<typeof validation>>({
     resolver: zodResolver(validation),
-    defaultValues: {
-      lang: 'en',
-      theme: 'light',
-    },
+    defaultValues: initialValues,
   });
 
+  // Helper: Show success message temporarily
+  const showSuccessMessage = () => {
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 2000);
+  };
+
+  // Load saved preferences into form
   const loadSettings = useCallback(async () => {
     try {
-      // Check if we have actual saved values (not just empty object)
-      const hasValidData = preferences && preferences.lang && preferences.theme;
-
-      if (hasValidData) {
-        // Create new data object with loaded values and defaults
-        const loadedData = {
-          lang: preferences.lang || 'en',
-          theme: preferences.theme || 'light',
-        };
-
-        // Reset form with loaded data (this updates both values and default values)
-        form.reset(loadedData);
+      if (hasValidPreferences(preferences!)) {
+        const formData = buildFormData(preferences!);
+        form.reset(formData);
       }
     } catch {
       // Silently handle storage errors
@@ -56,57 +53,33 @@ const PreferencesForm = () => {
     }
   }, [preferences, form]);
 
-  // Load settings from Chrome storage on component mount
   useEffect(() => {
     if (preferences) {
       loadSettings();
     }
   }, [preferences, form, loadSettings]);
 
+  // Save preferences to storage and apply changes
   const onSubmit = async (data: z.infer<typeof validation>) => {
-    try {
-      // Check if chrome.storage is available
-      if (!chrome?.storage?.local) {
-        form.reset(data);
-        setSaveSuccess(true);
-        setTimeout(() => {
-          setSaveSuccess(false);
-        }, 2000);
-        return;
-      }
-
-      // Save to Chrome local storage
-      const storageData = {
-        theme: data.theme,
-        lang: data.lang,
-      };
-
-      await chrome.storage.local.set({
-        preferences: JSON.stringify(storageData),
-      });
-      applyTheme(data.theme as TTheme);
-
-      // Immediately change the language for real-time UI updates
-      changeLanguage(storageData.lang as 'en' | 'id' | 'es' | 'ja');
-
-      // Reset form dirty state after successful save
+    // Fallback for when chrome.storage is not available
+    if (!chrome?.storage?.local) {
       form.reset(data);
-
-      // Show success feedback
-      setSaveSuccess(true);
-
-      // Clear success message after 2 seconds
-      setTimeout(() => {
-        setSaveSuccess(false);
-      }, 2000);
-    } catch {
-      // Silently handle save errors
-      // Could add user-facing error notification here in the future
+      showSuccessMessage();
+      return;
     }
+
+    const storageData = buildStorageData(data);
+
+    await setLocalStorage('preferences', storageData);
+    applyTheme(data.theme as TTheme);
+    changeLanguage(storageData.lang);
+
+    form.reset(data);
+    showSuccessMessage();
   };
 
-  const handleSaveStatus = async (val: boolean) => {
-    await chrome.storage.local.set({ ext_status: val });
+  const handleToggleExtension = async (enabled: boolean) => {
+    await setLocalStorage('ext_status', enabled);
   };
 
   return (
@@ -118,7 +91,7 @@ const PreferencesForm = () => {
         <Switch
           label={t('enabled')}
           checked={!!enableExtension}
-          onCheckedChange={handleSaveStatus}
+          onCheckedChange={handleToggleExtension}
           isRightLabel
         />
       </div>
@@ -126,77 +99,71 @@ const PreferencesForm = () => {
         <h3 className="text-base text-gray-900 dark:text-gray-100 font-semibold mb-6 transition-colors duration-500">
           {t('preferences')}
         </h3>
-        <form id="form-rhf-demo" onSubmit={form.handleSubmit(onSubmit)}>
-          <FieldGroup>
-            <ControlledField
-              form={form}
-              label={t('theme')}
-              name="theme"
-              htmlId="theme"
-              component={(field, fieldState) => (
-                <Select
-                  field={field}
-                  fieldState={fieldState}
-                  className="w-full"
-                  options={translatedThemeOptions}
-                  defaultValue="light"
-                  onValueChange={(value) => {
-                    form.setValue('theme', value, {
-                      shouldDirty: true,
-                      shouldValidate: true,
-                    });
-                  }}
-                />
-              )}
-            />
-
-            <div className="w-full">
+        <Form form={form} initialValues={initialValues} onSubmit={onSubmit}>
+          {({ formState: { isValid, isDirty }, getValues }) => (
+            <FieldGroup>
               <ControlledField
-                form={form}
+                name="agent"
+                className="col-span-5"
+                label="Agent"
+                options={agentOptions}
+                component={Select}
+              />
+
+              {getValues('agent') === 'gemini' && (
+                <>
+                  <ControlledField
+                    name="model"
+                    className="col-span-5"
+                    label="Model"
+                    component={Select}
+                    options={modelOptions[getValues('agent') as 'gemini']}
+                  />
+                  <ControlledField
+                    name="apiKey"
+                    className="col-span-5"
+                    label="API Key"
+                    component={Input}
+                    placeholder="Enter your API Key"
+                    type="password"
+                  />
+                </>
+              )}
+
+              <ControlledField
+                label={t('theme')}
+                name="theme"
+                component={Select}
+                options={translatedThemeOptions}
+              />
+
+              <ControlledField
                 name="lang"
-                htmlId="lang"
                 className="col-span-5"
                 label={t('language')}
-                component={(field, fieldState) => (
-                  <Select
-                    field={field}
-                    fieldState={fieldState}
-                    options={translatedLanguageOptions}
-                    defaultValue="en"
-                    className="w-full"
-                    onValueChange={(value) => {
-                      form.setValue('lang', value, {
-                        shouldDirty: true,
-                        shouldValidate: true,
-                      });
-                    }}
-                  />
-                )}
+                options={translatedLanguageOptions}
+                component={Select}
               />
-            </div>
 
-            <div className="flex justify-end">
-              <Button
-                type="submit"
-                disabled={
-                  !form.formState.isDirty ||
-                  !form.formState.isValid ||
-                  isLoading
-                }
-                className={saveSuccess ? 'bg-green-600 hover:bg-green-700' : ''}
-              >
-                {saveSuccess ? (
-                  <>
-                    <CheckCircle className="w-4 h-4 mr-2" />
-                    {t('saved')}
-                  </>
-                ) : (
-                  <>{t('apply')}</>
-                )}
-              </Button>
-            </div>
-          </FieldGroup>
-        </form>
+              <div className="flex justify-end">
+                <Button
+                  type="submit"
+                  disabled={!isDirty || !isValid || isLoading}
+                  className={saveSuccess ? 'bg-green-600 hover:bg-green-700' : ''}
+                >
+                  {saveSuccess ? (
+                    <>
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      {t('saved')}
+                    </>
+                  ) : (
+                    <>{t('apply')}</>
+                  )}
+                </Button>
+              </div>
+            </FieldGroup>
+          )}
+        </Form>
       </div>
     </>
   );

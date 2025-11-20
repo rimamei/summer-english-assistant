@@ -1,8 +1,8 @@
-import * as React from "react"
-import * as RadioGroupPrimitive from "@radix-ui/react-radio-group"
-import { CircleIcon } from "lucide-react"
+import * as React from 'react';
+import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
+import { CircleIcon } from 'lucide-react';
 
-import { cn } from "@/lib/utils"
+import { cn } from '@/utils/style';
 
 function RadioGroup({
   className,
@@ -11,10 +11,10 @@ function RadioGroup({
   return (
     <RadioGroupPrimitive.Root
       data-slot="radio-group"
-      className={cn("grid gap-3", className)}
+      className={cn('grid gap-3', className)}
       {...props}
     />
-  )
+  );
 }
 
 function RadioGroupItem({
@@ -25,7 +25,7 @@ function RadioGroupItem({
     <RadioGroupPrimitive.Item
       data-slot="radio-group-item"
       className={cn(
-        "border-gray-300 dark:border-zinc-600 text-logo dark:text-logo bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 focus-visible:border-logo dark:focus-visible:border-logo focus-visible:ring-logo/20 dark:focus-visible:ring-amber-400/30 aria-invalid:ring-red-500/20 dark:aria-invalid:ring-red-400/30 aria-invalid:border-red-500 dark:aria-invalid:border-red-400 aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-all duration-300 outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:bg-gray-200 dark:disabled:bg-gray-700",
+        'border-gray-300 dark:border-zinc-600 text-accent dark:text-accent bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 focus-visible:border-accent dark:focus-visible:border-accent focus-visible:ring-accent/20 dark:focus-visible:ring-amber-400/30 aria-invalid:ring-red-500/20 dark:aria-invalid:ring-red-400/30 aria-invalid:border-red-500 dark:aria-invalid:border-red-400 aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-all duration-300 outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:bg-gray-200 dark:disabled:bg-gray-700',
         className
       )}
       {...props}
@@ -34,10 +34,10 @@ function RadioGroupItem({
         data-slot="radio-group-indicator"
         className="relative flex items-center justify-center"
       >
-        <CircleIcon className="fill-amber-600 dark:fill-logo absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2 transition-colors duration-300" />
+        <CircleIcon className="fill-accent dark:fill-accent absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2 transition-colors duration-300" />
       </RadioGroupPrimitive.Indicator>
     </RadioGroupPrimitive.Item>
-  )
+  );
 }
 
-export { RadioGroup, RadioGroupItem }
+export { RadioGroup, RadioGroupItem };
