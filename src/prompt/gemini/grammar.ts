@@ -25,8 +25,8 @@ Follow this EXACT format (start directly with Pattern, no introduction):
 * **[word2]** ([type] - [${targetLanguage}])
 
 **Rules:**
-* [rule 1 - one short sentence]
-* [rule 2 - one short sentence]
+* [rule 1 - one short sentence in ${targetLanguage}]
+* [rule 2 - one short sentence in ${targetLanguage}]
 
 **Examples:**
 * ✅ [short correct example]
